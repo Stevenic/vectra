@@ -7,4 +7,89 @@ Keep in mind that your entire Vectra index is loaded into memory so it's not wel
 
 Pinecone style namespaces aren't directly supported but you could easily mimic them by creating a separate Vectra index (and folder) for each namespace.
 
-Sample code and the actual code coming the week. GPT and I are still writting it :)
+## Installation
+
+```
+$ npm install vectra
+```
+
+## Usage
+
+First create an instance of `LocalIndex` with the path to the folder where you want you're items stored:
+
+```typescript
+import { LocalIndex } from 'vectra';
+
+const index = new LocalIndex(path.join(__dirname, '..', 'index'));
+```
+
+Next, from inside an async function, create your index:
+
+```typescript
+if (!await index.isIndexCreated()) {
+    await index.createIndex();
+}
+```
+
+Add some items to your index:
+
+```typescript
+import { OpenAIApi, Configuration } from 'openai';
+
+const configuration = new Configuration({
+    apiKey: `<YOUR_KEY>`,
+});
+
+const api = new OpenAIApi(configuration);
+
+async function getVector(text: string) {
+    const response = await api.createEmbedding({
+        'model': 'text-embedding-ada-002',
+        'input': text,
+    });
+    return response.data.data[0].embedding;
+}
+
+async function addItem(text: string) {
+    await index.insertItem({
+        vector: await getVector(text),
+        metadata: { text }
+    });
+}
+
+// Add items
+await addItem('apple');
+await addItem('oranges');
+await addItem('red');
+await addItem('blue');
+```
+
+Then query for items:
+
+```typescript
+async function query(text: string) {
+    const vector = await getVector(input);
+    const results = await index.queryItems(vector, 3);
+    if (results.length > 0) {
+        for (const result of results) {
+            console.log(`[${result.score}] ${result.item.metadata.text}`);
+        }
+    } else {
+        console.log(`No results found.`);
+    }
+}
+
+await query('green');
+/*
+[0.9036569942401076] blue
+[0.8758153664568566] red
+[0.8323828606103998] apple
+*/
+
+await query('banana');
+/*
+[0.9033128691220631] apple
+[0.8493374123092652] oranges
+[0.8415324469533297] blue
+*/
+```
