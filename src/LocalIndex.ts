@@ -3,10 +3,6 @@ import * as path from 'path';
 import { v4 } from 'uuid';
 import { ItemSelector } from './ItemSelector';
 
-export interface LocalIndexConfig {
-    folderPath: string;
-}
-
 export interface CreateIndexConfig {
     version: number;
     deleteIfExists?: boolean;
@@ -23,12 +19,17 @@ export interface IndexStats {
     items: number;
 }
 
-export interface IndexItem {
+export interface IndexItem<TMetadata = Record<string,MetadataTypes>> {
     id: string;
-    metadata: Record<string,MetadataTypes>;
+    metadata: TMetadata;
     vector: number[];
     norm: number;
     metadataFile?: string;
+}
+
+export interface QueryResult<TMetadata = Record<string,MetadataTypes>> {
+    item: IndexItem<TMetadata>;
+    score: number;
 }
 
 export interface MetadataFilter {
@@ -94,16 +95,16 @@ export type MetadataTypes = number|string|boolean;
  * Each index is a folder on disk containing an index.json file and an optional set of metadata files.
  */
 export class LocalIndex {
-    private readonly _config: LocalIndexConfig;
+    private readonly _folderPath: string;
     private _data?: IndexData;
     private _update?: IndexData;
 
     /**
      * Creates a new instance of LocalIndex.
-     * @param config - Index configuration
+     * @param folderPath - Path to the index folder
      */
-    public constructor(config: LocalIndexConfig) {
-        this._config = Object.assign({}, config);
+    public constructor(folderPath: string) {
+        this._folderPath = folderPath;
     }
 
     /**
@@ -135,7 +136,7 @@ export class LocalIndex {
      * This method creates a new folder on disk containing an index.json file.
      * @param config - Index configuration
      */
-    public async createIndex(config: CreateIndexConfig): Promise<void> {
+    public async createIndex(config: CreateIndexConfig = {version: 1}): Promise<void> {
         // Delete if exists
         if (await this.isIndexCreated()) {
             if (config.deleteIfExists) {
@@ -147,7 +148,7 @@ export class LocalIndex {
 
         try {
             // Create folder for index
-            await fs.mkdir(this._config.folderPath, { recursive: true });
+            await fs.mkdir(this._folderPath, { recursive: true });
 
             // Initialize index.json file
             this._data = {
@@ -155,7 +156,7 @@ export class LocalIndex {
                 metadata_config: config.metadata_config ?? {},
                 items: []
             };
-            await fs.writeFile(path.join(this._config.folderPath, 'index.json'), JSON.stringify(this._data));
+            await fs.writeFile(path.join(this._folderPath, 'index.json'), JSON.stringify(this._data));
         } catch (err: unknown) {
             await this.deleteIndex();
             throw new Error('Error creating index');
@@ -169,7 +170,7 @@ export class LocalIndex {
      */
     public deleteIndex(): Promise<void> {
         this._data = undefined;
-        return fs.rmdir(this._config.folderPath, {
+        return fs.rm(this._folderPath, {
             recursive: true,
             maxRetries: 3
         });
@@ -207,7 +208,7 @@ export class LocalIndex {
 
         try {
             // Save index
-            await fs.writeFile(path.join(this._config.folderPath, 'index.json'), JSON.stringify(this._update));
+            await fs.writeFile(path.join(this._folderPath, 'index.json'), JSON.stringify(this._update));
             this._data = this._update;
             this._update = undefined;
         } catch(err: unknown) {
@@ -233,9 +234,9 @@ export class LocalIndex {
      * @param id Item id
      * @returns Item or undefined if not found
      */
-    public async getItem(id: string): Promise<IndexItem | undefined> {
+    public async getItem<TMetadata = Record<string,MetadataTypes>>(id: string): Promise<IndexItem<TMetadata> | undefined> {
         await this.loadIndexData();
-        return this._data!.items.find(i => i.id === id);
+        return this._data!.items.find(i => i.id === id) as any | undefined;
     }
 
     /**
@@ -246,14 +247,14 @@ export class LocalIndex {
      * @param item Item to insert
      * @returns Inserted item
      */
-    public async insertItem(item: Partial<IndexItem>): Promise<IndexItem> {
+    public async insertItem<TMetadata = Record<string,MetadataTypes>>(item: Partial<IndexItem<TMetadata>>): Promise<IndexItem<TMetadata>> {
         if (this._update) {
-            return await this.addItemToUpdate(item, true);
+            return await this.addItemToUpdate(item, true) as any;
         } else {
             await this.beginUpdate();
             const newItem = await this.addItemToUpdate(item, true);
             await this.endUpdate();
-            return newItem;
+            return newItem as any;
         }
     }
 
@@ -262,7 +263,7 @@ export class LocalIndex {
      */
     public async isIndexCreated(): Promise<boolean> {
         try {
-            await fs.access(path.join(this._config.folderPath, 'index.json'));
+            await fs.access(path.join(this._folderPath, 'index.json'));
             return true;
         } catch (err: unknown) {
             return false;
@@ -276,9 +277,9 @@ export class LocalIndex {
      * array is returned so no modifications should be made to the array.
      * @returns All items in the index
      */
-    public async listItems(): Promise<IndexItem[]> {
+    public async listItems<TMetadata = Record<string,MetadataTypes>>(): Promise<IndexItem<TMetadata>[]> {
         await this.loadIndexData();
-        return this._data!.items.slice();
+        return this._data!.items.slice() as any;
     }
 
     /**
@@ -288,9 +289,9 @@ export class LocalIndex {
      * @param filter Filter to apply
      * @returns Items matching the filter
      */
-    public async listItemsByMetadata(filter: MetadataFilter): Promise<IndexItem[]> {
+    public async listItemsByMetadata<TMetadata = Record<string,MetadataTypes>>(filter: MetadataFilter): Promise<IndexItem<TMetadata>[]> {
         await this.loadIndexData();
-        return this._data!.items.filter(i => ItemSelector.select(i.metadata, filter));
+        return this._data!.items.filter(i => ItemSelector.select(i.metadata, filter)) as any;
     }
 
     /**
@@ -301,9 +302,9 @@ export class LocalIndex {
      * @param vector Vector to query against
      * @param topK Number of items to return
      * @param filter Optional filter to apply
-     * @returns Similar items to the vector that match the filter
+     * @returns Similar items to the vector that matches the filter
      */
-    public async queryItems(vector: number[], topK: number, filter?: MetadataFilter): Promise<IndexItem[]> {
+    public async queryItems<TMetadata = Record<string,MetadataTypes>>(vector: number[], topK: number, filter?: MetadataFilter): Promise<QueryResult<TMetadata>[]> {
         await this.loadIndexData();
 
         // Filter items
@@ -321,18 +322,23 @@ export class LocalIndex {
             distances.push({ index: i, distance: distance });
         }
 
-        // Sort by distance
-        distances.sort((a, b) => a.distance - b.distance);
+        // Sort by distance DESCENDING
+        distances.sort((a, b) => b.distance - a.distance);
 
         // Find top k
-        const top = distances.slice(0, topK).map(d => items[d.index]);
+        const top: QueryResult<TMetadata>[] = distances.slice(0, topK).map(d => {
+            return {
+                item: Object.assign({}, items[d.index]) as any,
+                score: d.distance
+            };
+        });
 
         // Load external metadata
         for (const item of top) {
-            if (item.metadataFile) {
-                const metadataPath = path.join(this._config.folderPath, item.metadataFile);
+            if (item.item.metadataFile) {
+                const metadataPath = path.join(this._folderPath, item.item.metadataFile);
                 const metadata = await fs.readFile(metadataPath);
-                item.metadata = JSON.parse(metadata.toString());
+                item.item.metadata = JSON.parse(metadata.toString());
             }
         }
 
@@ -347,14 +353,14 @@ export class LocalIndex {
      * @param item Item to insert or replace
      * @returns Upserted item
      */
-    public async upsertItem(item: Partial<IndexItem>): Promise<IndexItem> {
+    public async upsertItem<TMetadata = Record<string,MetadataTypes>>(item: Partial<IndexItem<TMetadata>>): Promise<IndexItem<TMetadata>> {
         if (this._update) {
-            return await this.addItemToUpdate(item, false);
+            return await this.addItemToUpdate(item, false) as any;
         } else {
             await this.beginUpdate();
             const newItem = await this.addItemToUpdate(item, false);
             await this.endUpdate();
-            return newItem;
+            return newItem as any;
         }
     }
 
@@ -367,11 +373,11 @@ export class LocalIndex {
             throw new Error('Index does not exist');
         }
 
-        const data = await fs.readFile(path.join(this._config.folderPath, 'index.json'));
+        const data = await fs.readFile(path.join(this._folderPath, 'index.json'));
         this._data = JSON.parse(data.toString());
     }
 
-    private async addItemToUpdate(item: Partial<IndexItem>, unique: boolean): Promise<IndexItem> {
+    private async addItemToUpdate(item: Partial<IndexItem<any>>, unique: boolean): Promise<IndexItem> {
         // Ensure vector is provided
         if (!item.vector) {
             throw new Error('Vector is required');
@@ -399,8 +405,10 @@ export class LocalIndex {
 
             // Save remaining metadata to disk
             metadataFile = `${v4}.json`;
-            const metadataPath = path.join(this._config.folderPath, metadataFile);
+            const metadataPath = path.join(this._folderPath, metadataFile);
             await fs.writeFile(metadataPath, JSON.stringify(item.metadata));
+        } else if (item.metadata) {
+            metadata = item.metadata;
         }
 
         // Create new item
