@@ -7,6 +7,11 @@ Keep in mind that your entire Vectra index is loaded into memory so it's not wel
 
 Pinecone style namespaces aren't directly supported but you could easily mimic them by creating a separate Vectra index (and folder) for each namespace.
 
+## Other Language Bindings
+This repo contains the TypeScript/JavaScript binding for Vectra but other language bindings are being created. Since Vectra is file based, any language binding can be used to read or write a Vectra index. That means you can build a Vectra index using JS and then read it using Python.
+
+- [vectra-py](https://github.com/BMS-geodev/vectra-py) - Python version of Vectra.
+
 ## Installation
 
 ```
