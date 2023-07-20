@@ -88,6 +88,10 @@ export interface MetadataFilter {
 
 export type MetadataTypes = number|string|boolean;
 
+export type LocalIndexOptions = {
+    deferredSave?: false,
+}
+
 /**
  * Local vector index instance.
  * @remarks
@@ -96,15 +100,18 @@ export type MetadataTypes = number|string|boolean;
  */
 export class LocalIndex {
     private readonly _folderPath: string;
+    private readonly _options?: LocalIndexOptions;
     private _data?: IndexData;
     private _update?: IndexData;
 
     /**
      * Creates a new instance of LocalIndex.
      * @param folderPath - Path to the index folder
+     * @param options - Extra optional options
      */
-    public constructor(folderPath: string) {
+    public constructor(folderPath: string, options?: LocalIndexOptions) {
         this._folderPath = folderPath;
+        this._options = options;
     }
 
     /**
@@ -197,23 +204,32 @@ export class LocalIndex {
     }
 
     /**
+     * This method saves the index to disk.
+     */
+    public async commitChanges() {
+        try {
+            await fs.writeFile(path.join(this._folderPath, 'index.json'), JSON.stringify(this._data));
+        } catch(err: unknown) {
+            throw new Error(`Error saving index: ${(err as any).toString()}`);
+        }
+    }
+
+    /**
      * Ends an update to the index.
      * @remarks
-     * This method saves the index to disk.
+     * Commits the changes to disk if deferredSave is not enabled
      */
     public async endUpdate(): Promise<void> {
         if (!this._update) {
             throw new Error('No update in progress');
         }
 
-        try {
-            // Save index
-            await fs.writeFile(path.join(this._folderPath, 'index.json'), JSON.stringify(this._update));
-            this._data = this._update;
-            this._update = undefined;
-        } catch(err: unknown) {
-            throw new Error(`Error saving index: ${(err as any).toString()}`);
+        // Save index
+        if (!this._options?.deferredSave) {
+            this.commitChanges();
         }
+        this._data = this._update;
+        this._update = undefined;
     }
 
     /**

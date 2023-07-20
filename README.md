@@ -73,7 +73,7 @@ Then query for items:
 
 ```typescript
 async function query(text: string) {
-    const vector = await getVector(input);
+    const vector = await getVector(text);
     const results = await index.queryItems(vector, 3);
     if (results.length > 0) {
         for (const result of results) {
@@ -97,4 +97,23 @@ await query('banana');
 [0.8493374123092652] oranges
 [0.8415324469533297] blue
 */
+```
+
+## Deferred Save
+
+If you want to have control over when the data is persisted, use the optional parameter in the constructor when creating a LocalIndex
+
+```typescript
+import { LocalIndex, LocalIndexOptions } from 'vectra';
+
+const options: LocalIndexOptions = {
+    deferredSave: true,
+}
+const index = new LocalIndex(path.join(__dirname, '..', 'index'), options);
+```
+
+Once you are ready to save the changes, call commitChanges().
+
+```typescript
+await index.commitChanges();
 ```
