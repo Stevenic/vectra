@@ -89,7 +89,7 @@ export interface MetadataFilter {
 export type MetadataTypes = number|string|boolean;
 
 export type LocalIndexOptions = {
-    deferredSave?: false,
+    deferredSave?: boolean,
 }
 
 /**
