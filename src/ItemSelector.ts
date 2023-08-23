@@ -1,4 +1,4 @@
-import { MetadataFilter, MetadataTypes } from './LocalIndex';
+import { MetadataFilter, MetadataTypes } from './types';
 
 export class ItemSelector {
     /**
@@ -62,12 +62,12 @@ export class ItemSelector {
         for (const key in filter) {
             switch (key) {
                 case '$and':
-                    if (!filter[key].every((f) => this.select(metadata, f))) {
+                    if (!filter[key]!.every((f: MetadataFilter) => this.select(metadata, f))) {
                         return false;
                     }
                     break;
                 case '$or':
-                    if (!filter[key].some((f) => this.select(metadata, f))) {
+                    if (!filter[key]!.some((f: MetadataFilter) => this.select(metadata, f))) {
                         return false;
                     }
                     break;
@@ -120,32 +120,32 @@ export class ItemSelector {
                     }
                     break;
                 case '$gt':
-                    if (typeof value != 'number' || value <= filter[key]) {
+                    if (typeof value != 'number' || value <= filter[key]!) {
                         return false;
                     }
                     break;
                 case '$gte':
-                    if (typeof value != 'number' || value < filter[key]) {
+                    if (typeof value != 'number' || value < filter[key]!) {
                         return false;
                     }
                     break;
                 case '$lt':
-                    if (typeof value != 'number' || value >= filter[key]) {
+                    if (typeof value != 'number' || value >= filter[key]!) {
                         return false;
                     }
                     break;
                 case '$lte':
-                    if (typeof value != 'number' || value > filter[key]) {
+                    if (typeof value != 'number' || value > filter[key]!) {
                         return false;
                     }
                     break;
                 case '$in':
-                    if (typeof value == 'boolean' || !filter[key].includes(value)) {
+                    if (typeof value == 'boolean' || !filter[key]!.includes(value)) {
                         return false;
                     }
                     break;
                 case '$nin':
-                    if (typeof value == 'boolean' || filter[key].includes(value)) {
+                    if (typeof value == 'boolean' || filter[key]!.includes(value)) {
                         return false;
                     }
                     break;

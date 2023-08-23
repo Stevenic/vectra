@@ -10,8 +10,8 @@
         "target": "es6",
         "esModuleInterop": true,
         "lib": ["es2015"],
-        "outDir": "lib",
-        "rootDir": "src",
+        "outDir": "./lib",
+        "rootDir": "./src",
         "skipLibCheck": true
     },
     "include": [

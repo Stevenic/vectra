@@ -2,6 +2,7 @@ import * as fs from 'fs/promises';
 import * as path from 'path';
 import { v4 } from 'uuid';
 import { ItemSelector } from './ItemSelector';
+import { IndexItem, IndexStats, MetadataFilter, MetadataTypes, QueryResult } from './types';
 
 export interface CreateIndexConfig {
     version: number;
@@ -10,83 +11,6 @@ export interface CreateIndexConfig {
         indexed?: string[];
     };
 }
-
-export interface IndexStats {
-    version: number;
-    metadata_config: {
-        indexed?: string[];
-    };
-    items: number;
-}
-
-export interface IndexItem<TMetadata = Record<string,MetadataTypes>> {
-    id: string;
-    metadata: TMetadata;
-    vector: number[];
-    norm: number;
-    metadataFile?: string;
-}
-
-export interface QueryResult<TMetadata = Record<string,MetadataTypes>> {
-    item: IndexItem<TMetadata>;
-    score: number;
-}
-
-export interface MetadataFilter {
-    [key: string]: MetadataTypes|MetadataFilter|(number|string)[]|MetadataFilter[];
-
-    /**
-     * Equal to (number, string, boolean)
-     */
-    '$eq': number|string|boolean;
-
-    /**
-     * Not equal to (number, string, boolean)
-     */
-    '$ne': number|string|boolean;
-
-    /**
-     * Greater than (number)
-     */
-    '$gt': number;
-
-    /**
-     * Greater than or equal to (number)
-     */
-    '$gte': number;
-
-    /**
-     * Less than (number)
-     */
-    '$lt': number;
-
-    /**
-     * Less than or equal to (number)
-     */
-    '$lte': number;
-
-    /**
-     * In array (string or number)
-     */
-    '$in': (number|string)[];
-
-    /**
-     * Not in array (string or number)
-     */
-    '$nin': (number|string)[];
-
-    /**
-     * AND (MetadataFilter[])
-     */
-    '$and': MetadataFilter[];
-
-    /**
-     * OR (MetadataFilter[])
-     */
-    '$or': MetadataFilter[];
-}
-
-export type MetadataTypes = number|string|boolean;
 
 /**
  * Local vector index instance.
@@ -105,6 +29,13 @@ export class LocalIndex {
      */
     public constructor(folderPath: string) {
         this._folderPath = folderPath;
+    }
+
+    /**
+     * Path to the index folder.
+     */
+    public get folderPath(): string {
+        return this._folderPath;
     }
 
     /**
@@ -364,7 +295,10 @@ export class LocalIndex {
         }
     }
 
-    private async loadIndexData(): Promise<void> {
+    /**
+     * Ensures that the index has been loaded into memory.
+     */
+    protected async loadIndexData(): Promise<void> {
         if (this._data) {
             return;
         }
