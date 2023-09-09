@@ -20,7 +20,7 @@ export interface CreateIndexConfig {
  */
 export class LocalIndex {
     private readonly _folderPath: string;
-    private readonly _indexName?: string;
+    private readonly _indexName?: string | "index.json";
 
     private _data?: IndexData;
     private _update?: IndexData;
