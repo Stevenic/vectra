@@ -20,15 +20,19 @@ export interface CreateIndexConfig {
  */
 export class LocalIndex {
     private readonly _folderPath: string;
+    private readonly _indexName?: string;
+
     private _data?: IndexData;
     private _update?: IndexData;
 
     /**
      * Creates a new instance of LocalIndex.
      * @param folderPath - Path to the index folder
+     * @param indexName - Optional name of the index file. Defaults to index.json
      */
-    public constructor(folderPath: string) {
+    public constructor(folderPath: string, indexName?: string | "index.json") {
         this._folderPath = folderPath;
+        this._indexName = indexName;
     }
 
     /**
@@ -36,6 +40,13 @@ export class LocalIndex {
      */
     public get folderPath(): string {
         return this._folderPath;
+    }
+
+    /**
+     * Optional name of the index file. 
+     */
+    public get indexName(): string {
+        return this.indexName;
     }
 
     /**
@@ -87,7 +98,7 @@ export class LocalIndex {
                 metadata_config: config.metadata_config ?? {},
                 items: []
             };
-            await fs.writeFile(path.join(this._folderPath, 'index.json'), JSON.stringify(this._data));
+            await fs.writeFile(path.join(this._folderPath, this._indexName!), JSON.stringify(this._data));
         } catch (err: unknown) {
             await this.deleteIndex();
             throw new Error('Error creating index');
@@ -139,7 +150,7 @@ export class LocalIndex {
 
         try {
             // Save index
-            await fs.writeFile(path.join(this._folderPath, 'index.json'), JSON.stringify(this._update));
+            await fs.writeFile(path.join(this._folderPath, this._indexName!), JSON.stringify(this._update));
             this._data = this._update;
             this._update = undefined;
         } catch(err: unknown) {
@@ -194,7 +205,7 @@ export class LocalIndex {
      */
     public async isIndexCreated(): Promise<boolean> {
         try {
-            await fs.access(path.join(this._folderPath, 'index.json'));
+            await fs.access(path.join(this._folderPath, this.indexName));
             return true;
         } catch (err: unknown) {
             return false;
@@ -307,7 +318,7 @@ export class LocalIndex {
             throw new Error('Index does not exist');
         }
 
-        const data = await fs.readFile(path.join(this._folderPath, 'index.json'));
+        const data = await fs.readFile(path.join(this._folderPath, this.indexName));
         this._data = JSON.parse(data.toString());
     }
 
