@@ -20,7 +20,7 @@ export interface CreateIndexConfig {
  */
 export class LocalIndex {
     private readonly _folderPath: string;
-    private readonly _indexName?: string | "index.json";
+    private _indexName?: string | "index.json";
 
     private _data?: IndexData;
     private _update?: IndexData;
@@ -98,6 +98,9 @@ export class LocalIndex {
                 metadata_config: config.metadata_config ?? {},
                 items: []
             };
+
+            if (!this._indexName) this._indexName = "index.json"
+
             await fs.writeFile(path.join(this._folderPath, this._indexName!), JSON.stringify(this._data));
         } catch (err: unknown) {
             await this.deleteIndex();
