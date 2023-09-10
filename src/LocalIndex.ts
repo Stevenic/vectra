@@ -20,7 +20,7 @@ export interface CreateIndexConfig {
  */
 export class LocalIndex {
     private readonly _folderPath: string;
-    private _indexName?: string | "index.json";
+    private readonly _indexName: string;
 
     private _data?: IndexData;
     private _update?: IndexData;
@@ -30,9 +30,9 @@ export class LocalIndex {
      * @param folderPath - Path to the index folder
      * @param indexName - Optional name of the index file. Defaults to index.json
      */
-    public constructor(folderPath: string, indexName?: string | "index.json") {
+    public constructor(folderPath: string, indexName?: string) {
         this._folderPath = folderPath;
-        this._indexName = indexName;
+        this._indexName = indexName || "index.json";
     }
 
     /**
@@ -46,7 +46,7 @@ export class LocalIndex {
      * Optional name of the index file. 
      */
     public get indexName(): string {
-        return this.indexName;
+        return this._indexName;
     }
 
     /**
@@ -99,9 +99,7 @@ export class LocalIndex {
                 items: []
             };
 
-            if (!this._indexName) this._indexName = "index.json"
-
-            await fs.writeFile(path.join(this._folderPath, this._indexName!), JSON.stringify(this._data));
+            await fs.writeFile(path.join(this._folderPath, this._indexName), JSON.stringify(this._data));
         } catch (err: unknown) {
             await this.deleteIndex();
             throw new Error('Error creating index');
@@ -153,7 +151,7 @@ export class LocalIndex {
 
         try {
             // Save index
-            await fs.writeFile(path.join(this._folderPath, this._indexName!), JSON.stringify(this._update));
+            await fs.writeFile(path.join(this._folderPath, this._indexName), JSON.stringify(this._update));
             this._data = this._update;
             this._update = undefined;
         } catch(err: unknown) {
