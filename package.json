@@ -59,7 +59,8 @@
         "lint": "eslint **/src/**/*.{j,t}s{,x} --fix --no-error-on-unmatched-pattern",
         "test": "npm-run-all build test:mocha",
         "test:mocha": "nyc mocha tests",
-        "test:compat": "api-extractor run --verbose"
+        "test:compat": "api-extractor run --verbose",
+        "postinstall": "npm run build"
     },
     "files": [
         "_ts3.4",
