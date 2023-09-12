@@ -1,0 +1,1630 @@
+
+
+  
+
+UNITED STATES
+
+SECURITIES AND EXCHANGE COMMISSION
+
+Washington, D.C. 20549
+
+FORM 10-Q
+
+☒ QUARTERLY REPORT PURSUANT TO SECTION 13 OR 15(d) OF THE SECURITIES EXCHANGE ACT OF 1934
+
+For the quarterly period ended May 26, 2023
+
+OR
+
+☐ TRANSITION REPORT PURSUANT TO SECTION 13 OR 15(d) OF THE SECURITIES EXCHANGE ACT OF 1934
+
+For the transition period from to
+
+Commission File Number 001-38102
+
+![gheae2oaiqd5000002.jpg](sgh-20230526_g1.jpg)
+
+SMART GLOBAL HOLDINGS, INC.
+
+(Exact name of registrant as specified in its charter)
+
+| | | | | | |
+| Cayman Islands | 98-1013909 |
+| (State or other jurisdiction of incorporation or organization) | (I.R.S. Employer Identification No.) |
+
+| | | | | | |
+| c/o Walkers Corporate Limited | |
+| 190 Elgin Avenue | |
+| George Town, Grand Cayman | |
+| Cayman Islands | KY1-9008 |
+| (Address of Principal Executive Offices) | (Zip Code) |
+
+Registrant’s telephone number, including area code: (510) 623-1231
+
+Securities registered pursuant to Section 12(b) of the Act:
+
+| | | | | | | | | |
+| Title of each class | Trading Symbol(s) | Name of each exchange on which registered |
+| Ordinary shares, $0.03 par value per share | SGH | Nasdaq Global Select Market |
+
+Indicate by check mark whether the registrant (1) has filed all reports required to be filed by Section 13 or 15(d) of the Securities Exchange Act of 1934 during the preceding 12 months (or for such shorter period that the registrant was required to file such reports), and (2) has been subject to such filing requirements for the past 90 days. Yes ☒ No ☐
+
+Indicate by check mark whether the registrant has submitted electronically every Interactive Data File required to be submitted pursuant to Rule 405 of Regulation S-T (§ 232.405 of this chapter) during the preceding 12 months (or for such shorter period that the registrant was required to submit such files). Yes ☒ No ☐
+
+Indicate by check mark whether the registrant is a large accelerated filer, an accelerated filer, a non-accelerated filer, a smaller reporting company, or an emerging growth company. See the definitions of “large accelerated filer,” “accelerated filer,” “smaller reporting company,” and “emerging growth company” in Rule 12b-2 of the Exchange Act.
+
+| | | | | | | | | | | | | | | |
+| Large Accelerated Filer | Accelerated filer | Non-accelerated filer | Smaller reporting company | Emerging growth company |
+| ☒ | ☐ | ☐ | ☐ | ☐ |
+
+If an emerging growth company, indicate by check mark if the registrant has elected not to use the extended transition period for complying with any new or revised financial accounting standards provided pursuant to Section 13(a) of the Exchange Act. ☐
+
+Indicate by check mark whether the registrant is a shell company (as defined in Rule 12b-2 of the Act). Yes ☐ No ☒
+
+As of June 22, 2023, the registrant had 50,067,897 ordinary shares outstanding.
+
+  
+
+---
+
+  
+
+Table of Contents
+
+  
+
+| | | | | | | | | |
+| | | Page |
+| | | |
+| [PART I. Financial Information](https://www.sec.gov/Archives/edgar/data/0001616533/000162828023023925/sgh-20230526.htm#i1d78f24b64944d799dafff32c12a0c87_13) | |
+| | | |
+| [Item 1](https://www.sec.gov/Archives/edgar/data/0001616533/000162828023023925/sgh-20230526.htm#i1d78f24b64944d799dafff32c12a0c87_16) | [Financial Statements](https://www.sec.gov/Archives/edgar/data/0001616533/000162828023023925/sgh-20230526.htm#i1d78f24b64944d799dafff32c12a0c87_16) | [5](https://www.sec.gov/Archives/edgar/data/0001616533/000162828023023925/sgh-20230526.htm#i1d78f24b64944d799dafff32c12a0c87_16) |
+| [Item 2](https://www.sec.gov/Archives/edgar/data/0001616533/000162828023023925/sgh-20230526.htm#i1d78f24b64944d799dafff32c12a0c87_100) | [Management’s Discussion and Analysis of Financial Condition and Results of Operations](https://www.sec.gov/Archives/edgar/data/0001616533/000162828023023925/sgh-20230526.htm#i1d78f24b64944d799dafff32c12a0c87_100) | [31](https://www.sec.gov/Archives/edgar/data/0001616533/000162828023023925/sgh-20230526.htm#i1d78f24b64944d799dafff32c12a0c87_100) |
+| [Item 3](https://www.sec.gov/Archives/edgar/data/0001616533/000162828023023925/sgh-20230526.htm#i1d78f24b64944d799dafff32c12a0c87_133) | [Quantitative and Qualitative Disclosures About Market Risk](https://www.sec.gov/Archives/edgar/data/0001616533/000162828023023925/sgh-20230526.htm#i1d78f24b64944d799dafff32c12a0c87_133) | [40](https://www.sec.gov/Archives/edgar/data/0001616533/000162828023023925/sgh-20230526.htm#i1d78f24b64944d799dafff32c12a0c87_133) |
+| [Item 4](https://www.sec.gov/Archives/edgar/data/0001616533/000162828023023925/sgh-20230526.htm#i1d78f24b64944d799dafff32c12a0c87_136) | [Controls and Procedures](https://www.sec.gov/Archives/edgar/data/0001616533/000162828023023925/sgh-20230526.htm#i1d78f24b64944d799dafff32c12a0c87_136) | [40](https://www.sec.gov/Archives/edgar/data/0001616533/000162828023023925/sgh-20230526.htm#i1d78f24b64944d799dafff32c12a0c87_136) |
+| | | |
+| [PART II. Other Information](https://www.sec.gov/Archives/edgar/data/0001616533/000162828023023925/sgh-20230526.htm#i1d78f24b64944d799dafff32c12a0c87_139) | |
+| | | |
+| [Item 1](https://www.sec.gov/Archives/edgar/data/0001616533/000162828023023925/sgh-20230526.htm#i1d78f24b64944d799dafff32c12a0c87_142) | [Legal Proceedings](https://www.sec.gov/Archives/edgar/data/0001616533/000162828023023925/sgh-20230526.htm#i1d78f24b64944d799dafff32c12a0c87_142) | [42](https://www.sec.gov/Archives/edgar/data/0001616533/000162828023023925/sgh-20230526.htm#i1d78f24b64944d799dafff32c12a0c87_142) |
+| [Item 1A](https://www.sec.gov/Archives/edgar/data/0001616533/000162828023023925/sgh-20230526.htm#i1d78f24b64944d799dafff32c12a0c87_145) | [Risk Factors](https://www.sec.gov/Archives/edgar/data/0001616533/000162828023023925/sgh-20230526.htm#i1d78f24b64944d799dafff32c12a0c87_145) | [42](https://www.sec.gov/Archives/edgar/data/0001616533/000162828023023925/sgh-20230526.htm#i1d78f24b64944d799dafff32c12a0c87_145) |
+| [Item 2](https://www.sec.gov/Archives/edgar/data/0001616533/000162828023023925/sgh-20230526.htm#i1d78f24b64944d799dafff32c12a0c87_148) | [Unregistered Sales of Equity Securities and Use of Proceeds](https://www.sec.gov/Archives/edgar/data/0001616533/000162828023023925/sgh-20230526.htm#i1d78f24b64944d799dafff32c12a0c87_148) | [42](https://www.sec.gov/Archives/edgar/data/0001616533/000162828023023925/sgh-20230526.htm#i1d78f24b64944d799dafff32c12a0c87_148) |
+| [Item 3](https://www.sec.gov/Archives/edgar/data/0001616533/000162828023023925/sgh-20230526.htm#i1d78f24b64944d799dafff32c12a0c87_151) | [Defaults Upon Senior Securities](https://www.sec.gov/Archives/edgar/data/0001616533/000162828023023925/sgh-20230526.htm#i1d78f24b64944d799dafff32c12a0c87_151) | [42](https://www.sec.gov/Archives/edgar/data/0001616533/000162828023023925/sgh-20230526.htm#i1d78f24b64944d799dafff32c12a0c87_151) |
+| [Item 4](https://www.sec.gov/Archives/edgar/data/0001616533/000162828023023925/sgh-20230526.htm#i1d78f24b64944d799dafff32c12a0c87_154) | [Mine Safety Disclosures](https://www.sec.gov/Archives/edgar/data/0001616533/000162828023023925/sgh-20230526.htm#i1d78f24b64944d799dafff32c12a0c87_154) | [42](https://www.sec.gov/Archives/edgar/data/0001616533/000162828023023925/sgh-20230526.htm#i1d78f24b64944d799dafff32c12a0c87_154) |
+| [Item 5](https://www.sec.gov/Archives/edgar/data/0001616533/000162828023023925/sgh-20230526.htm#i1d78f24b64944d799dafff32c12a0c87_157) | [Other Information](https://www.sec.gov/Archives/edgar/data/0001616533/000162828023023925/sgh-20230526.htm#i1d78f24b64944d799dafff32c12a0c87_157) | [43](https://www.sec.gov/Archives/edgar/data/0001616533/000162828023023925/sgh-20230526.htm#i1d78f24b64944d799dafff32c12a0c87_157) |
+| [Item 6](https://www.sec.gov/Archives/edgar/data/0001616533/000162828023023925/sgh-20230526.htm#i1d78f24b64944d799dafff32c12a0c87_160) | [Exhibits](https://www.sec.gov/Archives/edgar/data/0001616533/000162828023023925/sgh-20230526.htm#i1d78f24b64944d799dafff32c12a0c87_160) | [43](https://www.sec.gov/Archives/edgar/data/0001616533/000162828023023925/sgh-20230526.htm#i1d78f24b64944d799dafff32c12a0c87_160) |
+| | | |
+| [Signatures](https://www.sec.gov/Archives/edgar/data/0001616533/000162828023023925/sgh-20230526.htm#i1d78f24b64944d799dafff32c12a0c87_163) | [44](https://www.sec.gov/Archives/edgar/data/0001616533/000162828023023925/sgh-20230526.htm#i1d78f24b64944d799dafff32c12a0c87_163) |
+
+  
+
+| | | | | | |
+| 2 | ![SGH_logo_rgb.jpg](sgh-20230526_g2.jpg) |
+
+---
+
+  
+
+Cautionary Note Regarding Forward-Looking Statements
+
+This Quarterly Report on Form 10-Q (“Quarterly Report”) contains forward-looking statements within the meaning of Section 27A of the Securities Act of 1933, as amended, Section 21E of the Securities Exchange Act of 1934, as amended, and the Private Securities Litigation Reform Act of 1995. These statements include, but are not limited to, statements concerning or regarding future events and our future financial and operating performance; statements regarding the extent and timing of and expectations regarding our future revenues and expenses and customer demand; statements regarding our business strategies, investments and growth drivers in our industries and markets; statements regarding the deployment of our products and services and our ability to meet customer commitments; statements regarding the effects of the ongoing COVID-19 pandemic and macroeconomic events, including supply chain challenges, foreign currency fluctuations and interest rate changes, upon our and our customers’ respective businesses; statements regarding the anticipated benefits to be realized from the acquisition of Stratus Technologies; statements regarding the estimations of future payouts under our equity plans and in connection with the acquisition of Stratus Technologies; statements regarding our expected capital expenditures and our estimates regarding our capital requirements; statements regarding restructuring activities and charges; statements regarding the impairment of goodwill; and statements regarding our reliance on third parties. These statements can be identified by the fact that they do not relate strictly to historical or current facts. Forward-looking statements often use words such as “anticipate,” “target,” “expect,” “estimate,” “intend,” “plan,” “goal,” “believe,” “could” and other words of similar meaning. Forward-looking statements provide our current expectations or forecasts of future events, circumstances, results or aspirations and are subject to a number of significant risks, uncertainties and other factors, many of which are outside of our control, including but not limited to, issues, delays or complications in integrating the operations of Stratus Technologies; global business and economic conditions and growth trends in technology industries, our customer markets and various geographic regions; uncertainties in the geopolitical environment; the rapidly evolving nature of the COVID-19 pandemic; disruptions in our operations or supply chain as a result of the COVID-19 pandemic or otherwise; the ability to manage our cost structure, including our success in implementing restructuring or other plans intended to improve our operating efficiency; workforce reductions; uncertainties in the global macro-economic environment; changes in demand for our segments; changes in trade regulations or adverse developments in international trade relations and agreements; changes in currency exchange rates; availability of our cash and cash equivalents; overall information technology spending; appropriations for government spending; the success of our strategic initiatives including additional investments in new products and additional capacity; acquisitions of companies or technologies, the failure to successfully integrate and operate them or customers’ negative reactions to them, including any resulting impairment of goodwill or gain (loss) on extinguishment of debt; limitations on, or changes in the availability of, supply of materials and components; fluctuations in material costs; the temporary or volatile nature of pricing trends in memory or elsewhere; deterioration in customer relationships; production or manufacturing difficulties; competitive factors; technological changes; future cash flows of the Penguin Edge business; difficulties with, or delays in, the introduction of new products; slowing or contraction of growth in the memory market in Brazil or in the LED market; reduction in, or termination of, incentives for local manufacturing in Brazil; changes to applicable tax regimes or rates; prices for the end products of our customers; strikes or labor disputes; deterioration in or loss of relations with any of our limited number of key vendors; the inability to maintain or expand government business; and the continuing availability of borrowings under term loans and revolving lines of credit and our ability to raise capital through debt or equity financings. These and other risks, uncertainties and factors are described in greater detail under the sections titled “Risk Factors,” “Critical Accounting Estimates,” “Results of Operations,” “Quantitative and Qualitative Disclosures About Market Risk” and “Liquidity and Capital Resources” contained in our Annual Report on Form 10-K for the fiscal year ended August 26, 2022, our Quarterly Report on Form 10-Q for the quarter ended February 24, 2023, this Quarterly Report on Form 10-Q and our other filings with the U.S. Securities and Exchange Commission (“SEC”). In addition, such risks, uncertainties and factors as outlined above and in such filings do not constitute all risks, uncertainties and factors that could cause actual results of our company to be materially different from such forward-looking statements. Accordingly, you are cautioned not to place undue reliance on any forward-looking statements.
+
+Any forward-looking statements that we make in this Quarterly Report speak only as of the date of this Quarterly Report. Except as required by law, we do not undertake to update the forward-looking statements contained in this Quarterly Report to reflect the impact of circumstances or events that may arise after the date that the forward-looking statements were made.
+
+About This Quarterly Report
+
+As used herein, “SGH,” “Company,” “Registrant,” “we,” “our,” “us” or similar terms refer to SMART Global Holdings, Inc. and our consolidated subsidiaries, unless the context indicates otherwise. Our fiscal year is the 52 or 53-week period ending
+
+| | | | | | |
+| 3 | ![SGH_logo_rgb.jpg](sgh-20230526_g2.jpg) |
+
+---
+
+  
+
+on the last Friday in August. Fiscal 2023 and 2022 each contain 52 weeks. All period references are to our fiscal periods unless otherwise indicated.
+
+| | | | | | |
+| 4 | ![SGH_logo_rgb.jpg](sgh-20230526_g2.jpg) |
+
+---
+
+  
+
+PART I. Financial Information
+
+Item 1. Financial Statements
+
+  
+
+INDEX TO FINANCIAL STATEMENTS
+
+| | | | | | |
+| | Page |
+| | |
+| [Consolidated Balance Sheets](https://www.sec.gov/Archives/edgar/data/0001616533/000162828023023925/sgh-20230526.htm#i1d78f24b64944d799dafff32c12a0c87_19) | [6](https://www.sec.gov/Archives/edgar/data/0001616533/000162828023023925/sgh-20230526.htm#i1d78f24b64944d799dafff32c12a0c87_19) |
+| [Consolidated Statements of Operations](https://www.sec.gov/Archives/edgar/data/0001616533/000162828023023925/sgh-20230526.htm#i1d78f24b64944d799dafff32c12a0c87_22) | [7](https://www.sec.gov/Archives/edgar/data/0001616533/000162828023023925/sgh-20230526.htm#i1d78f24b64944d799dafff32c12a0c87_22) |
+| [Consolidated Statements of Comprehensive Income (Loss)](https://www.sec.gov/Archives/edgar/data/0001616533/000162828023023925/sgh-20230526.htm#i1d78f24b64944d799dafff32c12a0c87_25) | [8](https://www.sec.gov/Archives/edgar/data/0001616533/000162828023023925/sgh-20230526.htm#i1d78f24b64944d799dafff32c12a0c87_25) |
+| [Consolidated Statements of Shareholders’ Equity](https://www.sec.gov/Archives/edgar/data/0001616533/000162828023023925/sgh-20230526.htm#i1d78f24b64944d799dafff32c12a0c87_28) | [9](https://www.sec.gov/Archives/edgar/data/0001616533/000162828023023925/sgh-20230526.htm#i1d78f24b64944d799dafff32c12a0c87_28) |
+| [Consolidated Statements of Cash Flows](https://www.sec.gov/Archives/edgar/data/0001616533/000162828023023925/sgh-20230526.htm#i1d78f24b64944d799dafff32c12a0c87_31) | [11](https://www.sec.gov/Archives/edgar/data/0001616533/000162828023023925/sgh-20230526.htm#i1d78f24b64944d799dafff32c12a0c87_31) |
+| [Notes to Consolidated Financial Statements](https://www.sec.gov/Archives/edgar/data/0001616533/000162828023023925/sgh-20230526.htm#i1d78f24b64944d799dafff32c12a0c87_34) | [12](https://www.sec.gov/Archives/edgar/data/0001616533/000162828023023925/sgh-20230526.htm#i1d78f24b64944d799dafff32c12a0c87_34) |
+
+  
+
+| | | | | | |
+| 5 | ![SGH_logo_rgb.jpg](sgh-20230526_g2.jpg) |
+
+---
+
+  
+
+SMART Global Holdings, Inc.
+
+Consolidated Balance Sheets
+
+(In thousands, except par value amount)
+
+(Unaudited)
+
+  
+
+| | | | | | | | | | | | |
+| As of | May 26, 2023 | | August 26, 2022 |
+| Assets | | | |
+| Cash and cash equivalents | $ | 401,275 | | | $ | 363,065 | |
+| Accounts receivable, net | 243,571 | | | 410,323 | |
+| Inventories | 226,051 | | | 323,084 | |
+| Other current assets | 68,014 | | | 55,393 | |
+| Total current assets | 938,911 | | | 1,151,865 | |
+| Property and equipment, net | 177,751 | | | 153,935 | |
+| Operating lease right-of-use assets | 77,789 | | | 77,399 | |
+| Intangible assets, net | 171,415 | | | 77,812 | |
+| Goodwill | 183,089 | | | 74,009 | |
+| Other noncurrent assets | 42,233 | | | 37,044 | |
+| Total assets | $ | 1,591,188 | | | $ | 1,572,064 | |
+| | | | |
+| Liabilities and Equity | | | |
+| Accounts payable and accrued expenses | $ | 210,125 | | | $ | 413,354 | |
+| Current debt | 32,253 | | | 12,025 | |
+| Acquisition-related contingent consideration | 45,700 | | | — | |
+| Other current liabilities | 96,227 | | | 90,161 | |
+| Total current liabilities | 384,305 | | | 515,540 | |
+| Long-term debt | 782,258 | | | 591,389 | |
+| Noncurrent operating lease liabilities | 73,421 | | | 71,754 | |
+| Other noncurrent liabilities | 27,038 | | | 14,835 | |
+| Total liabilities | 1,267,022 | | | 1,193,518 | |
+| | | | |
+| Commitments and contingencies | | | |
+| | | | |
+| SMART Global Holdings shareholders’ equity: | | | |
+| Ordinary shares, $0.03 par value; authorized 200,000 shares; 55,159 shares issued and 49,807 outstanding as of May 26, 2023; 52,880 shares issued and 48,604 outstanding as of August 26, 2022 | 1,655 | | | 1,586 | |
+| Additional paid-in capital | 432,185 | | | 448,112 | |
+| Retained earnings | 223,301 | | | 251,344 | |
+| Treasury shares, 5,351 and 4,276 shares held as of May 26, 2023 and August 26, 2022, respectively | (124,659) | | | (107,776) | |
+| Accumulated other comprehensive income (loss) | (214,385) | | | (221,655) | |
+| Total SGH shareholders’ equity | 318,097 | | | 371,611 | |
+| Noncontrolling interest in subsidiary | 6,069 | | | 6,935 | |
+| Total equity | 324,166 | | | 378,546 | |
+| Total liabilities and equity | $ | 1,591,188 | | | $ | 1,572,064 | |
+
+The accompanying notes are an integral part of these consolidated financial statements.
+
+| | | | | | |
+| 6 | ![SGH_logo_rgb.jpg](sgh-20230526_g2.jpg) |
+
+---
+
+  
+
+SMART Global Holdings, Inc.
+
+Consolidated Statements of Operations
+
+(In thousands, except per share amounts)
+
+(Unaudited)
+
+  
+
+| | | | | | | | | | | | | | | | | | | | | | | | |
+| | Three Months Ended | | Nine Months Ended |
+| | May 26, 2023 | | May 27, 2022 | | May 26, 2023 | | May 27, 2022 |
+| Net sales: | | | | | | | |
+| Products | $ | 325,665 | | | $ | 414,160 | | | $ | 1,089,703 | | | $ | 1,264,378 | |
+| Services | 57,665 | | | 48,380 | | | 188,279 | | | 117,277 | |
+| Total net sales | 383,330 | | | 462,540 | | | 1,277,982 | | | 1,381,655 | |
+| | | | | | | | |
+| Cost of sales: | | | | | | | |
+| Products | 259,975 | | | 329,349 | | | 875,769 | | | 985,600 | |
+| Services | 24,712 | | | 18,728 | | | 74,779 | | | 46,678 | |
+| Total cost of sales | 284,687 | | | 348,077 | | | 950,548 | | | 1,032,278 | |
+| Gross profit | 98,643 | | | 114,463 | | | 327,434 | | | 349,377 | |
+| | | | | | | | |
+| Operating expenses: | | | | | | | |
+| Research and development | 22,235 | | | 20,298 | | | 72,956 | | | 56,749 | |
+| Selling, general and administrative | 70,596 | | | 58,483 | | | 204,389 | | | 164,147 | |
+| Impairment of goodwill | — | | | — | | | 17,558 | | | — | |
+| Change in fair value of contingent consideration | 14,800 | | | 124 | | | 24,900 | | | 41,324 | |
+| Other operating (income) expense | (186) | | | 249 | | | 6,009 | | | 249 | |
+| Total operating expenses | 107,445 | | | 79,154 | | | 325,812 | | | 262,469 | |
+| Operating income (loss) | (8,802) | | | 35,309 | | | 1,622 | | | 86,908 | |
+| | | | | | | | |
+| Non-operating (income) expense: | | | | | | | |
+| Interest expense, net | 8,059 | | | 5,110 | | | 24,102 | | | 14,678 | |
+| Other non-operating (income) expense | 514 | | | 550 | | | 13,183 | | | 3,570 | |
+| Total non-operating (income) expense | 8,573 | | | 5,660 | | | 37,285 | | | 18,248 | |
+| Income (loss) before taxes | (17,375) | | | 29,649 | | | (35,663) | | | 68,660 | |
+| | | | | | | | |
+| Income tax provision | 6,702 | | | 5,154 | | | 9,876 | | | 20,495 | |
+| Net income (loss) | (24,077) | | | 24,495 | | | (45,539) | | | 48,165 | |
+| Net income attributable to noncontrolling interest | 378 | | | 382 | | | 1,143 | | | 1,567 | |
+| Net income (loss) attributable to SGH | $ | (24,455) | | | $ | 24,113 | | | $ | (46,682) | | | $ | 46,598 | |
+| | | | | | | | |
+| Earnings (loss) per share | | | | | | | |
+| Basic | $ | (0.50) | | | $ | 0.48 | | | $ | (0.95) | | | $ | 0.94 | |
+| Diluted | $ | (0.50) | | | $ | 0.44 | | | $ | (0.95) | | | $ | 0.84 | |
+| | | | | | | | |
+| Shares used in per share calculations: | | | | | | | |
+| Basic | 49,380 | | | 50,095 | | | 49,152 | | | 49,543 | |
+| Diluted | 49,380 | | | 54,998 | | | 49,152 | | | 55,756 | |
+
+    
+
+The accompanying notes are an integral part of these consolidated financial statements.
+
+| | | | | | |
+| 7 | ![SGH_logo_rgb.jpg](sgh-20230526_g2.jpg) |
+
+---
+
+  
+
+SMART Global Holdings, Inc.
+
+Consolidated Statements of Comprehensive Income (Loss)
+
+(In thousands)
+
+(Unaudited)
+
+  
+
+| | | | | | | | | | | | | | | | | | | | | | | | |
+| | Three Months Ended | | Nine Months Ended |
+| | May 26, 2023 | | May 27, 2022 | | May 26, 2023 | | May 27, 2022 |
+| Net income (loss) | $ | (24,077) | | | $ | 24,495 | | | $ | (45,539) | | | $ | 48,165 | |
+| Other comprehensive income (loss), net of tax: | | | | | | | |
+| Cumulative translation adjustment | 3,165 | | | 18,802 | | | 7,278 | | | 10,741 | |
+| Gains (losses) on derivative instruments | 4 | | | — | | | — | | | — | |
+| Gains (losses) on investments | 3 | | | — | | | (8) | | | — | |
+| Comprehensive income (loss) | (20,905) | | | 43,297 | | | (38,269) | | | 58,906 | |
+| Comprehensive income attributable to noncontrolling interest | 378 | | | 382 | | | 1,143 | | | 1,567 | |
+| Comprehensive income (loss) attributable to SGH | $ | (21,283) | | | $ | 42,915 | | | $ | (39,412) | | | $ | 57,339 | |
+
+The accompanying notes are an integral part of these consolidated financial statements.
+
+| | | | | | |
+| 8 | ![SGH_logo_rgb.jpg](sgh-20230526_g2.jpg) |
+
+---
+
+  
+
+SMART Global Holdings, Inc.
+
+Consolidated Statements of Shareholders’ Equity
+
+(In thousands)
+
+(Unaudited)
+
+  
+
+| | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | |
+| | Shares Issued | | Amount | | Additional Paid-in Capital | | Retained Earnings | | Treasury Shares | | Accumulated Other Comprehensive Income (Loss) | | Total SGH Shareholders’ Equity | | Non- controlling Interest in Subsidiary | | Total Equity |
+| As of August 26, 2022 | 52,880 | | | $ | 1,586 | | | $ | 448,112 | | | $ | 251,344 | | | $ | (107,776) | | | $ | (221,655) | | | $ | 371,611 | | | $ | 6,935 | | | $ | 378,546 | |
+| Net income | — | | | — | | | — | | | 4,992 | | | — | | | — | | | 4,992 | | | 332 | | | 5,324 | |
+| Other comprehensive income (loss) | — | | | — | | | — | | | — | | | — | | | (1,995) | | | (1,995) | | | — | | | (1,995) | |
+| Shares issued under equity plans | 1,060 | | | 32 | | | 3,910 | | | — | | | — | | | — | | | 3,942 | | | — | | | 3,942 | |
+| Repurchase of ordinary shares | — | | | — | | | — | | | — | | | (4,659) | | | — | | | (4,659) | | | — | | | (4,659) | |
+| Share-based compensation expense | — | | | — | | | 10,412 | | | — | | | — | | | — | | | 10,412 | | | — | | | 10,412 | |
+| Adoption of ASU 2020-06 | — | | | — | | | (50,822) | | | 18,639 | | | — | | | — | | | (32,183) | | | — | | | (32,183) | |
+| As of November 25, 2022 | 53,940 | | | 1,618 | | | 411,612 | | | 274,975 | | | (112,435) | | | (223,650) | | | 352,120 | | | 7,267 | | | 359,387 | |
+| Net income (loss) | — | | | — | | | — | | | (27,219) | | | — | | | — | | | (27,219) | | | 433 | | | (26,786) | |
+| Other comprehensive income (loss) | — | | | — | | | — | | | — | | | — | | | 6,093 | | | 6,093 | | | — | | | 6,093 | |
+| Shares issued under equity plans | 443 | | | 13 | | | 295 | | | — | | | — | | | — | | | 308 | | | — | | | 308 | |
+| Repurchase of ordinary shares | — | | | — | | | — | | | — | | | (11,564) | | | — | | | (11,564) | | | — | | | (11,564) | |
+| Share-based compensation expense | — | | | — | | | 10,395 | | | — | | | — | | | — | | | 10,395 | | | — | | | 10,395 | |
+| Purchase of Capped Calls | — | | | — | | | (15,090) | | | — | | | — | | | — | | | (15,090) | | | — | | | (15,090) | |
+| Settlement of Capped Calls | — | | | — | | | 10,786 | | | — | | | — | | | — | | | 10,786 | | | — | | | 10,786 | |
+| Distribution to noncontrolling interest | — | | | — | | | — | | | — | | | — | | | — | | | — | | | (2,009) | | | (2,009) | |
+| As of February 24, 2023 | 54,383 | | | 1,631 | | | 417,998 | | | 247,756 | | | (123,999) | | | (217,557) | | | 325,829 | | | 5,691 | | | 331,520 | |
+| Net income (loss) | — | | | — | | | — | | | (24,455) | | | — | | | — | | | (24,455) | | | 378 | | | (24,077) | |
+| Other comprehensive income (loss) | — | | | — | | | — | | | — | | | — | | | 3,172 | | | 3,172 | | | — | | | 3,172 | |
+| Shares issued under equity plans | 776 | | | 24 | | | 4,156 | | | — | | | — | | | — | | | 4,180 | | | — | | | 4,180 | |
+| Repurchase of ordinary shares | — | | | — | | | — | | | — | | | (660) | | | — | | | (660) | | | — | | | (660) | |
+| Share-based compensation expense | — | | — | | | 10,031 | | | — | | | — | | | — | | | 10,031 | | | — | | | 10,031 | |
+| As of May 26, 2023 | 55,159 | | | $ | 1,655 | | | $ | 432,185 | | | $ | 223,301 | | | $ | (124,659) | | | $ | (214,385) | | | $ | 318,097 | | | $ | 6,069 | | | $ | 324,166 | |
+
+The accompanying notes are an integral part of these consolidated financial statements.
+
+  
+
+  
+
+  
+
+  
+
+| | | | | | | | | |
+| 9 | | ![SGH_logo_rgb.jpg](sgh-20230526_g2.jpg) |
+
+---
+
+  
+
+SMART Global Holdings, Inc.
+
+Consolidated Statements of Shareholders’ Equity
+
+(In thousands)
+
+(Unaudited)
+
+  
+
+| | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | |
+| | Shares Issued | | Amount | | Additional Paid-in Capital | | Retained Earnings | | Treasury Shares | | Accumulated Other Comprehensive Income (Loss) | | Total SGH Shareholders’ Equity | | Non- controlling Interest in Subsidiary | | Total Equity |
+| As of August 27, 2021 | 50,138 | | | $ | 1,504 | | | $ | 396,120 | | | $ | 184,787 | | | $ | (50,545) | | | $ | (221,615) | | | $ | 310,251 | | | $ | 8,673 | | | $ | 318,924 | |
+| Net income | — | | — | | | — | | | 20,027 | | | — | | | — | | | 20,027 | | | 671 | | | 20,698 | |
+| Other comprehensive income (loss) | — | | — | | | — | | | — | | | — | | | (19,440) | | | (19,440) | | | — | | | (19,440) | |
+| Shares issued under equity plans | 734 | | 22 | | | 5,007 | | | — | | | — | | | — | | | 5,029 | | | — | | | 5,029 | |
+| Repurchase of ordinary shares | (51) | | (2) | | | 2 | | | — | | | (2,666) | | | — | | | (2,666) | | | — | | | (2,666) | |
+| Share-based compensation expense | — | | — | | | 9,739 | | | — | | | — | | | — | | | 9,739 | | | — | | | 9,739 | |
+| As of November 26, 2021 | 50,821 | | | 1,524 | | | 410,868 | | | 204,814 | | | (53,211) | | | (241,055) | | | 322,940 | | | 9,344 | | | 332,284 | |
+| Net income | — | | — | | | — | | | 2,458 | | | — | | | — | | | 2,458 | | | 514 | | | 2,972 | |
+| Other comprehensive income (loss) | — | | — | | | — | | | — | | | — | | | 11,379 | | | 11,379 | | | — | | | 11,379 | |
+| Shares issued under equity plans | 372 | | 11 | | | 2,420 | | | — | | | — | | | — | | | 2,431 | | | — | | | 2,431 | |
+| Repurchase of ordinary shares | (4) | | — | | | — | | | — | | | (229) | | | — | | | (229) | | | — | | | (229) | |
+| Share-based compensation expense | — | | — | | | 9,848 | | | — | | | — | | | — | | | 9,848 | | | — | | | 9,848 | |
+| Distribution to noncontrolling interest | — | | — | | | — | | | — | | | — | | | — | | | — | | | (3,773) | | | (3,773) | |
+| As of February 25, 2022 | 51,189 | | | 1,535 | | | 423,136 | | | 207,272 | | | (53,440) | | | (229,676) | | | 348,827 | | | 6,085 | | | 354,912 | |
+| Net income | — | | — | | | — | | | 24,113 | | | — | | | — | | | 24,113 | | | 382 | | | 24,495 | |
+| Other comprehensive income (loss) | — | | — | | | — | | | — | | | — | | | 18,802 | | | 18,802 | | | — | | | 18,802 | |
+| Shares issued under equity plans | 1,243 | | 38 | | | 4,351 | | | — | | | — | | | — | | | 4,389 | | | — | | | 4,389 | |
+| Repurchase of ordinary shares | — | | — | | | — | | | — | | | (13,905) | | | — | | | (13,905) | | | — | | | (13,905) | |
+| Share-based compensation expense | — | | — | | | 10,376 | | | — | | | — | | | — | | | 10,376 | | | — | | | 10,376 | |
+| As of May 27, 2022 | 52,432 | | | $ | 1,573 | | | $ | 437,863 | | | $ | 231,385 | | | $ | (67,345) | | | $ | (210,874) | | | $ | 392,602 | | | $ | 6,467 | | | $ | 399,069 | |
+
+The accompanying notes are an integral part of these consolidated financial statements.
+
+| | | | | | | | | |
+| 10 | | ![SGH_logo_rgb.jpg](sgh-20230526_g2.jpg) |
+
+---
+
+  
+
+SMART Global Holdings, Inc.
+
+Consolidated Statements of Cash Flows
+
+(In thousands)
+
+(Unaudited)
+
+  
+
+| | | | | | | | | | | | |
+| Nine Months Ended | May 26, 2023 | | May 27, 2022 |
+| Cash flows from operating activities: | | | |
+| Net income (loss) | $ | (45,539) | | | $ | 48,165 | |
+| Adjustments to reconcile net income (loss) to net cash provided by operating activities: | | | |
+| Depreciation expense and amortization of intangible assets | 61,020 | | | 48,461 | |
+| Amortization of debt discount and issuance costs | 3,054 | | | 7,476 | |
+| Share-based compensation expense | 30,838 | | | 30,295 | |
+| Impairment of goodwill | 17,558 | | | — | |
+| Change in fair value of contingent consideration | 24,900 | | | 41,324 | |
+| (Gain) loss on extinguishment of debt | 15,924 | | | 653 | |
+| Other | 3,213 | | | 640 | |
+| Changes in operating assets and liabilities: | | | |
+| Accounts receivable | 194,478 | | | (41,490) | |
+| Inventories | 104,561 | | | (116) | |
+| Other assets | 8,667 | | | 2,070 | |
+| Accounts payable and accrued expenses and other liabilities | (278,888) | | | (54,174) | |
+| Payment of acquisition-related contingent consideration | (73,724) | | | — | |
+| Deferred income taxes, net | 1,526 | | | 721 | |
+| Net cash provided by operating activities | 67,588 | | | 84,025 | |
+| | | | |
+| Cash flows from investing activities: | | | |
+| Capital expenditures and deposits on equipment | (37,522) | | | (29,298) | |
+| Acquisition of business, net of cash acquired | (213,073) | | | — | |
+| Other | 773 | | | (746) | |
+| Net cash used for investing activities | (249,822) | | | (30,044) | |
+| | | | |
+| Cash flows from financing activities: | | | |
+| Proceeds from debt | 295,287 | | | 270,775 | |
+| Proceeds from issuance of ordinary shares | 8,430 | | | 11,849 | |
+| Proceeds from borrowing under line of credit | — | | | 84,000 | |
+| Payment of acquisition-related contingent consideration | (28,100) | | | — | |
+| Payments to acquire ordinary shares | (16,883) | | | (16,800) | |
+| Payment of premium in connection with convertible note exchange | (14,141) | | | — | |
+| Repayments of debt | (17,149) | | | (125,000) | |
+| Net cash paid for settlement and purchase of Capped Calls | (4,304) | | | — | |
+| Distribution to noncontrolling interest | (2,009) | | | (3,773) | |
+| Repayments of borrowings under line of credit | — | | | (109,000) | |
+| Other | (3,417) | | | (3,841) | |
+| Net cash provided by financing activities | 217,714 | | | 108,210 | |
+| | | | |
+| Effect of changes in currency exchange rates on cash and cash equivalents | 2,730 | | | 2,149 | |
+| Net increase in cash and cash equivalents | 38,210 | | | 164,340 | |
+| Cash and cash equivalents at beginning of period | 363,065 | | | 222,986 | |
+| Cash and cash equivalents at end of period | $ | 401,275 | | | $ | 387,326 | |
+
+The accompanying notes are an integral part of these consolidated financial statements.
+
+| | | | | | |
+| 11 | ![SGH_logo_rgb.jpg](sgh-20230526_g2.jpg) |
+
+---
+
+  
+
+SMART Global Holdings, Inc.
+
+Notes to Consolidated Financial Statements
+
+(Tabular amounts in thousands, except per share amounts)
+
+(Unaudited)
+
+  
+
+Significant Accounting Policies
+
+Basis of Presentation
+
+The accompanying consolidated financial statements include SGH and its consolidated subsidiaries and have been prepared in accordance with accounting principles generally accepted in the United States of America (“GAAP”) consistent in all material respects with those applied in our Annual Report on Form 10-K for the fiscal year ended August 26, 2022 and the applicable rules and regulations of the Securities and Exchange Commission (“SEC”) regarding interim financial information. Certain information and disclosures normally included in consolidated financial statements prepared in accordance with GAAP have been condensed or omitted pursuant to such rules and regulations. In the opinion of our management, the accompanying unaudited consolidated financial statements contain all necessary adjustments, consisting of a normal recurring nature, to fairly state the financial information set forth herein. These consolidated interim financial statements should be read in conjunction with the consolidated financial statements and accompanying notes included in our Annual Report on Form 10-K for the fiscal year ended August 26, 2022. Certain reclassifications have been made to prior period amounts to conform to current period presentation.
+
+Fiscal Year: Our fiscal year is the 52 or 53-week period ending on the last Friday in August. Fiscal 2023 and 2022 each contain 52 weeks. All period references are to our fiscal periods unless otherwise indicated. Financial information for our subsidiaries in Brazil is included in our consolidated financial statements on a one-month lag because their fiscal years end on July 31 of each year.
+
+Subsequent Event
+
+On June 13, 2023, we entered into a Stock Purchase Agreement (the “Purchase Agreement”), by and among SMART Modular Technologies (LX) S.à.r.l., a société à responsabilité limitée governed by the laws of Grand Duchy of Luxembourg and our wholly owned subsidiary (“Seller”), Lexar Europe B.V., a company organized under the laws of The Netherlands (“Purchaser”), Shenzhen Longsys Electronics Co., Ltd., a company limited by shares governed by the laws of the People’s Republic of China (“Longsys”), solely with respect to certain provisions therein, Shanghai Intelligent Memory Semiconductor Co., Ltd., a limited liability company governed by the laws of the People’s Republic of China (“Parent Funding Entity”), and, solely with respect to certain provisions therein, SGH, for the intended sale of its standards-based modules assembly and test business in Brazil. The transaction, which was approved by our Board of Directors and the Board of Directors of Seller, is expected to close by the end of calendar year 2023.
+
+Pursuant to the Purchase Agreement, among other matters, and subject to the satisfaction or waiver of the conditions set forth therein, Seller will sell to Purchaser, and Purchaser will purchase from Seller, 81% of Seller’s right, title and interest in and to the outstanding quotas of SMART Modular Technologies do Brasil – Indústria e Comercio de Componentes Ltda., a sociedade limitada governed by the laws of Brazil (“SMART Brazil”), with Seller retaining a 19% interest in SMART Brazil (the “Retained Interest”) (the “Acquisition”).
+
+Pursuant to the terms of, and subject to the conditions specified in, the Purchase Agreement, upon consummation of the Acquisition (the “Closing”), Purchaser will pay to Seller (based on a total enterprise value of $205.0 million for SMART Brazil) consideration consisting of (i) an upfront cash purchase price of $137.7 million on a cash-free, debt-free basis and subject to certain customary adjustments as set forth in the Purchase Agreement, (ii) a deferred cash purchase price of $28.4 million eighteen months following the Closing and (iii) subject to and at the time of exercise of the Put/Call Option (as defined below), an additional cash payment equal to 19% of the amount of SMART Brazil’s cash at the Closing (as calculated pursuant to the Purchase Agreement) minus the amount of SMART Brazil’s indebtedness at the Closing (as calculated pursuant to the Purchase Agreement).
+
+Pursuant to the Purchase Agreement, at Closing, SMART Brazil, Seller, Purchaser, and Longsys will enter into a Quotaholders Agreement, which will provide Seller with a put option to sell the Retained Interest in SMART Brazil (the “Put Option”) during three exercise windows following its fiscal years ending July 31, 2026, July 31, 2027 or July 31, 2028 (the “Exercise
+
+| | | | | | |
+| 12 | ![SGH_logo_rgb.jpg](sgh-20230526_g2.jpg) |
+
+---
+
+  
+
+Windows”), with such Exercise Windows beginning on January 15, 2027 and ending on February 15, 2027, beginning on January 15, 2028 and ending on February 15, 2028 and beginning on January 15, 2029 and ending on February 15, 2029, respectively. A call option has also been granted to Purchaser to require Seller to sell the Retained Interest during the Exercise Windows (the “Call Option,” together with the Put Option, the “Put/Call Option”). The price for the Put/Call Option is based on a 100% enterprise value of 7.5x net income for SMART Brazil for the preceding fiscal year at the time of exercise. The Quotaholders Agreement also provides, among other things, for certain governance and approval rights among the parties thereto.
+
+The consummation of the Acquisition is subject to customary conditions to Closing, including, among others, (i) completion of filings for outbound direct investment with the Division of Development and Reform in the China (Shanghai) Pilot Free Trade Zone Lin-gang Special Area Administration and the Division of Finance and Trade Development in the China (Shanghai) Pilot Free Trade Zone Lin-gang Special Area Administration, and completion of foreign exchange registration with a qualified bank authorized by the Municipal Administration of Foreign Exchange in Shanghai (the “China Outbound Approvals”) and (ii) approval of the transactions contemplated by the Purchase Agreement by Longsys’ shareholders (the “Longsys Shareholder Approval”).
+
+The Purchase Agreement contains customary termination rights, including the right for Seller or Purchaser to terminate the Purchase Agreement if the Closing shall not have occurred by December 10, 2023. Purchaser shall pay a $8.0 million termination fee to Seller if the transaction is terminated due to a failure to obtain the China Outbound Approvals or the Longsys Shareholder Approval and other specified circumstances, which termination fee may be increased to $12.0 million over time.
+
+Recently Adopted Accounting Standards
+
+In August 2020, the Financial Accounting Standards Board (“FASB”) issued Accounting Standards Update (“ASU”) 2020-06 – Debt – Debt with Conversion and Other Options and Derivatives and Hedging – Contracts in Entity’s Own Equity: Accounting for Convertible Instruments and Contracts in an Entity’s Own Equity, which simplifies the accounting for convertible debt instruments by reducing the number of accounting models and the number of embedded conversion features that could be recognized separately from the primary contract. This ASU requires a convertible debt instrument to be accounted for as a single liability measured at its amortized cost, as long as no other features require bifurcation and recognition as derivatives. This ASU requires an entity to use the if-converted method in the diluted earnings per share calculation for convertible instruments. This ASU was effective for us in the first quarter of 2023 and permits the use of either the modified retrospective or fully retrospective method of transition.
+
+We adopted ASU 2020-06 in the first quarter of 2023 under the modified retrospective method. Upon adoption of ASU 2020-06, the previously separated equity component and associated issuance costs of our 2.25% convertible senior notes due 2026 were reclassified from additional paid-in capital to long-term debt, thereby eliminating future amortization of the debt discount as interest expense. The following table summarizes the effects of adopting ASU 2020-06:
+
+| | | | | | | | | | | | | | | | | | |
+| | Ending Balance as of August 26, 2022 | | Adoption of ASU 2020-06 | | Beginning Balance as of August 27, 2022 |
+| Long-term debt | $ | 591,389 | | | $ | 32,183 | | | $ | 623,572 | |
+| Additional paid-in capital | 448,112 | | | (50,822) | | | 397,290 | |
+| Retained earnings | 251,344 | | | 18,639 | | | 269,983 | | 
+
+In October 2021, the FASB issued ASU 2021-08 – Business Combinations: Accounting for Contract Asset and Contract Liabilities from Contracts with Customers, to require that an acquirer recognize and measure contract assets and liabilities acquired in a business combination in accordance with ASC 606, Revenue from Contracts with Customers. We adopted ASU 2021-08 in the third quarter of 2022 for any acquisitions occurring after our adoption.
+
+| | | | | | |
+| 13 | ![SGH_logo_rgb.jpg](sgh-20230526_g2.jpg) |
+
+---
+
+  
+
+Business Acquisition
+
+Stratus Technologies
+
+On August 29, 2022 (the “Acquisition Date”), we completed the acquisition of Storm Private Holdings I Ltd., a Cayman Islands exempted company (“Stratus Holding Company” and together with its subsidiaries, “Stratus Technologies”), pursuant to the terms of that certain Share Purchase Agreement (the “Stratus Purchase Agreement”), dated as of June 28, 2022, by and among SGH, Stratus Holding Company and Storm Private Investments LP, a Cayman Islands exempted limited partnership (“Seller”). Pursuant to the Stratus Purchase Agreement, among other matters, Seller sold to SGH, and SGH purchased from Seller, all of Seller’s right, title and interest in and to the outstanding equity securities of Stratus Holding Company (the “Share Purchase”). Stratus operates as part of SGH’s Intelligent Platform Solutions (“IPS”) segment.
+
+Stratus Technologies is a global leader in simplified, protected and autonomous computing platforms and services in the data center and at the Edge. For more than 40 years, Stratus Technologies has provided high-availability, fault-tolerant computing to Fortune 500 companies and small-to-medium sized businesses enabling them to securely and remotely run critical applications with minimal downtime. The acquisition of Stratus Technologies further enhances SGH’s growth and diversification strategy and complements and expands SGH’s IPS business in data center and edge environments.
+
+Purchase Price: At the closing of the transaction, we paid the Seller a cash purchase price of $225 million, subject to certain adjustments. In addition, the Seller has the right to receive, and we will be obligated to pay, contingent consideration (if any) of up to $50 million (the “Earnout”) based on the gross profit performance of Stratus Technologies during the first full 12 fiscal months following the closing. Pursuant to the terms of the Stratus Purchase Agreement, we had the option to settle the Earnout amount owed to the Seller, if any, in cash, ordinary shares of SGH, or a mix of cash and ordinary shares of SGH. On June 28, 2023, we provided notice to the Seller of our election to settle the Earnout in cash.
+
+Cash paid was utilized, in part, to settle the outstanding debt of Stratus Technologies as of the closing of the transaction and was recognized as a component of consideration transferred. As a result, the assets acquired and liabilities assumed do not include an assumed liability for the outstanding debt of Stratus Technologies. The purchase price was as follows:
+
+| | | | | | |
+| Cash | $ | 225,000 | |
+| Additional payment for net working capital adjustment (1) | 17,246 | |
+| Fair value of Earnout | 20,800 | |
+| | $ | 263,046 | |
+
+(1)Includes $14.4 million paid at closing and $2.8 million paid in the second quarter of 2023 upon completion of the review of the working capital assets acquired and liabilities assumed.
+
+Contingent Consideration: The Earnout was accounted for as contingent consideration. As of the Acquisition Date, the fair value of the Earnout was estimated to be $20.8 million and was valued using a Monte Carlo simulation analysis in a risk-neutral framework with assumptions for volatility, market price of risk adjustment, risk-free rate and cost of debt. The fair value measurement was based on significant inputs, not observable in the market, including forecasted gross profit, comparable company volatility, discount rate and cost of debt. The fair value of the Earnout was estimated based on the Company’s evaluation of the probability and amount of Earnout to be achieved based on the expected gross profit of Stratus Technologies. A Monte Carlo simulation model was used to estimate the Earnout payment, which was discounted to its present value based on the expected payment date of the Earnout. The model used an estimated gross profit volatility of 33.4% and a discount rate of 7.3% as of the Acquisition Date.
+
+The Earnout is revalued each quarter and any change in valuation is reflected in our results of operations. In the third quarter and first nine months of 2023, we adjusted the fair value of the Earnout to its fair value by $14.8 million and $24.9 million, respectively, with such changes recognized in income from operations. The changes in fair value reflected new information about the estimate of the gross profit of Stratus Technologies during the first full 12 fiscal months following the closing. As of May 26, 2023, the fair value of the Earnout was $45.7 million.
+
+| | | | | | |
+| 14 | ![SGH_logo_rgb.jpg](sgh-20230526_g2.jpg) |
+
+---
+
+  
+
+Valuation: We estimated the fair value of the assets and liabilities of Stratus Technologies as of the Acquisition Date. The purchase price has been allocated to the tangible and intangible assets acquired and liabilities assumed and was as follows:
+
+| | | | | | |
+| Cash and cash equivalents | $ | 29,174 | |
+| Accounts receivable | 26,685 | |
+| Inventories | 10,890 | |
+| Other current assets | 6,536 | |
+| Property and equipment | 7,292 | |
+| Operating lease right-of-use assets | 9,216 | |
+| Intangible assets | 123,700 | |
+| Goodwill | 125,929 | |
+| Other noncurrent assets | 11,661 | |
+| Accounts payable and accrued expenses | (32,656) | |
+| Other current liabilities | (36,723) | |
+| Noncurrent operating lease liabilities | (7,067) | |
+| Other noncurrent liabilities | (11,591) | |
+| Total net assets acquired | $ | 263,046 | | 
+
+The goodwill arising from the acquisition of Stratus Technologies was assigned to our IPS segment. None of the goodwill recognized is expected to be deductible for income tax purposes.
+
+The fair values and useful lives of identifiable intangible assets were as follows:
+
+| | | | | | | | | | | | |
+| | Amount | | Estimated useful life (in years) |
+| Technology | $ | 82,000 | | | 5 |
+| Customer relationships | 27,800 | | | 8 |
+| Trademarks/trade names | 10,000 | | | 9 |
+| In-process research and development | 3,900 | | | N/A |
+| | $ | 123,700 | | | | 
+
+•Technology intangible assets were valued using the multi-period excess earnings method based on the discounted cash flow and technology obsolescence rate. Discounted cash flow requires the use of significant unobservable inputs, including projected revenue, expenses, capital expenditures and other costs, and discount rates calculated based on the cost of equity adjusted for various risks, including the size of the acquiree, industry risk and other risk factors.
+
+•Customer relationship intangible assets were valued using the multi-period excess earnings method, which is the present value of the projected cash flows that are expected to be generated by the existing intangible assets after reduction by an estimated fair rate of return on contributory assets required to generate the customer relationship revenues. Key assumptions included discounted cash flow, estimated life cycle and customer attrition rates.
+
+•Trademark/trade name intangible assets were valued using the relief from royalty method, which is the discounted cash flow savings accruing to the owner by virtue of the fact that the owner is not required to license the trademarks/trade names from a third party. Key assumptions included attributable revenue expected from the trademarks/trade names, royalty rates and assumed asset life.
+
+•In-process research and development (“IPR&D”) relates to next generation fault tolerant architecture. IPR&D is indefinite-lived and will be reviewed for impairment at least annually. Amortization will commence upon completion of research and development efforts. IPR&D was valued based on discounted cash flow, which requires the use of significant unobservable inputs, including projected revenue, expenses, capital expenditures and other costs.
+
+Unaudited Pro Forma Financial Information: The following unaudited pro forma financial information presents SGH’s combined results of operations as if the acquisition of Stratus Technologies had occurred on August 27, 2021. The unaudited pro forma financial information is based on various adjustments and assumptions and is not necessarily
+
+| | | | | | |
+| 15 | ![SGH_logo_rgb.jpg](sgh-20230526_g2.jpg) |
+
+---
+
+  
+
+indicative of what SGH’s results of operations actually would have been had the acquisition been completed as of August 27, 2021 or will be for any future periods. Furthermore, the pro forma financial information does not include adjustments to reflect any potential revenue, synergies or dis-synergies, or cost savings that may be achievable in connection with the acquisition or the associated costs that may be necessary to achieve such revenues, synergies or cost savings.
+
+The following unaudited pro forma financial information for the three and nine months ended May 27, 2022 combines the historical results of operations of SGH for the three and nine months ended May 27, 2022 and the historical results of operations of Stratus Technologies for the three and nine months ended February 27, 2022:
+
+| | | | | | | | | | | | |
+| | Three Months Ended | | Nine Months Ended |
+| | May 27, 2022 | | May 27, 2022 |
+| Net sales | $ | 503,217 | | | $ | 1,500,383 | |
+| Net income attributable to SGH | 22,657 | | | 29,136 | |
+| | | | |
+| Earnings per share: | | | |
+| Basic | $ | 0.45 | | | $ | 0.59 | |
+| Diluted | $ | 0.41 | | | $ | 0.52 | | 
+
+Acquisition-related transaction expenses are included within selling, general and administrative expenses and were $4.8 million in the first nine months of 2023. For the first nine months of 2023, net sales for Stratus Technologies were $131.9 million and net loss was $2.6 million, excluding any charges recognized to adjust the Earnout to its fair value.
+
+Accounts Receivable
+
+In the third quarter of 2023, we entered into a trade accounts receivable sale program with a third-party financial institution to sell certain of our trade accounts receivable on a non-recourse basis pursuant to a factoring arrangement. This program will allow us to sell certain of our trade accounts receivables up to $60 million. There were no trade accounts receivable sold during the third quarter of 2023.
+
+Inventories
+
+| | | | | | | | | | | | |
+| As of | May 26, 2023 | | August 26, 2022 |
+| Raw materials | $ | 112,074 | | | $ | 150,913 | |
+| Work in process | 29,477 | | | 38,624 | |
+| Finished goods | 84,500 | | | 133,547 | |
+| | $ | 226,051 | | | $ | 323,084 | | 
+
+As of each of May 26, 2023 and August 26, 2022, 6% of total inventories were inventories owned and held under our logistics services.
+
+| | | | | | |
+| 16 | ![SGH_logo_rgb.jpg](sgh-20230526_g2.jpg) |
+
+---
+
+  
+
+Property and Equipment
+
+| | | | | | | | | | | | |
+| As of | May 26, 2023 | | August 26, 2022 |
+| Equipment | $ | 233,930 | | | $ | 204,805 | |
+| Buildings and building improvements | 72,361 | | | 59,047 | |
+| Furniture, fixtures and software | 47,855 | | | 38,715 | |
+| Land | 16,126 | | | 16,126 | |
+| | 370,272 | | | 318,693 | |
+| Accumulated depreciation | (192,521) | | | (164,758) | |
+| | $ | 177,751 | | | $ | 153,935 | | 
+
+Depreciation expense for property and equipment was $9.5 million and $27.4 million in the third quarter and first nine months of 2023, respectively, and $10.6 million and $30.3 million in the third quarter and first nine months of 2022, respectively.
+
+Change in Accounting Estimate: During the first quarter of 2023, we completed an assessment of the estimated useful lives of our manufacturing equipment. Based on that assessment, we revised the estimated useful lives from five years to eight years as of the beginning of the first quarter of 2023. The change reduced our non-cash depreciation expense for the first nine months of 2023 by approximately $7.9 million, which resulted in aggregate reductions of $7.6 million in cost of sales and research and development expense and a reduction of $0.2 million in the cost of our inventories as of the end of the third quarter of 2023. These reductions benefited net income for the first nine months of 2023 by $6.3 million, or $0.13 per share.
+
+Intangible Assets and Goodwill
+
+| | | | | | | | | | | | | | | | | | | | | | | | |
+| | As of May 26, 2023 | | As of August 26, 2022 |
+| | Gross Amount | | Accumulated Amortization | | Gross Amount | | Accumulated Amortization |
+| Intangible assets: | | | | | | | |
+| Technology | $ | 151,050 | | | $ | (38,168) | | | $ | 61,594 | | | $ | (18,473) | |
+| Customer relationships | 85,300 | | | (42,953) | | | 57,500 | | | (32,238) | |
+| Trademarks/trade names | 29,200 | | | (13,014) | | | 19,200 | | | (9,771) | |
+| | $ | 265,550 | | | $ | (94,135) | | | $ | 138,294 | | | $ | (60,482) | |
+| | | | | | | | |
+| Goodwill by segment: | | | | | | | |
+| Intelligent Platform Solutions | $ | 148,771 | | | | | $ | 40,401 | | | |
+| Memory Solutions | 34,318 | | | | | 33,608 | | | |
+| | $ | 183,089 | | | | | $ | 74,009 | | | | 
+
+In the first nine months of 2023 and 2022, we capitalized $127.3 million, primarily in connection with our acquisition of Stratus Technologies, and $1.1 million, respectively, for intangible assets with weighted-average useful lives of 6.1 years and 17.5 years, respectively. Amortization expense for intangible assets was $11.8 million and $33.6 million in the third quarter and first nine months of 2023, respectively, and $5.9 million and $18.2 million in the third quarter and first nine months of 2022, respectively. Amortization expense is expected to be $11.1 million for the remainder of 2023, $40.5 million for 2024, $35.6 million for 2025, $30.2 million for 2026, $29.5 million for 2027 and $24.6 million for 2028 and thereafter.
+
+Goodwill of our IPS segment increased in the first nine months of 2023, primarily due to the addition of $125.9 million in connection with our acquisition of Stratus Technologies. See “Business Acquisition – Stratus Technologies.” In the second quarter of 2023, we assessed goodwill associated with our Penguin Edge business within our IPS segment and concluded it was partially impaired. As a result, we recognized a charge of $17.6 million in the first nine months of 2023 to impair the carrying value of goodwill. See “Impairment of Penguin Edge Goodwill.”
+
+| | | | | | |
+| 17 | ![SGH_logo_rgb.jpg](sgh-20230526_g2.jpg) |
+
+---
+
+  
+
+Goodwill of our Memory Solutions segment increased by $0.7 million in the first nine months of 2023 and decreased in all of 2022 by $0.2 million from translation adjustments.
+
+Impairment of Penguin Edge Goodwill
+
+During the second quarter of 2023, we initiated a plan within our IPS segment pursuant to which we intend to wind down manufacturing and discontinue the sale of certain legacy products offered through our Penguin Edge business by approximately the end of calendar 2024. In connection therewith and with the preparation of the financial statements for our second quarter of 2023, we performed a quantitative assessment of the fair value of goodwill using an income approach with assumptions that are considered Level 3 measurements and concluded that the carrying value of the Penguin Edge reporting unit goodwill exceeded its fair value. As a result, we recorded a charge of $17.6 million in the second quarter of 2023 to impair the carrying value of IPS goodwill. The fair value of the Penguin Edge reporting unit was determined primarily by discounting estimated future cash flows, which were determined based on revenue and expense assumptions over the next two years, at a weighted-average cost of capital of 14.5%. We concluded that long-lived assets other than goodwill, primarily consisting of customer relationship intangible assets, had fair values in excess of their carrying amounts, and accordingly recorded no impairments of such assets. These assets will continue to be amortized over their remaining useful lives through the date of our anticipated completion of wind-down activities.
+
+At each reporting date through the end of the wind-down period, we will reassess the estimated remaining cash flows of the Penguin Edge business. As of the end of the third quarter of 2023, there was no further impairment of Penguin Edge goodwill. However, we currently anticipate that the remaining goodwill of the Penguin Edge reporting unit of $17.6 million as of the end of the third quarter of 2023 may become further impaired in future periods.
+
+Accounts Payable and Accrued Expenses
+
+| | | | | | | | | | | | |
+| As of | May 26, 2023 | | August 26, 2022 |
+| Accounts payable (1) | $ | 170,884 | | | $ | 345,063 | |
+| Salaries, wages and benefits | 22,563 | | | 45,189 | |
+| Income and other taxes | 8,415 | | | 17,961 | |
+| Other | 8,263 | | | 5,141 | |
+| | $ | 210,125 | | | $ | 413,354 | |
+
+(1)Includes accounts payable for property and equipment of $7.6 million and $3.5 million as of May 26, 2023 and August 26, 2022, respectively.
+
+Debt
+
+| | | | | | | | | | | | |
+| As of | May 26, 2023 | | August 26, 2022 |
+| Amended 2027 TLA | $ | 551,649 | | | $ | 269,304 | |
+| 2029 Notes | 146,748 | | | — | |
+| 2026 Notes | 98,471 | | | 213,023 | |
+| LED Earnout Note | — | | | 101,824 | |
+| Other | 17,643 | | | 19,263 | |
+| | 814,511 | | | 603,414 | |
+| Less current debt | (32,253) | | | (12,025) | |
+| Long-term debt | $ | 782,258 | | | $ | 591,389 | | 
+
+Credit Facility
+
+On February 7, 2022, SGH and SMART Modular Technologies, Inc. (collectively, the “Borrowers”) entered into a credit agreement (the “Original Credit Agreement”) with a syndicate of banks that provides for (i) a term loan credit facility in an aggregate principal amount of $275.0 million (the “2027 TLA”) and (ii) a revolving credit facility in an aggregate principal
+
+| | | | | | |
+| 18 | ![SGH_logo_rgb.jpg](sgh-20230526_g2.jpg) |
+
+---
+
+  
+
+amount of $250.0 million (the “2027 Revolver” and together with the 2027 TLA, the “Original Credit Facility”), in each case, maturing on February 7, 2027 (subject to certain earlier “springing maturity” dates upon certain conditions specified in the Original Credit Agreement). The Original Credit Agreement provides that up to $35.0 million of the 2027 Revolver is available for issuances of letters of credit.
+
+Incremental Amendment: On August 29, 2022, the Borrowers entered into the First Amendment (the “Amended Credit Agreement”) with and among the lenders party thereto and Citizens Bank, N.A., as Administrative Agent (the “Incremental Amendment”). The Incremental Amendment amends the Original Credit Agreement and (i) provides for incremental term loans under the Amended Credit Agreement in an aggregate amount of $300.0 million (the “Incremental Term Loans” and together with the 2027 TLA, the “Amended 2027 TLA”) which Incremental Term Loans are on the same terms as the term loans incurred under the Original Credit Agreement, (ii) increases the maximum First Lien Leverage Ratio (as defined in the Amended Credit Agreement) financial covenant from 3.00:1.00 to 3.25:1.00 and (iii) increases the aggregate amount of unrestricted cash and permitted investments netted from the definitions of Consolidated First Lien Debt and Consolidated Net Debt under the Amended Credit Agreement from $100 million to $125 million.
+
+Substantially simultaneously with entering into the Incremental Amendment, the Borrowers applied a portion of the proceeds of the Incremental Term Loans to (i) finance a portion of the purchase price for the acquisition of Stratus Technologies and (ii) prepay in full the $101.8 million outstanding under the LED Earnout Note. In connection with our prepayment of the LED Earnout Note, we recognized a gain of $0.8 million in the first quarter of 2023, which is included in other non-operating (income) expense in the accompanying statement of operations.
+
+Other: As of May 26, 2023, there was $558.9 million of principal amount outstanding under the Amended 2027 TLA, unamortized issuance costs were $7.2 million and the effective interest rate was 7.88%. As of May 26, 2023, there were no amounts outstanding under the 2027 Revolver.
+
+Convertible Senior Notes
+
+Convertible Senior Notes Exchange
+
+On January 18, 2023, SGH entered into separate, privately negotiated exchange agreements with a limited number of holders of its 2.25% Convertible Senior Notes due 2026 (the “2026 Notes”) to exchange $150.0 million principal amount of the 2026 Notes for (i) $150.0 million in aggregate principal amount of new 2.00% Convertible Senior Notes due 2029 (the “2029 Notes”) and (ii) an aggregate of approximately $15.6 million in cash, with such cash payment representing $14.1 million of premium paid for the 2026 Notes in excess of par value and $1.5 million of accrued and unpaid interest on the 2026 Notes (collectively, the “Exchange Transactions”). The 2029 Notes were issued pursuant to, and are governed by, an indenture (the “2029 Indenture”), dated as of January 23, 2023, between the Company and U.S. Bank Trust Company, National Association, as trustee.
+
+Transactions involving contemporaneous exchanges between the same debtor and creditor in connection with the issuance of a new debt obligation and satisfaction of an existing debt obligation are accounted for as debt extinguishments if the debt instruments have substantially different terms. An exchange is deemed to have substantially different terms if:
+
+•The present value of the remaining cash flows of the old instrument differs by more than 10% of the present value of the cash flows of the new instrument, or
+
+•The change in the fair value of the conversion option immediately before and after the exchange is greater than 10% of the carrying value of the debt instrument immediately prior to the exchange.
+
+We concluded that the exchanged 2026 Notes and the 2029 Notes had substantially different terms, and accordingly, we accounted for the Exchange Transactions as the extinguishment of the 2026 Notes and the issuance of the 2029 Notes. As a result, we recognized an extinguishment loss in the second quarter of 2023, included in other non-operating expense, of $16.7 million consisting of $14.1 million of premium paid to extinguish the 2026 Notes and $2.5 million for the write-off of unamortized issuance costs.
+
+2029 Notes
+
+The 2029 Notes are senior, unsecured obligations of the Company and are equal in right of payment with our existing and future senior, unsecured indebtedness, senior in right of payment to our existing and future indebtedness that is expressly subordinated to the 2029 Notes and effectively subordinated to our existing and future senior, secured indebtedness, to the extent of the value of the collateral securing that indebtedness. Our 2026 Notes and 2029 Notes are structurally
+
+| | | | | | |
+| 19 | ![SGH_logo_rgb.jpg](sgh-20230526_g2.jpg) |
+
+---
+
+  
+
+subordinated to all other existing and future indebtedness and other liabilities, including trade payables, and (to the extent the Company is not a holder thereof) preferred equity, if any, of our subsidiaries.
+
+The 2029 Notes bear interest at a rate of 2.00% per annum on the principal amount thereof, payable semi-annually in arrears on February 1 and August 1 of each year, beginning on August 1, 2023, to the noteholders of record of the 2029 Notes as of the close of business on the immediately preceding January 15 and July 15, respectively. The 2029 Notes will mature on February 1, 2029 (the “2029 Maturity Date”), unless earlier converted, redeemed or repurchased. The 2029 Notes are convertible into cash or a combination of cash and the Company’s ordinary shares, $0.03 par value per share (the “ordinary shares”), at our election.
+
+The initial conversion rate of the 2029 Notes is 47.1059 ordinary shares per $1,000 principal amount of the 2029 Notes, which represents an initial conversion price of approximately $21.23 per ordinary share. The conversion rate is subject to adjustment upon the occurrence of certain specified events as set forth in the 2029 Indenture. In connection with any conversion of the 2029 Notes, we are required to pay the principal amount in cash and have the option to settle any amount in excess of the principal portion in cash and/or ordinary shares.
+
+Conversion Rights: Holders of the 2029 Notes may convert them under the following circumstances:
+
+i.during any fiscal quarter commencing after the fiscal quarter ended on May 26, 2023 (and only during such fiscal quarter) if the last reported sale price per ordinary share exceeds 130% of the conversion price for at least 20 trading days in the 30 consecutive trading days ending on the last trading day of the immediately preceding fiscal quarter;
+
+ii.during the five consecutive business days immediately after any 10 consecutive trading day period (such 10 consecutive trading day period, the “measurement period”) in which the trading price per $1,000 principal amount of notes for each trading day of the measurement period was less than 98% of the product of the last reported sale price per ordinary share on such trading day and the conversion rate on such trading day;
+
+iii.upon the occurrence of certain corporate events or distributions on our ordinary shares, as provided in the 2029 Indenture;
+
+iv.if we call the 2029 Notes for redemption; and
+
+v.on or after August 1, 2028 until the close of business on the second scheduled trading day immediately before the maturity date.
+
+Upon the occurrence of a “make-whole fundamental change” (as defined in the 2029 Indenture), we will in certain circumstances increase the conversion rate for a specified period of time. In addition, upon the occurrence of a “fundamental change” (as defined in the 2029 Indenture), holders of the 2029 Notes may require us to repurchase their 2029 Notes at a cash repurchase price equal to the principal amount of the 2029 Notes to be repurchased, plus accrued and unpaid interest, if any, to, but excluding, the fundamental change repurchase date. The definition of fundamental change includes certain business combination transactions involving the Company and certain de-listing events with respect to our ordinary shares.
+
+Cash Redemption at Our Option: We have the right to redeem the 2029 Notes, in whole or in part, at our option at any time, and from time to time, on or after February 6, 2026 and on or before the 40th scheduled trading day immediately before the 2029 Maturity Date, at a cash redemption price equal to the principal amount of the 2029 Notes to be redeemed, plus accrued and unpaid interest, if any, but only if the last reported per share sale price of our ordinary shares exceeds 130% of the conversion price on (i) each of at least 20 trading days during the 30 consecutive trading days ending on, and including, the trading day immediately before the redemption notice date for such redemption and (ii) the trading day immediately before the date we send such notice. In addition, we have the right to redeem all, but not less than all, of the 2029 Notes if certain changes in tax law occur. Calling any 2029 Note for redemption will constitute a make-whole fundamental change with respect to such note, in which case the conversion rate applicable to the conversion of such note will be increased in certain circumstances if it is converted after it is called for redemption.
+
+2026 Notes
+
+In February 2020, we issued $250.0 million in aggregate principal amount of 2026 Notes. The 2026 Notes are general unsecured obligations, bear interest at an annual rate of 2.25% per year, payable semi-annually on February 15 and August 15, and mature on February 15, 2026, unless earlier converted, redeemed or repurchased. The 2026 Notes are governed by an indenture (the “2026 Indenture”) between us and U.S. Bank National Association, as trustee. After the effect of the share dividend paid in the second quarter of 2022, the conversion rate of the 2026 Notes is 49.2504 ordinary shares per $1,000 principal amount of notes, which represents a conversion price of approximately $20.30 per ordinary share. The conversion rate is subject to adjustment upon the occurrence of certain specified events as set forth in the 2026 Indenture. On January
+
+| | | | | | |
+| 20 | ![SGH_logo_rgb.jpg](sgh-20230526_g2.jpg) |
+
+---
+
+  
+
+18, 2023, we exchanged $150.0 million principal amount of 2026 Notes for $150.0 million principal amount of new 2029 Notes. As a result, as of May 26, 2023, $100.0 million in aggregate principal amount of 2026 Notes remain outstanding. See “Convertible Senior Notes – Convertible Senior Notes Exchange.”
+
+First Supplemental Indenture to Indenture Governing the 2026 Notes: On August 26, 2022, SGH entered into the First Supplemental Indenture (the “2026 First Supplemental Indenture”) to the 2026 Indenture governing the 2026 Notes. The 2026 First Supplemental Indenture became effective on August 27, 2022. Pursuant to the 2026 First Supplemental Indenture, SGH irrevocably elected (i) to eliminate SGH’s option to elect Physical Settlement (as defined in the 2026 Indenture) on any conversion of the 2026 Notes that occurs on or after the date of the 2026 First Supplemental Indenture and (ii) with respect to any Combination Settlement (as defined in the 2026 Indenture) for a conversion of the 2026 Notes, the Specified Dollar Amount (as defined in the 2026 Indenture) that will be settled in cash per $1,000 principal amount of the 2026 Notes shall be no lower than $1,000.
+
+As a result of our election, upon any conversion of the 2026 Notes, we will be required to pay cash in an amount at least equal to the principal portion while continuing to have the option to settle any amount in excess of the principal portion in cash and/or ordinary shares. Following the irrevocable election, only the amounts expected to be settled in excess of the principal portion are considered in calculating diluted earnings per share under the if-converted method.
+
+Convertible Senior Note Interest
+
+Unamortized debt discount and issuance costs are amortized over the terms of our 2026 Notes and 2029 Notes using the effective interest method. As of May 26, 2023 and August 26, 2022, the effective interest rate for our 2026 Notes was 2.83% and 7.06%, respectively. As of May 26, 2023, the effective interest rate for our 2029 Notes was 2.40%. Aggregate interest expense for our convertible notes consisted of contractual stated interest and amortization of discount and issuance costs and included the following:
+
+| | | | | | | | | | | | | | | | | | | | | | | | |
+| | Three Months Ended | | Nine Months Ended |
+| | May 26, 2023 | | May 27, 2022 | | May 26, 2023 | | May 27, 2022 |
+| Contractual stated interest | $ | 1,342 | | | $ | 1,438 | | | $ | 4,099 | | | $ | 4,219 | |
+| Amortization of discount and issuance costs | 230 | | | 2,242 | | | 884 | | | 6,702 | |
+| | $ | 1,572 | | | $ | 3,680 | | | $ | 4,983 | | | $ | 10,921 | | 
+
+As of August 26, 2022, the carrying amount of the equity components of the 2026 Notes, which was included in additional paid-in-capital, was $50.8 million. As of the beginning of the first quarter of 2023, we adopted ASU 2020-06. In connection therewith, we reclassified $32.2 million from additional paid-in-capital to long-term debt and $18.6 million from additional paid-in-capital to retained earnings. See “Recently Adopted Accounting Standards.”
+
+Maturities of Debt
+
+As of May 26, 2023, maturities of debt were as follows:
+
+| | | | | | |
+| Remainder of 2023 | $ | 8,156 | |
+| 2024 | 39,836 | |
+| 2025 | 32,625 | |
+| 2026 | 132,625 | |
+| 2027 | 461,684 | |
+| 2028 and thereafter | 151,575 | |
+| Less unamortized discount and issuance costs | (11,990) | |
+| | $ | 814,511 | | 
+
+| | | | | | |
+| 21 | ![SGH_logo_rgb.jpg](sgh-20230526_g2.jpg) |
+
+---
+
+  
+
+Leases
+
+As of May 26, 2023 and August 26, 2022, we had operating leases through which we utilize facilities, offices and equipment in our manufacturing operations, research and development activities and selling, general and administrative functions. Sublease income was not significant in any period presented. The components of operating lease expense were as follows:
+
+| | | | | | | | | | | | | | | | | | | | | | | | |
+| | Three Months Ended | | Nine Months Ended |
+| | May 26, 2023 | | May 27, 2022 | | May 26, 2023 | | May 27, 2022 |
+| Fixed lease cost | $ | 4,276 | | | $ | 3,402 | | | $ | 14,595 | | | $ | 9,917 | |
+| Variable lease cost | 323 | | | 370 | | | 1,006 | | | 1,192 | |
+| Short-term lease cost | 625 | | | 119 | | | 1,682 | | | 377 | |
+| | $ | 5,224 | | | $ | 3,891 | | | $ | 17,283 | | | $ | 11,486 | | 
+
+Cash flows used for operating activities in the first nine months of 2023 and 2022 included payments for operating leases of $6.7 million and $7.3 million, respectively. Acquisitions of right-of-use assets were $10.6 million in the first nine months of 2023 and $10.6 million in the first nine months of 2022.
+
+As of May 26, 2023 and August 26, 2022, the weighted-average remaining lease term for our operating leases was 10.2 years and 10.9 years, respectively. Certain of our operating leases include one or more options to extend the lease term for periods from two to five years. In determining the present value of our operating lease liabilities, we have assumed we will not extend any lease terms. As of May 26, 2023 and August 26, 2022, the weighted-average discount rate for our operating leases was 6.2% and 6.1%, respectively.
+
+Minimum payments of operating lease liabilities as of May 26, 2023 were as follows:
+
+| | | | | | |
+| Remainder of 2023 | $ | 3,115 | |
+| 2024 | 14,622 | |
+| 2025 | 12,573 | |
+| 2026 | 11,009 | |
+| 2027 | 8,569 | |
+| 2028 and thereafter | 65,537 | |
+| | 115,425 | |
+| Less imputed interest | (31,368) | |
+| Present value of total lease liabilities | $ | 84,057 | | 
+
+Commitments and Contingencies
+
+Contingencies
+
+From time to time, we are involved in legal matters that arise in the normal course of business. Litigation in general, and intellectual property, employment and shareholder litigation in particular, can be expensive and disruptive to normal business operations. Moreover, the results of complex legal proceedings are difficult to predict. Additionally, from time to time, we are a party in the normal course of business to a variety of agreements pursuant to which we may be obligated to indemnify another party. It is not possible to predict the maximum potential amount of future payments under these types of agreements due to the conditional nature of our obligations and the unique facts and circumstances involved in each particular agreement. Historically, our payments under these types of agreements have not had a material adverse effect on our business, results of operations or financial condition. We regularly review contingencies to determine whether the likelihood of loss has changed and to assess whether a reasonable estimate of the loss or range of loss can be made.
+
+| | | | | | |
+| 22 | ![SGH_logo_rgb.jpg](sgh-20230526_g2.jpg) |
+
+---
+
+  
+
+Equity
+
+SGH Shareholders’ Equity
+
+Share Dividend
+
+On January 3, 2022, our Board of Directors declared a share dividend of one ordinary share, $0.03 par value per share, for every one outstanding ordinary share owned to shareholders of record as of January 25, 2022. The dividend was paid on February 1, 2022. The accompanying consolidated financial statements and notes have been restated and adjusted for the impact of the share dividend.
+
+Share Repurchase Authorization
+
+On April 4, 2022, our Board of Directors approved a $75.0 million share repurchase authorization, under which we may repurchase our outstanding ordinary shares from time to time through open market purchases, privately-negotiated transactions or otherwise. The share repurchase authorization has no expiration date but may be suspended or terminated by the Board of Directors at any time. In the first nine months of 2023 and in 2022, we repurchased 0.5 million and 2.6 million shares, respectively, for $8.4 million and $50.0 million, respectively, under the repurchase authorization.
+
+Other Share Repurchases
+
+Ordinary shares withheld as payment of withholding taxes and exercise prices in connection with the vesting or exercise of equity awards are treated as ordinary share repurchases. We repurchased 41 thousand and 217 thousand ordinary shares as payment of withholding taxes for $0.7 million and $3.1 million, respectively, in the third quarter and first nine months of 2023, and 151 thousand and 205 thousand ordinary shares for $3.7 million and $6.6 million, respectively, in the third quarter and first nine months of 2022.
+
+In connection with the Exchange Transactions in the second quarter of 2023, we repurchased 326 thousand ordinary shares for $5.4 million.
+
+Stratus Technologies Earnout
+
+In connection with our acquisition of Status Technologies, the Seller has the right to receive an Earnout of up to $50.0 million based on the gross profit performance of Stratus Technologies during the first full 12 fiscal months following the closing. Pursuant to the terms of the Stratus Purchase Agreement, we had the option to settle the Earnout amount owed to the Seller, if any, in cash, ordinary shares of SGH, or a mix of cash and ordinary shares of SGH. On June 28, 2023, we provided notice to the Seller of our election to settle the Earnout in cash.
+
+Shares that would have been issuable pursuant to the Earnout are contingently issuable shares and are considered in the computation of diluted earnings per share if dilutive. The number of contingently issuable shares included in diluted earnings per share is the number of shares that would have been issuable at the time of settlement based on the assumption that the current fair value of the Earnout remained unchanged until the end of the earnout period. As of May 26, 2023, based on the fair value of the Earnout, the contingently issuable shares were anti-dilutive.
+
+2029 Capped Calls
+
+On January 18, 2023, in connection with the pricing of the 2029 Notes, we entered into privately negotiated capped call transactions (the “2029 Capped Calls”). The 2029 Capped Calls cover, subject to anti-dilution adjustments substantially similar to those applicable to the 2029 Notes, the aggregate number of ordinary shares that initially underlie the 2029 Notes, and are expected generally to reduce potential dilution to our ordinary shares upon any conversion of the 2029 Notes and/or offset any cash payments we are required to make in excess of the principal amount of converted 2029 Notes, as the case may be, with such reduction and/or offset subject to a cap, based on the cap price of the 2029 Capped Calls. The cap price of the 2029 Capped Calls is initially $29.1375 per share, which represented a premium of 75% over the last reported sale price of our ordinary shares on January 18, 2023. The cost of the 2029 Capped Calls, which are considered capital transactions, was $15.1 million and was recognized as a decrease to additional paid-in capital in the second quarter of 2023.
+
+The 2029 Capped Calls are separate transactions, each between the Company and the counterparties to the 2029 Capped Calls, and are not part of the terms of the 2029 Notes and do not affect any holder’s rights under the 2029 Notes or the 2029 Indenture. Holders of the 2029 Notes do not have any rights with respect to the 2029 Capped Calls.
+
+| | | | | | |
+| 23 | ![SGH_logo_rgb.jpg](sgh-20230526_g2.jpg) |
+
+---
+
+  
+
+2026 Capped Calls
+
+In connection with our issuance of the 2026 Notes in February 2020, we entered into capped call transactions (the “2026 Capped Calls”). As part of the Exchange Transactions, we entered into agreements with a number of counterparties to settle a portion of the 2026 Capped Calls in a notional amount corresponding to the amount of the 2026 Notes that were exchanged. The value received in connection with the settlement of a portion of the 2026 Capped Calls was $10.8 million and was recognized as an increase in additional paid-in capital in the second quarter of 2023.
+
+Accumulated Other Comprehensive Income (Loss)
+
+Changes in accumulated other comprehensive income (loss) by component for the nine months ended May 26, 2023 were as follows:
+
+| | | | | | | | | | | | | | | | | | | | | | | | |
+| | Cumulative Translation Adjustment | | Gains (Losses) on Derivative Instruments | | Gains (Losses) on Investments | | Total |
+| As of August 26, 2022 | $ | (221,655) | | | $ | — | | | $ | — | | | $ | (221,655) | |
+| | | | | | | | |
+| Other comprehensive income (loss) before reclassifications | 7,278 | | | 112 | | | (8) | | | 7,382 | |
+| Reclassifications out of accumulated other comprehensive income | — | | | (112) | | | — | | | (112) | |
+| Other comprehensive income (loss) | 7,278 | | | — | | | (8) | | | 7,270 | |
+| | | | | | | | |
+| As of May 26, 2023 | $ | (214,377) | | | $ | — | | | $ | (8) | | | $ | (214,385) | |
+
+Noncontrolling Interest in Subsidiary
+
+In the first nine months of 2023 and 2022, our Cree Joint Venture distributed an aggregate of $4.1 million and $7.7 million to its partners, including $2.1 million and $3.9 million to SGH and $2.0 million and $3.8 million to San’an, respectively. Cash and other assets of our Cree Joint Venture are generally not available for use by us in our other operations.
+
+Government Incentives
+
+Brazil Financial Credits
+
+Through one of our Brazilian subsidiaries, we participate in an incentive program, known as Programa de Apoio ao Desenvolvimento Tecnológico da Indústria de Semicondutores (also known as Technology Development Support of the Semiconductor Industry Program) (“PADIS”), pursuant to which the Brazilian government incentivizes the manufacture and sale of semiconductor components within Brazil.
+
+In January 2022, the Brazilian government approved an extension to PADIS. The financial credits available through the program are set to expire in December 2026. PADIS provides for reduced import and other transaction-related taxes for certain procurement, manufacturing and sales activities. In exchange, we must invest in certain research and development activities related to semiconductor-based solutions in an amount equivalent to 5% of the gross revenues of such Brazilian subsidiary recognized in connection with incentivized sales of semiconductor components in Brazil, excluding exports and sales to customers located at the Manaus Free Trade Zone, subject to the limitations of 13.1% (through December 31, 2024) and 12.3% (from January 1, 2025 through December 31, 2026) of the subsidiary’s gross revenues.
+
+Pursuant to PADIS, we recognized aggregate financial credits, reflected as a reduction of research and development expense, of $0.4 million and $4.4 million in the third quarter and first nine months of 2023, respectively, and $3.3 million and $15.2 million in the third quarter and first nine months of 2022, respectively. Financial credits earned under PADIS may be refunded in cash or used to offset liabilities for Brazil federal taxes. As of May 26, 2023 and August 26, 2022, receivables for earned but unused financial credits were $19.8 million and $18.7 million, respectively. Financial credits earned but unused as of May 26, 2023 can be utilized through April 2028.
+
+| | | | | | |
+| 24 | ![SGH_logo_rgb.jpg](sgh-20230526_g2.jpg) |
+
+---
+
+  
+
+Fair Value Measurements
+
+Cash and cash equivalents as of May 26, 2023 included money market funds of $18.1 million and time deposits of $11.0 million. Cash and cash equivalents as of August 26, 2022 included money market funds of $13.8 million. Money market funds were valued based on Level 1 measurements using quoted prices in active markets for identical assets. Time deposits were valued based on Level 2 measurements, including market-based observable inputs.
+
+Fair value measurements were as follows:
+
+| | | | | | | | | | | | | | | | | | | | | | | | |
+| | As of May 26, 2023 | | As of August 26, 2022 |
+| | Fair Value | | Carrying Value | | Fair Value | | Carrying Value |
+| Liabilities: | | | | | | | |
+| Derivative financial instrument liabilities | $ | 534 | | | $ | 534 | | | $ | 605 | | | $ | 605 | |
+| Acquisition-related contingent consideration | 45,700 | | | 45,700 | | | — | | | — | |
+| Amended 2027 TLA | 558,859 | | | 551,649 | | | 273,281 | | | 269,304 | |
+| 2029 Notes | 185,046 | | | 146,748 | | | — | | | — | |
+| 2026 Notes | 128,720 | | | 98,471 | | | 290,223 | | | 213,023 | |
+| LED Earnout Note | — | | | — | | | 96,412 | | | 101,824 | |
+| Debt – other | 16,489 | | | 17,643 | | | 17,855 | | | 19,263 | | 
+
+The fair values of our derivative financial instruments, as measured on a recurring basis, were based on Level 2 measurements, including market-based observable inputs of currency exchange spot and forward rates, interest rates and credit-risk spreads.
+
+Acquisition-related contingent consideration is related to our acquisition of Stratus Technologies and is included in current liabilities as of May 26, 2023. The fair value as of May 26, 2023, measured on a recurring basis, was based on Level 3 measurements, which included significant inputs not observable in the market. The fair value was estimated using a Monte Carlo simulation analysis in a risk-neutral framework with assumptions for volatility, market price of risk adjustment, risk-free rate and cost of debt. The fair value of the Earnout was estimated based on the Company’s evaluation of the probability and amount of Earnout to be achieved based on the expected gross profit of Stratus Technologies. The Monte Carlo simulation model was used to estimate the Earnout payment, which was discounted to its present value based on the expected payment date of the Earnout. The model used an estimated gross profit volatility of 32.6% and a discount rate of 8.81% as of May 26, 2023.
+
+The fair values of our Amended 2027 TLA, LED Earnout Note and other debt, as measured on a non-recurring basis, were estimated based on Level 2 measurements, including discounted cash flows and interest rates based on similar debt issued by parties with credit ratings similar to ours. The fair values of the 2029 Notes and the 2026 Notes, as measured on a non-recurring basis, was determined based on Level 2 measurements, including the trading prices of the notes.
+
+Derivative Instruments
+
+We use currency forward contracts to mitigate our exposure of certain monetary assets and liabilities from changes in currency exchange rates. Realized and unrealized gains and losses from derivative instruments without hedge accounting designation as well as the changes in the underlying monetary assets and liabilities from changes in currency exchange rates are included in other non-operating (income) expense.
+
+| | | | | | | | | | | | | | | | | | | | | | | | |
+| | Three Months Ended | | Nine Months Ended |
+| | May 26, 2023 | | May 27, 2022 | | May 26, 2023 | | May 27, 2022 |
+| Realized losses on currency forward contracts | $ | 480 | | | $ | 8,767 | | | $ | 1,763 | | | $ | 4,227 | |
+| Unrealized (gains) losses on currency forward contracts | 13 | | | (3,327) | | | (92) | | | 188 | | 
+
+| | | | | | |
+| 25 | ![SGH_logo_rgb.jpg](sgh-20230526_g2.jpg) |
+
+---
+
+  
+
+Equity Plans
+
+As of May 26, 2023, 7.5 million shares of our ordinary shares were available for future awards under our equity plans.
+
+Restricted Share Awards and Restricted Share Units Awards (“Restricted Awards”)
+
+Aggregate Restricted Award activity was as follows:
+
+| | | | | | | | | | | | | | | | | | | | | | | | |
+| | Three Months Ended | | Nine Months Ended |
+| | May 26, 2023 | | May 27, 2022 | | May 26, 2023 | | May 27, 2022 |
+| Awards granted | 1,270 | | | 935 | | 2,492 | | 1,581 |
+| Weighted-average grant date fair value per share | $ | 15.98 | | | $ | 24.25 | | | $ | 17.49 | | | $ | 25.96 | |
+| Aggregate vesting date fair value of shares vested | $ | 6,418 | | | $ | 24,098 | | | $ | 22,032 | | | $ | 42,326 | | 
+
+As of May 26, 2023, total unrecognized compensation costs for unvested Restricted Awards was $91.9 million, which was expected to be recognized over a weighted-average period of 2.7 years.
+
+Share Options
+
+As of May 26, 2023, total aggregate unrecognized compensation costs for unvested options was $1.5 million, which was expected to be recognized over a weighted-average period of 1.2 years.
+
+Employee Share Purchase Plan (“ESPP”)
+
+Under our ESPP, employees purchased 602 thousand ordinary shares for $6.6 million in the first nine months of 2023 and 307 thousand shares for $6.5 million in the first nine months of 2022.
+
+Share-Based Compensation Expense
+
+| | | | | | | | | | | | | | | | | | | | | | | | |
+| | Three Months Ended | | Nine Months Ended |
+| | May 26, 2023 | | May 27, 2022 | | May 26, 2023 | | May 27, 2022 |
+| Share-based compensation expense by caption: | | | | | | | |
+| Cost of sales | $ | 1,655 | | | $ | 1,724 | | | $ | 4,732 | | | $ | 5,103 | |
+| Research and development | 1,617 | | | 1,679 | | | 4,692 | | | 4,778 | |
+| Selling, general and administrative | 6,759 | | | 7,144 | | | 21,414 | | | 20,414 | |
+| | $ | 10,031 | | | $ | 10,547 | | | $ | 30,838 | | | $ | 30,295 | | 
+
+Income tax benefits related to the tax deductions for share-based awards are recognized only upon the settlement of the related share-based awards. Income tax benefits for share-based awards were $2.2 million and $6.2 million in the third quarter and first nine months of 2023, respectively, and $5.1 million and $10.1 million in the third quarter and first nine months of 2022, respectively.
+
+Revenue and Customer Contract Balances
+
+Net Sales and Gross Billings
+
+We provide certain logistics services on an agent basis, whereby we procure materials on behalf of our customers and then resell such materials to our customers. Our logistics services business includes procurement, logistics, inventory management, temporary warehousing, kitting and/or packaging services. While we take title to inventory under such arrangements, control of such inventory does not transfer to us as we do not, at any point, have the ability to direct the use, and thereby obtain the benefits of, the inventory.
+
+| | | | | | |
+| 26 | ![SGH_logo_rgb.jpg](sgh-20230526_g2.jpg) |
+
+---
+
+  
+
+Gross amounts invoiced to customers in connection with these agent services include amounts related to the services performed by us in addition to the cost of the materials procured. However, only the amount related to the agent component is recognized as revenue in our results of operations. We generally recognize revenue for these procurement, logistics and inventory management services upon the completion of such services, which typically occurs at the time of shipment of product to the customer. The cost of materials invoiced to our customers under these arrangements, but not recognized as revenue or cost of sales in our results of operations, were as follows:
+
+| | | | | | | | | | | | | | | | | | | | | | | | |
+| | Three Months Ended | | Nine Months Ended |
+| | May 26, 2023 | | May 27, 2022 | | May 26, 2023 | | May 27, 2022 |
+| Cost of materials invoiced in connection with logistics services | $ | 143,128 | | | $ | 574,034 | | | $ | 664,863 | | | $ | 1,250,024 | | 
+
+Customer Contract Balances
+
+| | | | | | | | | | | | |
+| As of | May 26, 2023 | | August 26, 2022 |
+| Contract assets (1) | $ | 767 | | | $ | 1,322 | |
+| | | | |
+| Contract liabilities: (2) | | | |
+| Deferred revenue (3) | $ | 70,743 | | | $ | 39,676 | |
+| Customer advances | 14,780 | | 24,125 |
+| | $ | 85,523 | | | $ | 63,801 | |
+
+(1)Contract assets are included in other current and noncurrent assets.
+
+(2)Contract liabilities are included in other current and noncurrent liabilities based on the timing of when our customer is expected to take control of the asset or receive the benefit of the service.
+
+(3)Deferred revenue includes $11.2 million and $23.3 million as of May 26, 2023 and August 26, 2022, respectively, related to contracts that contain termination rights.
+
+Deferred revenue represents amounts received from customers in advance of satisfying performance obligations. As of May 26, 2023, we expect to recognize revenue of $53.7 million of the balance of $70.7 million in the next 12 months and the remaining amount thereafter. In the first nine months of 2023, we recognized revenue of $25.1 million from satisfying performance obligations related to amounts included in deferred revenue as of August 26, 2022.
+
+Customer advances represent amounts received from customers for advance payments to secure product. In the first nine months of 2023, we recognized revenue of $18.9 million from satisfying performance obligations related to amounts included in customer advances as of August 26, 2022.
+
+As of May 26, 2023 and August 26, 2022, other current liabilities included $10.6 million and $15.4 million, respectively, for estimates of consideration payable to customers, including estimates for pricing adjustments and returns.
+
+Other Operating (Income) Expense
+
+In the first quarter of 2023, we initiated plans that included workforce reductions and the elimination of certain projects across our businesses. In connection therewith, we recorded restructure charges of $6.0 million for the first nine months of 2023, primarily for employee severance costs and other benefits. We anticipate that these activities will continue into future quarters and anticipate recording additional restructure charges. As of May 26, 2023, $2.0 million remained unpaid, which is expected to be paid in the remainder of 2023.
+
+| | | | | | |
+| 27 | ![SGH_logo_rgb.jpg](sgh-20230526_g2.jpg) |
+
+---
+
+  
+
+Other Non-operating (Income) Expense
+
+| | | | | | | | | | | | | | | | | | | | | | | | |
+| | Three Months Ended | | Nine Months Ended |
+| | May 26, 2023 | | May 27, 2022 | | May 26, 2023 | | May 27, 2022 |
+| Loss (gain) on extinguishment of debt | $ | — | | | $ | — | | | $ | 15,924 | | | $ | 653 | |
+| Foreign currency losses | 590 | | | 641 | | | 1,113 | | | 3,516 | |
+| Loss (gain) on disposition of assets | 41 | | | 19 | | | (3,075) | | | 65 | |
+| Other | (117) | | | (110) | | | (779) | | | (664) | |
+| | $ | 514 | | | $ | 550 | | | $ | 13,183 | | | $ | 3,570 | | 
+
+In the second quarter of 2023, we recognized a loss in connection with the extinguishment of $150.0 million of our 2026 Notes. See “Debt – Convertible Senior Notes – Convertible Senior Notes Exchange.”
+
+Income Taxes
+
+| | | | | | | | | | | | | | | | | | | | | | | | |
+| | Three Months Ended | | Nine Months Ended |
+| | May 26, 2023 | | May 27, 2022 | | May 26, 2023 | | May 27, 2022 |
+| Income (loss) before taxes | $ | (17,375) | | | $ | 29,649 | | | $ | (35,663) | | | $ | 68,660 | |
+| Income tax provision | 6,702 | | | 5,154 | | | 9,876 | | | 20,495 | | 
+
+Interim income tax provision includes a provision for federal, state and foreign taxes based on the annual estimated effective tax rate applicable to us and our subsidiaries, adjusted for certain discrete items which are fully recognized in the period they occur. We have historically determined our interim income tax provision (benefit) by applying the annual estimated effective income tax rate expected to be applicable for the full fiscal year to the income (loss) before taxes for the interim period. In determining the full year estimate, we do not include the estimated impact of unusual and/or infrequent items, which may cause significant variations in the customary relationship between income tax provision (benefit) and income (loss) before taxes. Additionally, our income tax provision (benefit) is subject to volatility and could be impacted by changes in our geographic earnings, non-deductible stock based compensation and certain tax credits.
+
+Income tax provision for the third quarter of 2023 increased by $1.5 million as compared to the same period in the prior year, primarily due to an increase in U.S. profits. For tax years beginning on or after January 1, 2022, the Tax Cuts and Jobs Act of 2017 eliminates the option to deduct research and development expenditures, as defined under IRC Section 174, in the year incurred. Instead, taxpayers are required to amortize such expenditures over five years if incurred in the U.S. and over fifteen years if incurred in a foreign jurisdiction. Due to this change, we expect to incur U.S. taxes despite historical net operating losses and credit carryforwards. Income tax provision for the first nine months of 2023 decreased by $10.6 million as compared to the same period in the prior year, primarily due to current year losses in certain of our foreign operations, offset by increase in U.S. taxable profits.
+
+As of May 26, 2023 and August 26, 2022, we had a full valuation allowance for net deferred tax assets associated with our U.S. operations, based on an analysis of positive and negative evidence, including analyzing three-year cumulative pre-tax income or loss, projections of future taxable income and other quantitative and qualitative information. We intend to maintain a full valuation allowance on our U.S. net deferred tax assets until there is sufficient positive evidence to support the reversal of all or some portion of the valuation allowance. Due to improvements in our U.S. operating results over the past three years, we believe there is a reasonable possibility that, within the next 12 months, sufficient positive evidence may become available to allow us to reach a conclusion that a significant portion of the valuation allowance will no longer be needed. Release of the valuation allowance would result in the recognition of certain deferred tax assets and a decrease to income tax expense in the period the valuation allowance is released. However, the exact timing and amount of the valuation allowance release are subject to change based on the level of our U.S. profitability.
+
+Determining the consolidated income tax provision (benefit), income tax liabilities and deferred tax assets and liabilities involves judgment. We calculate and provide for income taxes in each of the tax jurisdictions in which we operate, which involves estimating current tax exposures as well as making judgments regarding the recoverability of deferred tax assets in
+
+| | | | | | |
+| 28 | ![SGH_logo_rgb.jpg](sgh-20230526_g2.jpg) |
+
+---
+
+  
+
+each jurisdiction. The estimates used could differ from actual results, which may have a significant impact on operating results in future periods.
+
+Earnings Per Share
+
+| | | | | | | | | | | | | | | | | | | | | | | | |
+| | Three Months Ended | | Nine Months Ended |
+| | May 26, 2023 | | May 27, 2022 | | May 26, 2023 | | May 27, 2022 |
+| Net income (loss) attributable to SGH – Basic and Diluted | $ | (24,455) | | | $ | 24,113 | | | $ | (46,682) | | | $ | 46,598 | |
+| | | | | | | | |
+| Weighted-average shares outstanding – Basic | 49,380 | | 50,095 | | 49,152 | | 49,543 |
+| Dilutive effect of equity plans and convertible notes | — | | 4,903 | | — | | 6,213 |
+| Weighted-average shares outstanding – Diluted | 49,380 | | 54,998 | | 49,152 | | 55,756 |
+| | | | | | | | |
+| Earnings (loss) per share: | | | | | | | |
+| Basic | $ | (0.50) | | | $ | 0.48 | | | $ | (0.95) | | | $ | 0.94 | |
+| Diluted | $ | (0.50) | | | $ | 0.44 | | | $ | (0.95) | | | $ | 0.84 | | 
+
+Below are unweighted potentially dilutive shares that were not included in the computation of diluted earnings per share because to do so would have been antidilutive:
+
+| | | | | | | | | | | | | | | | | | | | | | | | |
+| | Three Months Ended | | Nine Months Ended |
+| | May 26, 2023 | | May 27, 2022 | | May 26, 2023 | | May 27, 2022 |
+| Equity plans | 8,482 | | 459 | | 8,482 | | 333 |
+| Stratus Technologies contingently issuable shares | 2,566 | | — | | 2,566 | | — |
+| | 11,048 | | 459 | | 11,048 | | 333 |
+
+Upon any conversion of our 2026 Notes or 2029 Notes, we will be required to pay cash in an amount at least equal to the principal portion and have the option to settle any amount in excess of the principal portion in cash and/or ordinary shares. As a result, only the amounts settled in excess of the principal portion are considered in calculating diluted earnings per share. See “Debt – Convertible Senior Notes.”
+
+Segment and Other Information
+
+Segment information presented below is consistent with how our chief operating decision maker evaluates operating results to make decisions about allocating resources and assessing performance. We have the following three businesses, which are our reportable segments:
+
+•Memory Solutions: Our Memory Solutions group, under our SMART Modular brand, provides high performance and reliable memory solutions through the design, development and advanced packaging of leading-edge to extended lifecycle products. These specialty products are tailored to meet customer-specific requirements across networking and communications, enterprise storage, computing, including desktop, notebook and server applications, smartphones and other vertical markets. These products are marketed to OEMs and to commercial and government customers. The Memory Solutions group also offers SMART Supply Chain Services, which provides customized, integrated supply chain services to enable our customers to better manage supply chain planning and execution, reduce costs and increase productivity.
+
+•Intelligent Platform Solutions (“IPS”): Our IPS group, under our Penguin Solutions and newly acquired Stratus Technologies brands, offers specialized platform solutions and services for high-performance computing (“HPC”), artificial intelligence (“AI”), machine learning (“ML”), advanced modeling and the internet of things (“IoT”) that span the continuum of edge, core and cloud. Our solutions are designed specifically for customers across multiple markets, including government, hyperscale, energy, financial services, health care, education and others. On
+
+| | | | | | |
+| 29 | ![SGH_logo_rgb.jpg](sgh-20230526_g2.jpg) |
+
+---
+
+  
+
+August 29, 2022, we completed the acquisition of Stratus Technologies, a global leader in simplified, protected and autonomous computing solutions in the data center and at the Edge.
+
+•LED Solutions: Our LED Solutions group, under our Cree LED brand, offers a broad portfolio of application-optimized LEDs focused on improving on lumen density, intensity, efficacy, optical control and reliability. Backed by expert design assistance and superior sales support, our LED products enable our customers to develop and market LED-based products for general lighting, video screens and specialty lighting applications.
+
+Segments are determined based on sources of revenue, types of customers and operating performance. There are no differences between the accounting policies for our segment reporting and our consolidated results of operations. Operating expenses directly associated with the activities of a specific segment are charged to that segment. Certain other indirect operating income and expenses are generally allocated to segments based on their respective percentage of net sales. We do not allocate interest, other non-operating (income) expense or taxes to segments.
+
+| | | | | | | | | | | | | | | | | | | | | | | | |
+| | Three Months Ended | | Nine Months Ended |
+| | May 26, 2023 | | May 27, 2022 | | May 26, 2023 | | May 27, 2022 |
+| Net sales: | | | | | | | |
+| Memory Solutions | $ | 148,370 | | | $ | 265,850 | | | $ | 491,473 | | | $ | 765,332 | |
+| Intelligent Platform Solutions | 170,854 | | | 95,345 | | | 604,276 | | | 296,256 | |
+| LED Solutions | 64,106 | | | 101,345 | | | 182,233 | | | 320,067 | |
+| Total net sales | $ | 383,330 | | | $ | 462,540 | | | $ | 1,277,982 | | | $ | 1,381,655 | |
+| | | | | | | | |
+| Segment operating income: | | | | | | | |
+| Memory Solutions | $ | 11,284 | | | $ | 30,094 | | | $ | 46,859 | | | $ | 99,260 | |
+| Intelligent Platform Solutions | 25,798 | | | 10,790 | | | 97,942 | | | 32,672 | |
+| LED Solutions | (782) | | | 13,388 | | | (2,237) | | | 48,925 | |
+| Total segment operating income | 36,300 | | | 54,272 | | | 142,564 | | | 180,857 | |
+| | | | | | | | |
+| Unallocated: | | | | | | | |
+| Share-based compensation expense | (10,031) | | | (10,547) | | | (30,838) | | | (30,295) | |
+| Amortization of acquisition-related intangibles | (11,609) | | | (5,943) | | | (33,282) | | | (18,115) | |
+| Flow through of inventory step up | — | | | — | | | (2,599) | | | — | |
+| Cost of sales-related restructure | (211) | | | — | | | (5,763) | | | — | |
+| Acquisition and integration expenses | (8,637) | | | (2,181) | | | (18,193) | | | (3,471) | |
+| Impairment of goodwill | — | | | — | | | (17,558) | | | — | |
+| Change in fair value of contingent consideration | (14,800) | | | (124) | | | (24,900) | | | (41,324) | |
+| Restructure charge | 186 | | | (249) | | | (6,009) | | | (249) | |
+| Other | — | | | 81 | | | (1,800) | | | (495) | |
+| Total unallocated | (45,102) | | | (18,963) | | | (140,942) | | | (93,949) | |
+| Consolidated operating income (loss) | $ | (8,802) | | | $ | 35,309 | | | $ | 1,622 | | | $ | 86,908 | | 
+
+| | | | | | |
+| 30 | ![SGH_logo_rgb.jpg](sgh-20230526_g2.jpg) |
+
+---
+
+  
+
+Item 2. Management’s Discussion and Analysis of Financial Condition and Results of Operations
+
+The following discussion and analysis should be read in conjunction with the consolidated financial statements and accompanying notes included elsewhere in this Quarterly Report and in our Annual Report on Form 10-K for the fiscal year ended August 26, 2022. This discussion contains forward looking statements that involve risks, uncertainties and other factors. Our actual results could differ materially from those contained in these forward-looking statements due to a number of risks, uncertainties and other factors, including those discussed below and elsewhere in this Quarterly Report and in our Annual Report on Form 10-K for the fiscal year ended August 26, 2022. See also “Cautionary Note Regarding Forward-Looking Statements.”
+
+Our fiscal year is the 52 or 53-week period ending on the last Friday in August. Fiscal 2023 and 2022 each contain 52 weeks. All period references are to our fiscal periods unless otherwise indicated. All financial information for our subsidiaries in Brazil is included in our consolidated financial statements on a one-month lag because their fiscal years end on July 31 of each year. All tabular amounts are in thousands.
+
+Overview
+
+At SGH, we power growth and expand possibilities by continually investing in our people, innovation and new opportunities. Our diverse lines of businesses – across computing, memory and LED lighting solutions – all focus on serving customers by delivering engineer-driven technology solutions to specialty end markets. SGH serves as a foundation and a support for each of our businesses, while also empowering them to deliver their own unique solutions to their customers to unlock avenues for growth and technological advancement.
+
+Since our inception over 30 years ago, SGH has grown into a diversified group of businesses focused on the design and manufacture of specialty solutions for the computing, memory and LED markets. Our success is based on a customer-focused approach characterized by a commitment to quality, advanced technical expertise, quick time-to-market, build-to-order flexibility and excellence in customer service.
+
+In addition to driving growth organically and through acquisitions, we use the SGH operating system to support and drive operational efficiency and performance. SGH’s Operating System incorporates best practices to ensure our business lines are empowered to deliver for our customers consistently and efficiently.
+
+  
+
+![sgh-operating-system.4 (002).jpg](sgh-20230526_g3.jpg)
+
+  
+
+Recent Event – Divestiture of SMART Brazil
+
+On June 13, 2023, we entered into a Stock Purchase Agreement (the “Purchase Agreement”), by and among SMART Modular Technologies (LX) S.à.r.l., a société à responsabilité limitée governed by the laws of Grand Duchy of Luxembourg
+
+| | | | | | |
+| 31 | ![SGH_logo_rgb.jpg](sgh-20230526_g2.jpg) |
+
+---
+
+  
+
+and our wholly owned subsidiary (“Seller”), Lexar Europe B.V., a company organized under the laws of The Netherlands (“Purchaser”), Shenzhen Longsys Electronics Co., Ltd., a company limited by shares governed by the laws of the People’s Republic of China (“Longsys”), solely with respect to certain provisions therein, Shanghai Intelligent Memory Semiconductor Co., Ltd., a limited liability company governed by the laws of the People’s Republic of China (“Parent Funding Entity”), and, solely with respect to certain provisions therein, SGH, for the intended sale of its standards-based modules assembly and test business in Brazil. The transaction, which was approved by our Board of Directors and the Board of Directors of Seller, is expected to close by the end of calendar year 2023.
+
+Pursuant to the Purchase Agreement, among other matters, and subject to the satisfaction or waiver of the conditions set forth therein, Seller will sell to Purchaser, and Purchaser will purchase from Seller, 81% of Seller’s right, title and interest in and to the outstanding quotas of SMART Modular Technologies do Brasil – Indústria e Comercio de Componentes Ltda., a sociedade limitada governed by the laws of Brazil (“SMART Brazil”), with Seller retaining a 19% interest in SMART Brazil (the “Retained Interest”) (the “Acquisition”).
+
+Pursuant to the terms of, and subject to the conditions specified in, the Purchase Agreement, upon consummation of the Acquisition (the “Closing”), Purchaser will pay to Seller (based on a total enterprise value of $205.0 million for SMART Brazil) consideration consisting of (i) an upfront cash purchase price of $137.7 million on a cash-free, debt-free basis and subject to certain customary adjustments as set forth in the Purchase Agreement, (ii) a deferred cash purchase price of $28.4 million eighteen months following the Closing and (iii) subject to and at the time of exercise of the Put/Call Option (as defined below), an additional cash payment equal to 19% of the amount of SMART Brazil’s cash at the Closing (as calculated pursuant to the Purchase Agreement) minus the amount of SMART Brazil’s indebtedness at the Closing (as calculated pursuant to the Purchase Agreement).
+
+Pursuant to the Purchase Agreement, at Closing, SMART Brazil, Seller, Purchaser, and Longsys will enter into a Quotaholders Agreement, which will provide Seller with a put option to sell the Retained Interest in SMART Brazil (the “Put Option”) during three exercise windows following its fiscal years ending July 31, 2026, July 31, 2027 or July 31, 2028 (the “Exercise Windows”), with such Exercise Windows beginning on January 15, 2027 and ending on February 15, 2027, beginning on January 15, 2028 and ending on February 15, 2028 and beginning on January 15, 2029 and ending on February 15, 2029, respectively. A call option has also been granted to Purchaser to require Seller to sell the Retained Interest during the Exercise Windows (the “Call Option,” together with the Put Option, the “Put/Call Option”). The price for the Put/Call Option is based on a 100% enterprise value of 7.5x net income for SMART Brazil for the preceding fiscal year at the time of exercise. The Quotaholders Agreement also provides, among other things, for certain governance and approval rights among the parties thereto.
+
+The consummation of the Acquisition is subject to customary conditions to Closing, including, among others, (i) completion of filings for outbound direct investment with the Division of Development and Reform in the China (Shanghai) Pilot Free Trade Zone Lin-gang Special Area Administration and the Division of Finance and Trade Development in the China (Shanghai) Pilot Free Trade Zone Lin-gang Special Area Administration, and completion of foreign exchange registration with a qualified bank authorized by the Municipal Administration of Foreign Exchange in Shanghai (the “China Outbound Approvals”) and (ii) approval of the transactions contemplated by the Purchase Agreement by Longsys’ shareholders (the “Longsys Shareholder Approval”).
+
+The Purchase Agreement contains customary termination rights, including the right for Seller or Purchaser to terminate the Purchase Agreement if the Closing shall not have occurred by December 10, 2023. Purchaser shall pay a $8.0 million termination fee to Seller if the transaction is terminated due to a failure to obtain the China Outbound Approvals or the Longsys Shareholder Approval and other specified circumstances, which termination fee may be increased to $12.0 million over time.
+
+See “Item 1. Financial Statements – Notes to Consolidated Financial Statements – Subsequent Event.”
+
+Acquisition of Stratus Technologies
+
+On August 29, 2022, we completed the acquisition of Storm Private Holdings I Ltd., a Cayman Islands exempted company (“Stratus Holding Company” and together with its subsidiaries, “Stratus Technologies”). Stratus Technologies, which operates as part of IPS, is a global leader in simplified, protected, and autonomous computing platforms and services in the data center and at the Edge. For more than 40 years, Stratus Technologies has provided high-availability, fault-tolerant computing to Fortune 500 companies and small-to-medium sized businesses enabling them to securely and remotely run critical applications with minimal downtime.
+
+| | | | | | |
+| 32 | ![SGH_logo_rgb.jpg](sgh-20230526_g2.jpg) |
+
+---
+
+  
+
+At the closing, we paid a cash purchase price of $225 million, subject to certain adjustments. In addition, the seller has the right to receive, and we will be obligated to pay, contingent consideration of up to $50 million (the “Earnout”) based on the gross profit performance of Stratus Technologies during the first full 12 fiscal months following the closing. Pursuant to the terms of the Stratus Purchase Agreement, we had the option to settle the Earnout amount owed to the Seller, if any, in cash, ordinary shares of SGH, or a mix of cash and ordinary shares of SGH. On June 28, 2023, we provided notice to the Seller of our election to settle the Earnout in cash. See “Item 1. Financial Statements – Notes to Consolidated Financial Statements – Business Acquisition – Stratus Technologies.”
+
+Factors Affecting Our Operating Performance
+
+COVID-19. The outbreak of coronavirus disease 2019 (“COVID-19”) has resulted in substantial loss of life, economic disruption and government intervention worldwide. The COVID-19 pandemic has resulted in reduced sales volumes of certain of our product lines since early calendar 2020. COVID-19 also disrupted our product development, marketing and corporate development activities, and has more recently affected our supply chain. If these conditions continue, or if we have an outbreak in any of our facilities, sales volumes may be negatively impacted and we may, among other issues, experience, in any or all product lines, delays in product development, a decreased ability to support our customers, disruptions in sales and manufacturing activities and overall reduced productivity each of which could have a negative impact on our ability to meet customer commitments and on our revenue and profitability. The reduction of investment in new capacity due to the pandemic, coupled with strong demand to expand delivery and logistics, internet and cloud services, has resulted in significant supply shortages that may impact our ability to manufacture products for our customers and may result in rising prices of the materials we need to manufacture our products. We may not be able to pass on these rising costs to our customers which could result in a negative impact to our gross margins. Furthermore, if there is a significant outbreak or if travel restrictions or stay-at-home or work remote or from home conditions or other governmental or voluntary restrictions relating to the COVID-19 pandemic significantly impact our suppliers’ ability to manufacture or deliver raw materials or provide key components or services, we could experience more delays or reductions in our ability to manufacture and ship products to our customers. While certain segments of our customer base are experiencing strong demand, the pandemic may negatively impact the demand for other segments for our customer base or those customers’ ability to manufacture their products, which could reduce their demand for our products or services.
+
+Macro-Economic Demand Factors. Our business segments each have their own unique set of demand factors. Demand in our Memory Solutions group is driven by end-market demand from OEMs for customer-specific solutions in vertical markets such as industrial, government, networking, high-performance compute and enterprise storage, as well as from OEMs for memory modules used in desktop and notebook computers, smartphones, IoT and SSD products in Brazil. In addition, macro-economic factors specific to the Brazil economy affect this segment, given our sales and operations in that market. Our IPS business is driven by demand for high compute solutions across AI and machine learning initiatives, as well as traditional workload optimization and efficiency applications. Finally, demand for our LED products is derived from targeted end-market applications, such as general high-power and mid-power lighting and specialty lighting, such as video and horticulture applications. We believe our diversified business segments may provide a natural hedge against downturns in any particular industry although broader macro-economic trends, such as the COVID-19 pandemic, can adversely affect all three segments concurrently.
+
+Shifts in the Mix of Our Revenue. Shifts in the mix of revenue from our operating segments, which can vary significantly from period to period, can impact our business and operating results, including gross and operating margins. For example, our Memory Solutions group, while not party to long-term fixed purchasing commitments, has nonetheless historically seen relatively stable demand and margins. By contrast, our IPS group has shown solid growth, but is subject to greater variability in its sales and margin profile from period to period, as recognition of revenue is tied to customer decisions as to the completion of delivery and system go-live events, and margin is driven by the extent to which higher margin software and managed services comprise IPS sales. Our resource commitments and planning for each segment are relatively fixed in the short term, and as such, variability in expected revenue mix will have direct implications for our operating income and margins.
+
+Our Ability to Identify, Complete and Successfully Integrate Acquisitions. A substantial portion of our growth over the last several years has been driven by acquisitions, and we intend to continue to use corporate development as an engine for growth. Within our existing segments, we plan to pursue acquisitions to expand features and functionality, expand into adjacent businesses and grow our customer base and geographic footprint. From time to time, we may seek to expand our addressable market by entering new business segments where, as we did with our LED business and our recently acquired Stratus Technologies business, we identify a business opportunity at scale with a path to being accretive to our overall operations in the near term. If we are unable to identify and complete attractive acquisitions, we may not be successful in
+
+| | | | | | |
+| 33 | ![SGH_logo_rgb.jpg](sgh-20230526_g2.jpg) |
+
+---
+
+  
+
+growing our revenue and/or expanding our margins. Any acquisitions we do complete may require us to incur debt or raise capital through equity financings or may subject us to unforeseen liabilities or operational challenges that in turn impede our ability to realize the expected returns on our investment.
+
+Disruptions in Our Supply Chain May Adversely Affect Our Businesses. We depend on third-party suppliers for key components of our products, such as commodity DRAM components from offshore foundries that we use in our specialty memory products and third-party wafers that we use in our memory and LED businesses. We have adopted this “Fab-Light” business model to reduce our capital expenditures and operating expenses, while affording greater flexibility in adapting to shifts in demand and other market trends. However, our reliance on third-party manufacturers exposes us to risk of supply chain disruption and lost business. If such disruptions worsen or are prolonged, or if there is meaningful disruption in our supply arrangement with any of our third-party suppliers, our operating results and financial condition could be adversely affected.
+
+Results of Operations
+
+| | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | |
+| | Three Months Ended | | Nine Months Ended |
+| | May 26, 2023 | | May 27, 2022 | | May 26, 2023 | | May 27, 2022 |
+| Net sales: | | | | | | | | | | | | | | | |
+| Memory Solutions | $ | 148,370 | | | 38.7 | % | | $ | 265,850 | | | 57.5 | % | | $ | 491,473 | | | 38.5 | % | | $ | 765,332 | | | 55.4 | % |
+| Intelligent Platform Solutions | 170,854 | | | 44.6 | % | | 95,345 | | | 20.6 | % | | 604,276 | | | 47.3 | % | | 296,256 | | | 21.4 | % |
+| LED Solutions | 64,106 | | | 16.7 | % | | 101,345 | | | 21.9 | % | | 182,233 | | | 14.3 | % | | 320,067 | | | 23.2 | % |
+| Total net sales | 383,330 | | | 100.0 | % | | 462,540 | | | 100.0 | % | | 1,277,982 | | | 100.0 | % | | 1,381,655 | | | 100.0 | % |
+| Cost of sales | 284,687 | | | 74.3 | % | | 348,077 | | | 75.3 | % | | 950,548 | | | 74.4 | % | | 1,032,278 | | | 74.7 | % |
+| Gross profit | 98,643 | | | 25.7 | % | | 114,463 | | | 24.7 | % | | 327,434 | | | 25.6 | % | | 349,377 | | | 25.3 | % |
+| | | | | | | | | | | | | | | | |
+| Operating expenses: | | | | | | | | | | | | | | | |
+| Research and development | 22,235 | | | 5.8 | % | | 20,298 | | | 4.4 | % | | 72,956 | | | 5.7 | % | | 56,749 | | | 4.1 | % |
+| Selling, general and administrative | 70,596 | | | 18.4 | % | | 58,483 | | | 12.6 | % | | 204,389 | | | 16.0 | % | | 164,147 | | | 11.9 | % |
+| Impairment of goodwill | — | | | — | % | | — | | | — | % | | 17,558 | | | 1.4 | % | | — | | | — | % |
+| Change in fair value of contingent consideration | 14,800 | | | 3.9 | % | | 124 | | | — | % | | 24,900 | | | 1.9 | % | | 41,324 | | | 3.0 | % |
+| Other operating (income) expense | (186) | | | — | % | | 249 | | | 0.1 | % | | 6,009 | | | 0.5 | % | | 249 | | | — | % |
+| Total operating expenses | 107,445 | | | 28.0 | % | | 79,154 | | | 17.1 | % | | 325,812 | | | 25.5 | % | | 262,469 | | | 19.0 | % |
+| Operating income (loss) | (8,802) | | | (2.3) | % | | 35,309 | | | 7.6 | % | | 1,622 | | | 0.1 | % | | 86,908 | | | 6.3 | % |
+| | | | | | | | | | | | | | | | |
+| Non-operating (income) expense: | | | | | | | | | | | | | | | |
+| Interest expense, net | 8,059 | | | 2.1 | % | | 5,110 | | | 1.1 | % | | 24,102 | | | 1.9 | % | | 14,678 | | | 1.1 | % |
+| Other non-operating (income) expense | 514 | | | 0.1 | % | | 550 | | | 0.1 | % | | 13,183 | | | 1.0 | % | | 3,570 | | | 0.3 | % |
+| Total non-operating (income) expense | 8,573 | | | 2.2 | % | | 5,660 | | | 1.2 | % | | 37,285 | | | 2.9 | % | | 18,248 | | | 1.3 | % |
+| Income (loss) before taxes | (17,375) | | | (4.5) | % | | 29,649 | | | 6.4 | % | | (35,663) | | | (2.8) | % | | 68,660 | | | 5.0 | % |
+| | | | | | | | | | | | | | | | |
+| Income tax provision | 6,702 | | | 1.7 | % | | 5,154 | | | 1.1 | % | | 9,876 | | | 0.8 | % | | 20,495 | | | 1.5 | % |
+| Net income (loss) | (24,077) | | | (6.3) | % | | 24,495 | | | 5.3 | % | | (45,539) | | | (3.6) | % | | 48,165 | | | 3.5 | % |
+| Net income attributable to noncontrolling interest | 378 | | | 0.1 | % | | 382 | | | 0.1 | % | | 1,143 | | | 0.1 | % | | 1,567 | | | 0.1 | % |
+| Net income (loss) attributable to SGH | $ | (24,455) | | | (6.4) | % | | $ | 24,113 | | | 5.2 | % | | $ | (46,682) | | | (3.7) | % | | $ | 46,598 | | | 3.4 | % |
+
+Percentages represent percentage of total net sales. Summations of percentages may not compute precisely due to rounding.
+
+Net Sales, Cost of Sales and Gross Profit
+
+Net sales decreased by $79.2 million, or 17.1%, in the third quarter of 2023 compared to the same period in the prior year, and by $103.7 million, or 7.5%, for the first nine months of 2023 compared to the same period in the prior year. These decreases were primarily due to lower sales in both our Memory Solutions and LED Solutions businesses, offset by strong performance from IPS. IPS net sales increased by $75.5 million, or 79.2%, and by $308.0 million, or 104.0%, in the third quarter and first nine months of 2023 compared to the same periods in the prior year, respectively, primarily due to higher sales in our Penguin Solutions business and from $46.0 million and $131.9 million, respectively, of revenue from our recent
+
+| | | | | | |
+| 34 | ![SGH_logo_rgb.jpg](sgh-20230526_g2.jpg) |
+
+---
+
+  
+
+acquisition of Stratus Technologies. Memory Solutions sales decreased by $117.5 million, or 44.2%, and by $273.9 million, or 35.8%, in the third quarter and first nine months of 2023 compared to the same periods in the prior year, respectively, primarily due to lower sales volumes of DRAM products, as well as lower sales volumes of mobile memory products in Brazil. LED Solutions sales decreased by $37.2 million, or 36.7%, and by $137.8 million, or 43.1%, in the third quarter and first nine months of 2023 compared to the same periods in the prior year, respectively, primarily due to lower customer demand.
+
+Cost of sales decreased by $63.4 million, or 18.2%, in the third quarter of 2023, compared to the same period in the prior year, and by $81.7 million, or 7.9%, for the first nine months of 2023 compared to the same period in the prior year. Memory Solutions and LED Solutions segments had lower material cost from lower sales, which were offset by additional costs from the operations of our recently-acquired Stratus Technologies business.
+
+Gross margin increased to 25.7% in the third quarter of 2023 compared to 24.7% in the same period in the prior year, and was relatively flat for the first nine months of 2023 compared to the same period in 2022, primarily due to lower sales and gross profits for our Memory Solutions and LED Solutions businesses, partially offset by strength in our IPS business, which included higher margins of our recently-acquired Stratus Technologies business.
+
+Approximately 12% and 25% of our net sales in the first nine months of 2023 and 2022, respectively, were from our Brazil operations.
+
+Change in Accounting Estimate: During the first quarter of 2023, we completed an assessment of the estimated useful lives of our manufacturing equipment. Based on that assessment, we revised the estimated useful lives from five years to eight years as of the beginning of the first quarter of 2023. The change reduced our non-cash depreciation expense for the first nine months of 2023 by approximately $7.9 million, which resulted in aggregate reductions of $7.6 million in cost of sales and research and development expense and a reduction of $0.2 million in the cost of our inventories as of the end of the third quarter of 2023.
+
+Non-GAAP Measure of Segment Operating Income
+
+Below is a table of our operating income, measured on a non-GAAP basis, which our management uses to supplement SGH’s financial results under GAAP to analyze its operations and make decisions as to future operational plans. Our management believes that this supplemental non-GAAP information is useful to investors in analyzing and assessing our past and future operating performance. These non-GAAP measures exclude certain items, such as share-based compensation expense, amortization of acquisition-related intangible assets (consisting of amortization of developed technology, customer relationships, trademarks/trade names and backlog acquired in connection with business combinations), acquisition-related inventory adjustments, acquisition-related expenses, restructure charges and integration expenses, impairment of goodwill, changes in the fair value of contingent consideration, (gains) losses from changes in currency exchange rates, amortization of debt discount and other costs, gain (loss) on extinguishment of debt, other infrequent or unusual items and related tax effects and other tax adjustments. While amortization of acquisition-related intangible assets is excluded, the revenues from acquired companies is reflected in our non-GAAP measures and these intangible assets contribute to revenue generation. See “Item 1. Financial Statements – Notes to Consolidated Financial Statements – Segment and Other Information.”
+
+Non-GAAP financial measures should not be considered as a substitute for, or superior to, measures of financial performance prepared in accordance with GAAP, as they exclude important information about our financial results, as noted above. The presentation of these adjusted amounts varies from amounts presented in accordance with GAAP and therefore may not be comparable to amounts reported by other companies.
+
+| | | | | | |
+| 35 | ![SGH_logo_rgb.jpg](sgh-20230526_g2.jpg) |
+
+---
+
+  
+
+| | | | | | | | | | | | | | | | | | | | | | | | |
+| | Three Months Ended | | Nine Months Ended |
+| | May 26, 2023 | | May 27, 2022 | | May 26, 2023 | | May 27, 2022 |
+| GAAP operating income (loss) | $ | (8,802) | | | $ | 35,309 | | | $ | 1,622 | | | $ | 86,908 | |
+| Share-based compensation expense | 10,031 | | | 10,547 | | | 30,838 | | | 30,295 | |
+| Amortization of acquisition-related intangibles | 11,609 | | | 5,943 | | | 33,282 | | | 18,115 | |
+| Flow-through of inventory step up | — | | | — | | | 2,599 | | | — | |
+| Cost of sales-related restructure | 211 | | | — | | | 5,763 | | | — | |
+| Acquisition and integration expenses | 8,637 | | | 2,181 | | | 18,193 | | | 3,470 | |
+| Impairment of goodwill | — | | | — | | | 17,558 | | | — | |
+| Change in fair value of contingent consideration | 14,800 | | | 124 | | | 24,900 | | | 41,324 | |
+| Restructure charge | (186) | | | 249 | | | 6,009 | | | 249 | |
+| Other | — | | | (81) | | | 1,800 | | | 496 | |
+| Non-GAAP operating income | $ | 36,300 | | | $ | 54,272 | | | $ | 142,564 | | | $ | 180,857 | |
+| | | | | | | | |
+| Non-GAAP operating income (loss) by segment: | | | | | | | |
+| Memory Solutions | $ | 11,284 | | | $ | 30,094 | | | $ | 46,859 | | | $ | 99,260 | |
+| Intelligent Platform Solutions | 25,798 | | | 10,790 | | | 97,942 | | | 32,672 | |
+| LED Solutions | (782) | | | 13,388 | | | (2,237) | | | 48,925 | |
+| Total non-GAAP operating income (loss) by segment | $ | 36,300 | | | $ | 54,272 | | | $ | 142,564 | | | $ | 180,857 | |
+
+Memory Solutions operating income decreased by $18.8 million, or 62.5%, in the third quarter of 2023 compared to the same period in the prior year, and by $52.4 million, or 52.8%, in the first nine months of 2023 compared to the same period in the prior year, primarily due to lower sales and gross profit.
+
+IPS operating income increased by $15.0 million, or 139.1%, in the third quarter of 2023 compared to the same period in the prior year, and by $65.3 million, or 199.8%, in the first nine months of 2023 compared to the same period in the prior year, primarily due to higher sales and margins from our Penguin Solutions business and strong performance from our recently-acquired Stratus Technologies business, partially offset by higher operating expenses from the Stratus Technologies business and higher personnel-related expenses for increased headcount to support IPS’ revenue growth.
+
+LED Solutions operating income decreased by $14.2 million, or 105.8%, in the third quarter of 2023 compared to the same period in the prior year, and by $51.2 million, or 104.6%, in the first nine months of 2023 compared to the same period in the prior year, primarily due to lower sales and gross profit from lower sales volumes, partially offset by lower operating expenses mainly driven by personnel-related expenses due to lower headcount.
+
+Operating and Non-operating (Income) Expense
+
+Research and Development
+
+Research and development expense increased by $1.9 million, or 9.5%, in the third quarter of 2023 compared to the same period in the prior year, and by $16.2 million, or 28.6%, for the first nine months of 2023 compared to the same period in the prior year, primarily due to expenses associated with our recently-acquired Stratus Technologies business and a decrease of $3.0 million and $10.9 million, respectively, in the Brazil financial credits, which are reflected as a reduction of research and development expenses. The first nine months of 2023 also had lower personnel-related expenses.
+
+Selling, General and Administrative
+
+Selling, general and administrative expense increased by $12.1 million, or 20.7%, in the third quarter of 2023 compared to the same period in the prior year, and by $40.2 million, or 24.5%, for the first nine months of 2023 compared to the same period in the prior year, primarily due to expenses associated with our recently-acquired Stratus Technologies business and as well as higher acquisition and integration expenses.
+
+| | | | | | |
+| 36 | ![SGH_logo_rgb.jpg](sgh-20230526_g2.jpg) |
+
+---
+
+  
+
+Impairment of Goodwill
+
+During the second quarter of 2023, we initiated a plan pursuant to which we intend to wind down manufacturing and discontinue the sale of certain legacy products offered through our Penguin Edge business by approximately the end of calendar 2024. In connection therewith and with the preparation of the financial statements included in our Quarterly Report for the fiscal quarter ended February 24, 2023, we assessed goodwill associated with our Penguin Edge business within our IPS segment and concluded it was partially impaired. As a result, we recorded an impairment charge of $17.6 million in the second quarter of 2023 related to our IPS segment. As of the end of the third quarter of 2023, there was no further impairment of Penguin Edge goodwill. However, we currently anticipate that the remaining goodwill of the Penguin Edge reporting unit of $17.6 million as of the end of the third quarter of 2023 may become further impaired in future periods. See “Item 1. Financial Statements – Notes to Consolidated Financial Statements – Intangible Assets and Goodwill – Impairment of Penguin Edge Goodwill.”
+
+Change in Fair Value of Contingent Consideration
+
+Our acquisitions of Stratus Technologies in the first quarter of 2023 and our LED Business in the third quarter of 2021 each included contingent consideration. We estimate the fair value of the contingent consideration as of the date of acquisition and subsequently recognize changes in the fair value in results of operations. During the third quarter and first nine months of 2023, we recorded charges of $14.8 million and $24.9 million, respectively, to adjust the fair value of the contingent consideration from our acquisition of Stratus Technologies. During the third quarter and first nine months of 2022, we recorded charges of $0.1 million and $41.3 million, respectively, to adjust the fair value of the contingent consideration from our acquisition of the LED business. See “Item 1. Financial Statements – Notes to Consolidated Financial Statements – Business Acquisition – Stratus Technologies.”
+
+Other Operating (Income) Expense
+
+Other operating expense in the first nine months of 2023 included restructure charges of $6.0 million primarily for employee severance costs and other benefits resulting from workforce reductions, the elimination of certain projects across our businesses and other costs associated with the wind down of our Penguin Edge business. We anticipate that these activities will continue into future quarters and anticipate recording additional restructure charges.
+
+Interest Expense, Net
+
+Net interest expense increased by $2.9 million and $9.4 million in the third quarter and first nine months of 2023, respectively, compared to the same periods in the prior year, primarily due to interest expense from the Amended 2027 TLA Credit Facility. See “Item 1. Financial Statements – Notes to Consolidated Financial Statements – Debt.”
+
+Other Non-operating (Income) Expense
+
+Other non-operating (income) expense in the first nine months of 2023 included losses of $15.9 million from the extinguishment of debt, partially offset by net gains of $3.1 million from the disposition of assets. In the second quarter of 2023, we recognized a loss in connection with the extinguishment of $150.0 million of our 2026 Notes. In addition, the first nine months of 2023 included net foreign currency losses of $1.1 million compared to $3.5 million from the same period in the prior year. See “Item 1. Financial Statements – Notes to Consolidated Financial Statements – Debt – Convertible Senior Notes – Convertible Senior Notes Exchange” and “Item 1. Financial Statements – Notes to Consolidated Financial Statements – Other Non-operating (Income) Expense.”
+
+Income Tax Provision (Benefit)
+
+Income tax provision for the third quarter of 2023 increased by $1.5 million as compared to the same period in the prior year, primarily due to an increase in U.S. profits. Income tax provision for the first nine months of 2023 decreased by $10.6 million compared to the same period in the prior year, primarily due to current year losses in certain of our foreign operations, offset by increase in U.S. taxable profits. See “Item 1. Financial Statements – Notes to Consolidated Financial Statements – Income Taxes.”
+
+Liquidity and Capital Resources
+
+As of May 26, 2023, we had cash and cash equivalents of $401.3 million, of which $126.9 million was held outside of the United States. Our principal uses of cash and capital resources have been acquisitions, debt service requirements, capital expenditures, research and development expenditures and working capital requirements. We expect that future capital
+
+| | | | | | |
+| 37 | ![SGH_logo_rgb.jpg](sgh-20230526_g2.jpg) |
+
+---
+
+  
+
+expenditures will focus on expanding our research and development activities, manufacturing equipment upgrades, acquisitions and IT infrastructure and software upgrades. Cash and cash equivalents generally consist of funds held in demand deposit accounts, money market funds and time deposits. We do not enter into investments for trading or speculative purposes.
+
+We expect that our existing cash and cash equivalents, borrowings available under our credit facilities and cash generated by operating activities will be sufficient to fund our operations for at least the next twelve months. We may from time to time seek additional equity or debt financing. Any future equity financing may be dilutive to our existing investors, and any future debt financing may include debt service requirements and financial and other restrictive covenants that may constrain our operations and growth strategies. In the event that we seek additional financing, we may not be able to raise such financing on terms acceptable to us or at all. If we are unable to raise additional capital or generate cash flows necessary to expand our operations and invest in continued product innovation, we may not be able to compete successfully, which would harm our business, operations and financial condition.
+
+Credit Facility
+
+On August 29, 2022, we amended our credit facility and borrowed an additional $300 million, which amount was added to our existing term loan. The incremental term loans are on the same terms as the term loans incurred under the original credit agreement. In addition, we amended certain covenants under the amended credit agreement. In the first quarter of 2023, we applied a portion of the proceeds of the incremental term loans to (i) finance a portion of the purchase price of the acquisition of Stratus Technologies and (ii) pay in full the $101.8 million outstanding under the LED Earnout Note. See “Item 1. Financial Statements – Notes to Consolidated Financial Statements – Debt – Credit Facility.”
+
+Convertible Senior Notes
+
+On January 18, 2023, we entered into separate, privately negotiated exchange agreements with a limited number of holders of our 2026 Notes to exchange $150.0 million principal amount of our 2026 Notes for (i) $150.0 million in aggregate principal amount of new 2.00% Convertible Senior Notes due 2029 and (ii) an aggregate of approximately $15.6 million in cash, with such cash payment representing the premium paid for the 2026 Notes in excess of par value and accrued and unpaid interest on the 2026 Notes. See “Item 1. Financial Statements – Notes to Consolidated Financial Statements – Debt – Convertible Senior Notes – Convertible Notes Exchange.”
+
+On August 26, 2022, we irrevocably elected (i) to eliminate our option to elect Physical Settlement (as defined in the 2026 Indenture) on any conversion of our 2026 Notes that occurs on or after August 27, 2022 and (ii) with respect to any Combination Settlement (as defined in the 2026 Indenture) for a conversion of the 2026 Notes, the Specified Dollar Amount (as defined in the 2026 Indenture) that will be settled in cash per $1,000 principal amount of the 2026 Notes shall be no lower than $1,000. As a result of our election, upon any conversion of the 2026 Notes, we will be required to pay cash in an amount at least equal to the principal portion while continuing to have the option to settle any amount in excess of the principal portion in cash and/or ordinary shares. See “Item 1. Financial Statements – Notes to Consolidated Financial Statements – Debt – Convertible Senior Notes – 2026 Notes.”
+
+Acquisition of Stratus Technologies
+
+On August 29, 2022, we completed our previously announced acquisition of Stratus Technologies. At the closing of the transaction, we paid the seller a cash purchase price of $225 million, subject to certain adjustments. In addition, the seller has the right to receive, and we will be obligated to pay, contingent consideration of up to $50 million based on the gross profit performance of Stratus Technologies during the first full 12 fiscal months following the closing. Pursuant to the terms of the Stratus Purchase Agreement, we had the option to settle the Earnout amount owed to the Seller, if any, in cash, ordinary shares of SGH, or a mix of cash and ordinary shares of SGH. On June 28, 2023, we provided notice to the Seller of our election to settle the Earnout in cash. See “Item 1. Financial Statements – Notes to Consolidated Financial Statements – Business Acquisition – Stratus Technologies.”
+
+| | | | | | |
+| 38 | ![SGH_logo_rgb.jpg](sgh-20230526_g2.jpg) |
+
+---
+
+  
+
+Cash Flows
+
+| | | | | | | | | | | | |
+| | Nine Months Ended |
+| | May 26, 2023 | | May 27, 2022 |
+| Net cash provided by operating activities | $ | 67,588 | | | $ | 84,025 | |
+| Net cash used for investing activities | (249,822) | | | (30,044) | |
+| Net cash provided by financing activities | 217,714 | | | 108,210 | |
+| Effect of changes in currency exchange rates | 2,730 | | | 2,149 | |
+| Net increase in cash and cash equivalents | $ | 38,210 | | | $ | 164,340 | |
+
+Operating Activities: Cash flows from operating activities reflects net income, adjusted for certain non-cash items, including depreciation and amortization expense, share-based compensation, adjustments for changes in the fair value of contingent consideration, gains and losses from investing or financing activities and from the effects of changes in operating assets and liabilities.
+
+Net cash provided by operating activities in the first nine months of 2023 resulted primarily from net loss of $45.5 million, adjusted for non-cash items of $156.5 million. Operating cash flows were adversely affected by a $43.4 million net change in our operating assets and liabilities primarily from the effects of a decrease of $278.9 million in accounts payable and accrued expenses and other liabilities and the payment of $73.7 million of contingent consideration related to our 2021 acquisition of the LED business, partially offset by the effect of decreases of $194.5 million in accounts receivable and $104.6 million in inventories. The decreases in accounts payable and accrued expenses and accounts receivable were primarily due to the timing of payments and receipts. The decrease in inventories was primarily due to lower sales in our Memory Solutions segment.
+
+Net cash provided by operating activities in the first nine months of 2022 resulted primarily from net income of $48.2 million, adjusted for non-cash items of $128.8 million. Operating cash flows were adversely affected by a $93.0 million net change in our operating assets and liabilities primarily from the effects of an increase of $41.5 million in accounts receivable and a decrease of $54.2 million in accounts payable and accrued expenses and other liabilities. The increase in accounts receivable was primarily due to higher gross sales in our Memory Solutions and IPS segments, and the decrease in accounts payable and accrued expenses and other liabilities was primarily due to the lower inventories primarily in the same segments.
+
+Investing Activities: Net cash used for investing activities in the first nine months of 2023 consisted primarily of $213.1 million for the acquisition of Stratus Technologies and $37.5 million for purchases of property and equipment. Net cash used for investing activities in the first nine months of 2022 consisted primarily of purchases of property and equipment and deposits.
+
+Financing Activities: Net cash provided by financing activities in the first nine months of 2023 consisted primarily of $295.3 million in net proceeds from issuance of a term loan and $8.4 million in proceeds from the issuance of ordinary shares from our equity plans, partially offset by a $28.1 million payment of contingent consideration related to our 2021 acquisition of the LED business, $17.1 million in repayments of debt, $16.9 million of payments to acquire our ordinary shares, $14.1 million payment of premium in connection with our convertible note exchange and $4.3 million net cash paid for settlement and purchase of Capped Calls. Net cash provided by financing activities in the first nine months of 2022 consisted primarily of $270.8 million in net proceeds from the issuance of a term loan and $11.8 million in proceeds from the issuance of ordinary shares, partially offset by $125.0 million in principal repayment of the LED Purchase Price Note, $25.0 million in net repayments of borrowings under our line of credit and $16.8 million of payments to acquire our ordinary shares.
+
+Critical Accounting Estimates
+
+The preparation of financial statements and related disclosures in conformity with accounting principles generally accepted in the United States of America requires management to make estimates and judgments that affect the reported amounts of assets, liabilities, revenues, expenses and related disclosures. Estimates and judgments are based on historical experience, forecasted events and various other assumptions that we believe to be reasonable under the circumstances. We evaluate our estimates and judgments on an ongoing basis.
+
+| | | | | | |
+| 39 | ![SGH_logo_rgb.jpg](sgh-20230526_g2.jpg) |
+
+---
+
+  
+
+For a discussion of our critical accounting estimates, see “PART II – Item 7. Management’s Discussion and Analysis of Financial Condition and Results of Operations – Critical Accounting Estimates” of our Annual Report on Form 10-K for the fiscal year ended August 26, 2022. There have been no material changes to our critical accounting estimates from those described in our Annual Report on Form 10-K for the fiscal year ended August 26, 2022.
+
+Item 3. Quantitative and Qualitative Disclosure About Market Risk
+
+Foreign Exchange Risk
+
+We are subject to inherent risks attributed to operating in a global economy. Our international sales and our operations in foreign countries subject us to risks associated with fluctuating currency values and exchange rates. Because a significant portion of our sales are denominated in U.S. dollars, increases in the value of the U.S. dollar could increase the price of our products so that they become relatively more expensive to customers in a particular country, possibly leading to a reduction in sales and profitability in that country. In addition, we have certain costs that are denominated in foreign currencies, and decreases in the value of the U.S. dollar could result in increases in such costs, which could have a material adverse effect on our results of operations.
+
+As a result of our international operations, we generate a portion of our net sales and incur a portion of our expenses in currencies other than the U.S. dollar, particularly the Brazilian real. We present our consolidated financial statements in U.S. dollars, and we translate the assets, liabilities, net sales and expenses of a substantial portion of our foreign operations into U.S. dollars at applicable exchange rates. Consequently, increases or decreases in the value of the U.S. dollar may affect the value of these items with respect to our non-U.S. dollar businesses in our consolidated financial statements, even if their value has not changed in their local currency. Our customer pricing and material cost of sales are generally based on U.S. dollars. Accordingly, the impact of currency fluctuations to our consolidated statements of operations is primarily to our other costs of sales (i.e., non-material components) and our operating expenses as those items are typically denominated in local currency. Our consolidated statements of operations are also impacted by foreign currency gains and losses arising from transactions denominated in a currency other than the functional currency of the respective subsidiary. These translations could significantly affect the comparability of our results between financial periods or result in significant changes to the carrying value of our assets, liabilities and equity. As a result, changes in foreign currency exchange rates impact our reported results.
+
+Approximately 12% and 25% of our net sales in the first nine months of 2023 and 2022, respectively, originated in Brazilian real. We utilize foreign exchange forward contracts to mitigate foreign currency exchange rate risk associated with foreign currency-denominated liabilities in Brazil, primarily third party payables. We do not use foreign currency contracts for speculative or trading purposes.
+
+Based on our monetary assets and liabilities denominated in foreign currencies as of May 26, 2023 and August 26, 2022, we estimate that a 10% adverse change in exchange rates versus the U.S. dollar would result in losses recorded in non-operating (income) expense of $10.7 million and $5.8 million, respectively, to revalue these assets and liabilities.
+
+Interest Rate Risk
+
+We are subject to interest rate risk in connection with our variable-rate debt. As of May 26, 2023, we had $558.9 million principal amount outstanding under the Amended 2027 TLA. In addition, our Amended Credit Agreement provides for borrowings of up to $250.0 million under the 2027 Revolver. Assuming that we would satisfy the financial covenants required to borrow and that the amounts available under the 2027 Revolver were fully drawn, a 1.0% increase in interest rates would result in an increase in annual interest expense and a decrease in our cash flows of $8.1 million per year.
+
+Item 4. Controls and Procedures
+
+Evaluation of Disclosure Controls and Procedures
+
+An evaluation was performed under the supervision and with the participation of our management, including our principal executive officer and principal financial officer, of the effectiveness of our disclosure controls and procedures (as defined in Rules 13a-15(e) and 15d-15(e) under the Securities Exchange Act of 1934, as amended (the “Exchange Act”)) as of the end of the period covered by this report. Based upon that evaluation, our management, including our principal executive officer and principal financial officer, concluded that our disclosure controls and procedures were effective as of November 25, 2022 to ensure the information required to be disclosed by us in the reports that we file or submits under the Exchange Act
+
+| | | | | | |
+| 40 | ![SGH_logo_rgb.jpg](sgh-20230526_g2.jpg) |
+
+---
+
+  
+
+is (i) recorded, processed, summarized and reported within the time periods specified in the SEC rules and forms and (ii) accumulated and communicated to our management, including our principal executive officer and principal financial officer, as appropriate to allow timely decisions regarding required disclosures. There are inherent limitations to the effectiveness of any system of disclosure controls and procedures, including the possibility of human error and the circumvention or overriding of the controls and procedures. Accordingly, even effective disclosure controls and procedures can only provide reasonable assurance of achieving their control objectives.
+
+Changes in Internal Control Over Financial Reporting
+
+During the third quarter of fiscal 2023, there were no changes in our internal control over financial reporting, as defined in Rules 13a-15(f) and 15d-15(f) under the Exchange Act, that have materially affected, or are reasonably likely to materially affect, our internal control over financial reporting.
+
+| | | | | | |
+| 41 | ![SGH_logo_rgb.jpg](sgh-20230526_g2.jpg) |
+
+---
+
+  
+
+PART II. Other Information
+
+Item 1. Legal Proceedings
+
+For a discussion of legal proceedings, see “Item 1A. Risk Factors” and “PART I. Financial Information – Item 1. Financial Statements – Notes to Consolidated Financial Statements – Commitments and Contingencies.”
+
+Item 1A. Risk Factors
+
+There have been no material changes to the risks described in “PART I – Item 1A. Risk Factors” in our Annual Report on Form 10-K for the fiscal year ended August 26, 2022, as updated in “PART II – Other Information – Item 1A. Risk Factors” in our Quarterly Report on Form 10-Q for the fiscal quarter ended February 24, 2023. You should carefully consider the risks and uncertainties and the other information in these reports and this Quarterly Report, including “PART I. Financial Information – Item 2. Management’s Discussion and Analysis of Financial Condition and Results of Operations” and our financial statements and related notes. Our business, financial condition or results of operations could be materially and adversely affected if any of these risks occurs and, as a result, the market price of our ordinary shares could decline and you could lose all or part of your investment.
+
+This Quarterly Report also contains forward-looking statements that involve risks and uncertainties. See “Cautionary Note Regarding Forward-Looking Statements” for additional information. Our actual results could differ materially and adversely from those anticipated in these forward-looking statements as a result of certain factors, including the risks facing our company described in our Annual Report on Form 10-K for the fiscal year ended August 26, 2022, our Quarterly Report on Form 10-Q for the fiscal quarter ended February 24, 2023 and this Quarterly Report.
+
+Item 2. Unregistered Sales of Equity Securities and Use of Proceeds
+
+Issuer Purchases of Equity Securities
+
+On April 5, 2022, we announced that our Board of Directors approved a $75 million share repurchase authorization, under which we may repurchase our outstanding ordinary shares from time to time through open market purchases, privately-negotiated transactions or otherwise. The share repurchase authorization has no expiration date but may be suspended or terminated by our Board of Directors at any time. As of May 26, 2023, the remaining dollar value of shares that may be repurchased was $16.6 million. No shares were repurchased during the third quarter of 2023.
+
+Item 3. Defaults Upon Senior Securities
+
+None.
+
+Item 4. Mine Safety Disclosures
+
+Not applicable.
+
+| | | | | | |
+| 42 | ![SGH_logo_rgb.jpg](sgh-20230526_g2.jpg) |
+
+---
+
+  
+
+Item 5. Other Information
+
+None.
+
+Item 6. Exhibits
+
+INDEX TO EXHIBITS
+
+| | | | | | | | | | | | | | | | | | | | | |
+| | | | Incorporated by Reference |
+| Exhibit No. | Description | Filed Herewith | Form | File No. | Exhibit | Filing Date |
+| 3.1 | [Second Amended and Restated Memorandum and Articles of Association of SMART Global Holdings, Inc.](http://www.sec.gov/Archives/edgar/data/1616533/000119312520092828/d902118dex31.htm) | | 10-Q | 001-38102 | 3.1 | 04/07/2020 |
+| 4.1 | [Description of the Registrant’s Securities Registered Pursuant to Section 12 of the Exchange Act of 1934](https://www.sec.gov/Archives/edgar/data/1616533/000156459021051710/sgh-ex41_1681.htm) | | 10-K | 001-38102 | 4.1 | 10/25/2021 |
+| 31.1 | [Certification of Principal Executive Officer Pursuant to Rules 13a-14(a) and 15d-14(a) under the Securities Exchange Act of 1934, as Adopted Pursuant to Section 302 of the Sarbanes-Oxley Act of 2002](https://www.sec.gov/Archives/edgar/data/0001616533/000162828023023925/sghq3-23form10xqex311.htm) | X | | | | |
+| 31.2 | [Certification of Principal Financial Officer Pursuant to Rules 13a-14(a) and 15d-14(a) under the Securities Exchange Act of 1934, as Adopted Pursuant to Section 302 of the Sarbanes-Oxley Act of 2002](https://www.sec.gov/Archives/edgar/data/0001616533/000162828023023925/sghq3-23form10xqex312.htm) | X | | | | |
+| 32.1\* | [Certification of C](https://www.sec.gov/Archives/edgar/data/0001616533/000162828023023925/sghq3-23form10xqex321.htm)[hief](https://www.sec.gov/Archives/edgar/data/0001616533/000162828023023925/sghq3-23form10xqex321.htm) [Executive Officer Pursuant to 18 U.S.C. Section 1350, as Adopted Pursuant to Section 906 of the Sarbanes-Oxley Act of 2002](https://www.sec.gov/Archives/edgar/data/0001616533/000162828023023925/sghq3-23form10xqex321.htm) | X | | | | |
+| 32.2\* | [Certification of C](https://www.sec.gov/Archives/edgar/data/0001616533/000162828023023925/sghq3-23form10xqex322.htm)[hief](https://www.sec.gov/Archives/edgar/data/0001616533/000162828023023925/sghq3-23form10xqex322.htm) [Financial Officer Pursuant to 18 U.S.C. Section 1350, as Adopted Pursuant to Section 906 of the Sarbanes-Oxley Act of 2002](https://www.sec.gov/Archives/edgar/data/0001616533/000162828023023925/sghq3-23form10xqex322.htm) | X | | | | |
+| 101.INS | Inline XBRL Instance Document – the instance document does not appear in the Interactive Data File because XBRL tags are embedded within the Inline XBRL document | X | | | | |
+| 101.SCH | Inline XBRL Taxonomy Extension Schema Document | X | | | | |
+| 101.CAL | Inline XBRL Taxonomy Extension Calculation Linkbase Document | X | | | | |
+| 101.DEF | Inline XBRL Taxonomy Extension Definition Linkbase Document | X | | | | |
+| 101.LAB | Inline XBRL Taxonomy Extension Label Linkbase Document | X | | | | |
+| 101.PRE | Inline XBRL Taxonomy Extension Presentation Linkbase Document | X | | | | |
+| 104 | Cover Page Interactive Data File (embedded within the Inline XBRL document) | X | | | | |
+
+\* The certifications attached as Exhibit 32.1 and 32.2 that accompany this Quarterly Report on Form 10-Q are deemed furnished and not filed with the SEC and are not to be incorporated by reference into any filing of the Registrant under the Securities Act of 1933, as amended, or the Exchange Act, whether made before or after the date of this Quarterly Report on Form 10-Q, irrespective of any general incorporation language contained in such filing.
+
+| | | | | | |
+| 43 | ![SGH_logo_rgb.jpg](sgh-20230526_g2.jpg) |
+
+---
+
+  
+
+SIGNATURES
+
+Pursuant to the requirements of Section 13 or 15(d) of the Securities Exchange Act of 1934, the Registrant has duly caused this report to be signed on its behalf by the undersigned, thereunto duly authorized.
+
+| | | | | | | | | |
+| | SMART Global Holdings, Inc. |
+| Date: June 29, 2023 | By: | /s/ Mark Adams |
+| | | Mark Adams |
+| | | President and Chief Executive Officer |
+| | | (Principal Executive Officer) |
+| | | |
+| Date: June 29, 2023 | By: | /s/ Ken Rizvi |
+| | | Ken Rizvi |
+| | | Senior Vice President and Chief Financial Officer |
+| | | (Principal Financial and Accounting Officer) |
+
+  
+
+| | | | | | |
+| 44 | ![SGH_logo_rgb.jpg](sgh-20230526_g2.jpg) |
+
+<img src="https://www.sec.gov/akam/13/pixel\_7bc09972?a=dD0zZjUwNzFmNzBmMDA1YWE5Mzc0MTU1ZDc1YmIxYzk0NjEyZTIxZGRkJmpzPW9mZg==" style="visibility: hidden; position: absolute; left: -999px; top: -999px;" />

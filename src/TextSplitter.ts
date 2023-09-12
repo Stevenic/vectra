@@ -1,6 +1,8 @@
 import { GPT3Tokenizer } from "./GPT3Tokenizer";
 import { TextChunk, Tokenizer } from "./types";
 
+const ALPHANUMERIC_CHARS = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+
 export interface TextSplitterConfig {
     separators: string[];
     keepSeparators: boolean;
@@ -15,7 +17,6 @@ export class TextSplitter {
 
     public constructor(config?: Partial<TextSplitterConfig>) {
         this._config = Object.assign({
-            separators: ["\n\n", "\n", " ", ""],
             keepSeparators: false,
             chunkSize: 400,
             chunkOverlap: 40,
@@ -71,10 +72,22 @@ export class TextSplitter {
 
     private recursiveSplit(text: string, separators: string[], startPos: number): TextChunk[] {
         const chunks: TextChunk[] = [];
-        if (text.length > 0 && separators.length > 0) {
-            const separator = separators[0];
+        if (text.length > 0) {
+            // Split text into parts
+            let parts: string[];
+            let separator = '';
             const nextSeparators = separators.length > 1 ? separators.slice(1) : [];
-            const parts = text.split(separator);
+            if (separators.length > 0) {
+                // Split by separator
+                separator = separators[0];
+                parts = text.split(separator);
+            } else {
+                // Cut text in half
+                const half = Math.floor(text.length / 2);
+                parts = [text.substring(0, half), text.substring(half)];
+            }
+
+            // Iterate over parts
             for (let i = 0; i < parts.length; i++) {
                 const lastChunk = (i === parts.length - 1);
 
@@ -85,30 +98,82 @@ export class TextSplitter {
                     chunk += separator;
                 }
 
-                // Encode chunk text
-                const tokens = this._config.tokenizer.encode(chunk);
-                if (tokens.length > this._config.chunkSize) {
+                // Ensure chunk contains text
+                if (!this.containsAlphanumeric(chunk)) {
+                    continue;
+                }
+
+                // Optimization to avoid encoding really large chunks
+                if (chunk.length / 6 > this._config.chunkSize) {
                     // Break the text into smaller chunks
                     const subChunks = this.recursiveSplit(chunk, nextSeparators, startPos);
                     chunks.push(...subChunks);
                 } else {
-                    // Append chunk to output
-                    chunks.push({
-                        text: chunk,
-                        tokens: tokens,
-                        startPos: startPos,
-                        endPos: endPos,
-                        startOverlap: [],
-                        endOverlap: [],
-                    });
+                    // Encode chunk text
+                    const tokens = this._config.tokenizer.encode(chunk);
+                    if (tokens.length > this._config.chunkSize) {
+                        // Break the text into smaller chunks
+                        const subChunks = this.recursiveSplit(chunk, nextSeparators, startPos);
+                        chunks.push(...subChunks);
+                    } else {
+                        // Append chunk to output
+                        chunks.push({
+                            text: chunk,
+                            tokens: tokens,
+                            startPos: startPos,
+                            endPos: endPos,
+                            startOverlap: [],
+                            endOverlap: [],
+                        });
+                    }
+
                 }
+
 
                 // Update startPos
                 startPos = endPos + 1;
             }
         }
 
-        return chunks;
+        return this.combineChunks(chunks);
+    }
+
+    private combineChunks(chunks: TextChunk[]): TextChunk[] {
+        const combinedChunks: TextChunk[] = [];
+        let currentChunk: TextChunk|undefined;
+        let currentLength = 0;
+        const separator = this._config.keepSeparators ? '' : ' ';
+        for (let i = 0; i < chunks.length; i++) {
+            const chunk = chunks[i];
+            if (currentChunk) {
+                const length = currentChunk.tokens.length + chunk.tokens.length;
+                if (length > this._config.chunkSize) {
+                    combinedChunks.push(currentChunk);
+                    currentChunk = chunk;
+                    currentLength = chunk.tokens.length;
+                } else {
+                    currentChunk.text += separator + chunk.text;
+                    currentChunk.tokens.push(...chunk.tokens);
+                    currentLength += chunk.tokens.length;
+                }
+            } else {
+                currentChunk = chunk;
+                currentLength = chunk.tokens.length;
+            }
+        }
+        if (currentChunk) {
+            combinedChunks.push(currentChunk);
+        }
+        return combinedChunks;
+    }
+
+    private containsAlphanumeric(text: string): boolean {
+        for (let i = 0; i < text.length; i++) {
+            if (ALPHANUMERIC_CHARS.includes(text[i])) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private getSeparators(docType?: string): string[] {
@@ -131,8 +196,7 @@ export class TextSplitter {
                     // Split by the normal type of lines
                     "\n\n",
                     "\n",
-                    " ",
-                    "",
+                    " "
                 ];
             case "go":
                 return [
@@ -149,8 +213,7 @@ export class TextSplitter {
                     // Split by the normal type of lines
                     "\n\n",
                     "\n",
-                    " ",
-                    "",
+                    " "
                 ];
             case "java":
             case "c#":
@@ -176,8 +239,7 @@ export class TextSplitter {
                     // Split by the normal type of lines
                     "\n\n",
                     "\n",
-                    " ",
-                    "",
+                    " "
                 ];
             case "js":
             case "jsx":
@@ -201,8 +263,7 @@ export class TextSplitter {
                     // Split by the normal type of lines
                     "\n\n",
                     "\n",
-                    " ",
-                    "",
+                    " "
                 ];
             case "php":
                 return [
@@ -220,8 +281,7 @@ export class TextSplitter {
                     // Split by the normal type of lines
                     "\n\n",
                     "\n",
-                    " ",
-                    "",
+                    " "
                 ];
             case "proto":
                 return [
@@ -240,8 +300,7 @@ export class TextSplitter {
                     // Split by the normal type of lines
                     "\n\n",
                     "\n",
-                    " ",
-                    "",
+                    " "
                 ];
             case "python":
             case "py":
@@ -253,8 +312,7 @@ export class TextSplitter {
                     // Now split by the normal type of lines
                     "\n\n",
                     "\n",
-                    " ",
-                    "",
+                    " "
                 ];
             case "rst":
                 return [
@@ -267,8 +325,7 @@ export class TextSplitter {
                     // Split by the normal type of lines
                     "\n\n",
                     "\n",
-                    " ",
-                    "",
+                    " "
                 ];
             case "ruby":
                 return [
@@ -286,8 +343,7 @@ export class TextSplitter {
                     // Split by the normal type of lines
                     "\n\n",
                     "\n",
-                    " ",
-                    "",
+                    " "
                 ];
             case "rust":
                 return [
@@ -305,8 +361,7 @@ export class TextSplitter {
                     // Split by the normal type of lines
                     "\n\n",
                     "\n",
-                    " ",
-                    "",
+                    " "
                 ];
             case "scala":
                 return [
@@ -326,8 +381,7 @@ export class TextSplitter {
                     // Split by the normal type of lines
                     "\n\n",
                     "\n",
-                    " ",
-                    "",
+                    " "
                 ];
             case "swift":
                 return [
@@ -347,9 +401,9 @@ export class TextSplitter {
                     // Split by the normal type of lines
                     "\n\n",
                     "\n",
-                    " ",
-                    "",
+                    " "
                 ];
+            case "md":
             case "markdown":
                 return [
                     // First, try to split along Markdown headings (starting with level 2)
@@ -369,10 +423,14 @@ export class TextSplitter {
                     "\n\n___\n\n",
                     // Note that this splitter doesn't handle horizontal lines defined
                     // by *three or more* of ***, ---, or ___, but this is not handled
+                    // Github tables
+                    "<table>",
+                    // "<tr>",
+                    // "<td>",
+                    // "<td ",
                     "\n\n",
                     "\n",
-                    " ",
-                    "",
+                    " "
                 ];
             case "latex":
                 return [
@@ -400,8 +458,7 @@ export class TextSplitter {
                     // Now split by the normal type of lines
                     "\n\n",
                     "\n",
-                    " ",
-                    "",
+                    " "
                 ];
             case "html":
                 return [
@@ -434,8 +491,7 @@ export class TextSplitter {
                     "<meta>",
                     "<title>",
                     // Normal type of lines
-                    " ",
-                    "",
+                    " "
                 ];
             case "sol":
                 return [
@@ -464,8 +520,7 @@ export class TextSplitter {
                     // Split by the normal type of lines
                     "\n\n",
                     "\n",
-                    " ",
-                    "",
+                    " "
                 ];
             default:
                 return [

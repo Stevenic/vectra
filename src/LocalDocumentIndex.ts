@@ -8,8 +8,6 @@ import { MetadataFilter, EmbeddingsModel, Tokenizer, MetadataTypes, EmbeddingsRe
 import { LocalDocumentResult } from './LocalDocumentResult';
 import { LocalDocument } from './LocalDocument';
 
-const EMBEDDINGS_BATCH_SIZE = 500;
-
 export interface DocumentQueryOptions {
     maxDocuments?: number;
     maxChunks?: number;
@@ -131,10 +129,13 @@ export class LocalDocumentIndex extends LocalIndex {
      * @remarks
      * A new update is started if one is not already in progress. If an document with the same uri
      * already exists, it will be replaced.
-     * @param item Item to insert
+     * @param uri - Document URI
+     * @param text - Document text
+     * @param docType - Optional. Document type
+     * @param metadata - Optional. Document metadata to index
      * @returns Inserted document
      */
-    public async upsertDocument(uri: string, text: string, metadata?: Record<string, MetadataTypes>): Promise<LocalDocument> {
+    public async upsertDocument(uri: string, text: string, docType?: string, metadata?: Record<string, MetadataTypes>): Promise<LocalDocument> {
         // Ensure embeddings configured
         if (!this._embeddings) {
             throw new Error(`Embeddings model not configured.`);
@@ -150,12 +151,15 @@ export class LocalDocumentIndex extends LocalIndex {
             documentId = v4();
         }
 
-        // Populate docType based on extension
-        const config = Object.assign({}, this._chunkingConfig);
-        const pos = uri.lastIndexOf('.');
-        if (pos >= 0) {
-            const ext = uri.substring(pos + 1).toLowerCase();
-            config.docType = ext;
+        // Initialize text splitter settings
+        const config = Object.assign({ docType }, this._chunkingConfig);
+        if (config.docType == undefined) {
+            // Populate docType based on extension
+            const pos = uri.lastIndexOf('.');
+            if (pos >= 0) {
+                const ext = uri.substring(pos + 1).toLowerCase();
+                config.docType = ext;
+            }
         }
 
         // Split text into chunks
@@ -163,14 +167,17 @@ export class LocalDocumentIndex extends LocalIndex {
         const chunks = splitter.split(text);
 
         // Break chunks into batches for embedding generation
+        let totalTokens = 0;
         const chunkBatches: string[][] = [];
         let currentBatch: string[] = [];
         for (const chunk of chunks) {
-            currentBatch.push(chunk.text);
-            if (currentBatch.length >= EMBEDDINGS_BATCH_SIZE) {
+            totalTokens += chunk.tokens.length;
+            if (totalTokens > this._embeddings.maxTokens) {
                 chunkBatches.push(currentBatch);
                 currentBatch = [];
+                totalTokens = chunk.tokens.length;
             }
+            currentBatch.push(chunk.text.replace(/\n/g, ' '));
         }
         if (currentBatch.length > 0) {
             chunkBatches.push(currentBatch);
@@ -257,7 +264,7 @@ export class LocalDocumentIndex extends LocalIndex {
         // Generate embeddings for query
         let embeddings: EmbeddingsResponse;
         try {
-            embeddings = await this._embeddings.createEmbeddings(query);
+            embeddings = await this._embeddings.createEmbeddings(query.replace(/\n/g, ' '));
         } catch (err: unknown) {
             throw new Error(`Error generating embeddings for query: ${(err as any).toString()}`);
         }
