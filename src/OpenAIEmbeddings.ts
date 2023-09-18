@@ -140,7 +140,8 @@ export class OpenAIEmbeddings implements EmbeddingsModel {
 
         // Process response
         if (response.status < 300) {
-            return { status: 'success', output: response.data.data.sort((a, b) => a.index - b.index).map((item) => item.embedding) };
+            const {data,model,usage} = response.data
+            return { status: 'success', output: data.sort((a, b) => a.index - b.index).map((item) => item.embedding), model, usage };
         } else if (response.status == 429) {
             return { status: 'rate_limited', message: `The embeddings API returned a rate limit error.` }
         } else {
