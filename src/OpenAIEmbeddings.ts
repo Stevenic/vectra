@@ -83,6 +83,8 @@ export class OpenAIEmbeddings implements EmbeddingsModel {
 
     private readonly UserAgent = 'AlphaWave';
 
+    public readonly maxTokens = 8000;
+
     /**
      * Options the client was configured with.
      */
@@ -121,7 +123,7 @@ export class OpenAIEmbeddings implements EmbeddingsModel {
 
         // Create client
         this._httpClient = axios.create({
-            validateStatus: (status) => status < 400 || status == 429
+            validateStatus: (status) => true
         });
     }
 
@@ -138,10 +140,12 @@ export class OpenAIEmbeddings implements EmbeddingsModel {
 
         // Process response
         if (response.status < 300) {
-            return { status: 'success', output: response.data.data.sort((a, b) => a.index - b.index).map((item) => item.embedding) };
+            const {data,model,usage} = response.data
+            return { status: 'success', output: data.sort((a, b) => a.index - b.index).map((item) => item.embedding), model, usage };
         } else if (response.status == 429) {
             return { status: 'rate_limited', message: `The embeddings API returned a rate limit error.` }
         } else {
+            console.log(inputs);
             return { status: 'error', message: `The embeddings API returned an error status of ${response.status}: ${response.statusText}` };
         }
     }

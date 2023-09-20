@@ -5,6 +5,11 @@
  */
 export interface EmbeddingsModel {
     /**
+     * Maximum number of tokens
+     */
+    readonly maxTokens: number;
+
+    /**
      * Creates embeddings for the given inputs.
      * @param inputs Text inputs to create embeddings for.
      * @returns A `EmbeddingsResponse` with a status and the generated embeddings or a message when an error occurs.
@@ -51,7 +56,7 @@ export interface TextChunk {
 }
 
 export interface TextFetcher {
-    fetch(uri: string): Promise<string>;
+    fetch(uri: string): Promise<{ text: string; docType: string|undefined; }>;
 }
 
 export interface IndexStats {

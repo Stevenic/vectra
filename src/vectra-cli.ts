@@ -5,11 +5,11 @@ import { LocalDocumentIndex } from "./LocalDocumentIndex";
 import { WebFetcher } from './WebFetcher';
 import { OpenAIEmbeddings } from './OpenAIEmbeddings';
 import { Colorize } from './internals';
-import { Console } from 'console';
 
 export async function run() {
     // prettier-ignore
     const args = await yargs(hideBin(process.argv))
+        .scriptName('vectra')
         .command('create <index>', `create a new local index`, {}, async (args) => {
             const folderPath = args.index as string;
             const index = new LocalDocumentIndex({ folderPath });
@@ -22,7 +22,7 @@ export async function run() {
             const index = new LocalDocumentIndex({ folderPath });
             await index.deleteIndex();
         })
-        .command('add-web <index>', `adds one or more web pages to an index`, (yargs) => {
+        .command('add <index>', `adds one or more web pages to an index`, (yargs) => {
             return yargs
                 .option('keys', {
                     alias: 'k',
@@ -81,9 +81,9 @@ export async function run() {
             for (const uri of uris) {
                 try {
                     console.log(Colorize.progress(`fetching ${uri}`));
-                    const content =  await fetcher.fetch(uri);
+                    const { text, docType } =  await fetcher.fetch(uri);
                     console.log(Colorize.replaceLine(Colorize.progress(`indexing ${uri}`)));
-                    await index.upsertDocument(uri, content);
+                    await index.upsertDocument(uri, text, docType);
                     console.log(Colorize.replaceLine(Colorize.success(`added ${uri}`)));
                 } catch (err: unknown) {
                     console.log(Colorize.replaceLine(Colorize.error(`Error adding: ${uri}\n${(err as Error).message}`)));
@@ -142,25 +142,25 @@ export async function run() {
                 .option('document-count', {
                     alias: 'dc',
                     describe: 'max number of documents to return (defaults to 10)',
-                    type: 'count',
+                    type: 'number',
                     default: 10
                 })
                 .option('chunk-count', {
                     alias: 'cc',
                     describe: 'max number of chunks to return (defaults to 50)',
-                    type: 'count',
+                    type: 'number',
                     default: 50
                 })
                 .option('section-count', {
                     alias: 'sc',
                     describe: 'max number of document sections to render (defaults to 1)',
-                    type: 'count',
+                    type: 'number',
                     default: 1
                 })
                 .option('tokens', {
                     alias: 't',
                     describe: 'max number of tokens to render for each document section (defaults to 2000)',
-                    type: 'count',
+                    type: 'number',
                     default: 2000
                 })
                 .option('format', {
@@ -200,7 +200,7 @@ export async function run() {
                     const sections = await result.renderSections(args.tokens, args.sectionCount);
                     for (let i = 0; i < sections.length; i++) {
                         const section = sections[i];
-                        console.log(Colorize.title(args.sectionCount > 1 ? 'Section' : `Section ${1}`));
+                        console.log(Colorize.title(args.sectionCount == 1 ? 'Section' : `Section ${i + 1}`));
                         console.log(Colorize.value('score', section.score));
                         console.log(Colorize.value('tokens', section.tokenCount));
                         console.log(Colorize.output(section.text));
