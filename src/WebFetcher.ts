@@ -3,7 +3,6 @@ import { TextFetcher } from './types';
 import * as cheerio from 'cheerio';
 import TurndownService  from 'turndown';
 
-
 const ALLOWED_CONTENT_TYPES = [
     "text/html",
     "application/json",
@@ -45,7 +44,7 @@ export class WebFetcher implements TextFetcher {
         } as WebFetcherConfig, config);
     }
 
-    public async fetch(uri: string): Promise<{ text: string; docType: string|undefined; }> {
+    public async fetch(uri: string, onDocument: (uri: string, text: string, docType?: string) => Promise<boolean>): Promise<boolean> {
         const httpClient = axios.create({
             validateStatus: () => true,
         });
@@ -78,10 +77,10 @@ export class WebFetcher implements TextFetcher {
         const docType = contentTypeArray[0] != 'text/plain' ? contentTypeArray[0].split('/')[1] : undefined;
         if (docType == 'html' && this._config.htmlToMarkdown) {
             const text = this.htmlToMarkdown(response.data, uri);
-            return {text, docType: 'md'};
+            return await onDocument(uri, text, 'md');
         } else {
             const text = response.data;
-            return {text, docType};
+            return await onDocument(uri, text, docType);
         }
     }
 

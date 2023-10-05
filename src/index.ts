@@ -1,3 +1,4 @@
+export * from './FileFetcher';
 export * from './GPT3Tokenizer';
 export * from './ItemSelector';
 export * from './LocalIndex';

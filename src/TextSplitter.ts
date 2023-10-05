@@ -223,6 +223,10 @@ export class TextSplitter {
             case "tsx":
             case "typescript":
                 return [
+                    // split along regions
+                    "// LLM-REGION",
+                    "/* LLM-REGION",
+                    "/** LLM-REGION",
                     // Split along class definitions
                     "\nclass ",
                     // Split along method definitions
@@ -245,6 +249,10 @@ export class TextSplitter {
             case "jsx":
             case "javascript":
                 return [
+                    // split along regions
+                    "// LLM-REGION",
+                    "/* LLM-REGION",
+                    "/** LLM-REGION",
                     // Split along class definitions
                     "\nclass ",
                     // Split along function definitions

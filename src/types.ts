@@ -44,6 +44,16 @@ export interface EmbeddingsResponse {
      * Optional. Message when status is not equal to `success`.
      */
     message?: string;
+
+    /**
+     * Optional. Model used to create the embeddings.
+     */
+    model?: string;
+
+    /**
+     * Optional. Usage statistics for the request.
+     */
+    usage?: Record<string, any>;
 }
 
 export interface TextChunk {
@@ -56,7 +66,7 @@ export interface TextChunk {
 }
 
 export interface TextFetcher {
-    fetch(uri: string): Promise<{ text: string; docType: string|undefined; }>;
+    fetch(uri: string, onDocument: (uri: string, text: string, docType?: string) => Promise<boolean>): Promise<boolean>;
 }
 
 export interface IndexStats {

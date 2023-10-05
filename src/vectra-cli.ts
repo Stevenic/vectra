@@ -5,6 +5,7 @@ import { LocalDocumentIndex } from "./LocalDocumentIndex";
 import { WebFetcher } from './WebFetcher';
 import { OpenAIEmbeddings } from './OpenAIEmbeddings';
 import { Colorize } from './internals';
+import { FileFetcher } from './FileFetcher';
 
 export async function run() {
     // prettier-ignore
@@ -77,16 +78,20 @@ export async function run() {
             const uris = await getItemList(args.uri as string[], args.list as string, 'web page');
 
             // Fetch web pages
-            const fetcher = new WebFetcher();
-            for (const uri of uris) {
+            const fileFetcher = new FileFetcher();
+            const webFetcher = new WebFetcher();
+            for (const path of uris) {
                 try {
-                    console.log(Colorize.progress(`fetching ${uri}`));
-                    const { text, docType } =  await fetcher.fetch(uri);
-                    console.log(Colorize.replaceLine(Colorize.progress(`indexing ${uri}`)));
-                    await index.upsertDocument(uri, text, docType);
-                    console.log(Colorize.replaceLine(Colorize.success(`added ${uri}`)));
+                    console.log(Colorize.progress(`fetching ${path}`));
+                    const fetcher = path.startsWith('http') ? webFetcher : fileFetcher;
+                    await fetcher.fetch(path, async (uri, text, docType) => {
+                        console.log(Colorize.replaceLine(Colorize.progress(`indexing ${uri}`)));
+                        await index.upsertDocument(uri, text, docType);
+                        console.log(Colorize.replaceLine(Colorize.success(`added ${uri}`)));
+                        return true;
+                    });
                 } catch (err: unknown) {
-                    console.log(Colorize.replaceLine(Colorize.error(`Error adding: ${uri}\n${(err as Error).message}`)));
+                    console.log(Colorize.replaceLine(Colorize.error(`Error adding: ${path}\n${(err as Error).message}`)));
                 }
             }
         })
