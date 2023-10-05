@@ -50,7 +50,7 @@ export class TextSplitter {
         function getOverlapTokens(tokens?: number[]): number[] {
             if (tokens != undefined) {
                 const len = tokens.length > that._config.chunkOverlap ? that._config.chunkOverlap : tokens.length;
-                return tokens.slice(tokens.length);
+                return tokens.slice(0, len);
             } else {
                 return [];
             }
