@@ -73,7 +73,7 @@ Then query for items:
 
 ```typescript
 async function query(text: string) {
-    const vector = await getVector(input);
+    const vector = await getVector(text);
     const results = await index.queryItems(vector, 3);
     if (results.length > 0) {
         for (const result of results) {
