@@ -1,8 +1,16 @@
 import axios, { AxiosInstance, AxiosResponse, AxiosRequestConfig } from 'axios';
 import { EmbeddingsModel, EmbeddingsResponse } from "./types";
 import { CreateEmbeddingRequest, CreateEmbeddingResponse, OpenAICreateEmbeddingRequest } from "./internals";
+import { Colorize } from "./internals";
 
 export interface BaseOpenAIEmbeddingsOptions {
+    /**
+     * Optional. Whether to log requests to the console.
+     * @remarks
+     * This is useful for debugging prompts and defaults to `false`.
+     */
+    logRequests?: boolean;
+
     /**
      * Optional. Retry policy to use when calling the OpenAI API.
      * @remarks
@@ -15,6 +23,24 @@ export interface BaseOpenAIEmbeddingsOptions {
      * Optional. Request options to use when calling the OpenAI API.
      */
     requestConfig?: AxiosRequestConfig;
+}
+
+
+/**
+ * Options for configuring an `OpenAIEmbeddings` to generate embeddings using an OSS hosted model.
+ */
+export interface OSSEmbeddingsOptions extends BaseOpenAIEmbeddingsOptions {
+    /**
+     * Model to use for completion.
+     */
+    ossModel: string;
+
+    /**
+     * Optional. Endpoint to use when calling the OpenAI API.
+     * @remarks
+     * For Azure OpenAI this is the deployment endpoint.
+     */
+    ossEndpoint: string;
 }
 
 /**
@@ -79,25 +105,23 @@ export interface AzureOpenAIEmbeddingsOptions extends BaseOpenAIEmbeddingsOption
  */
 export class OpenAIEmbeddings implements EmbeddingsModel {
     private readonly _httpClient: AxiosInstance;
-    private readonly _useAzure: boolean;
+    private readonly _clientType: ClientType;
 
     private readonly UserAgent = 'AlphaWave';
-
-    public readonly maxTokens = 8000;
 
     /**
      * Options the client was configured with.
      */
-    public readonly options: OpenAIEmbeddingsOptions|AzureOpenAIEmbeddingsOptions;
+    public readonly options: OSSEmbeddingsOptions|OpenAIEmbeddingsOptions|AzureOpenAIEmbeddingsOptions;
 
     /**
      * Creates a new `OpenAIClient` instance.
      * @param options Options for configuring an `OpenAIClient`.
      */
-    public constructor(options: OpenAIEmbeddingsOptions|AzureOpenAIEmbeddingsOptions) {
+    public constructor(options: OSSEmbeddingsOptions|OpenAIEmbeddingsOptions|AzureOpenAIEmbeddingsOptions) {
         // Check for azure config
         if ((options as AzureOpenAIEmbeddingsOptions).azureApiKey) {
-            this._useAzure = true;
+            this._clientType = ClientType.AzureOpenAI;
             this.options = Object.assign({
                 retryPolicy: [2000, 5000],
                 azureApiVersion: '2023-05-15',
@@ -114,8 +138,13 @@ export class OpenAIEmbeddings implements EmbeddingsModel {
             }
 
             this.options.azureEndpoint = endpoint;
+        } else if ((options as OSSEmbeddingsOptions).ossModel) {
+            this._clientType = ClientType.OSS;
+            this.options = Object.assign({
+                retryPolicy: [2000, 5000]
+            }, options) as OSSEmbeddingsOptions;
         } else {
-            this._useAzure = false;
+            this._clientType = ClientType.OpenAI;
             this.options = Object.assign({
                 retryPolicy: [2000, 5000]
             }, options) as OpenAIEmbeddingsOptions;
@@ -123,7 +152,7 @@ export class OpenAIEmbeddings implements EmbeddingsModel {
 
         // Create client
         this._httpClient = axios.create({
-            validateStatus: (status) => true
+            validateStatus: (status) => status < 400 || status == 429
         });
     }
 
@@ -134,18 +163,30 @@ export class OpenAIEmbeddings implements EmbeddingsModel {
      * @returns A `EmbeddingsResponse` with a status and the generated embeddings or a message when an error occurs.
      */
     public async createEmbeddings(inputs: string | string[]): Promise<EmbeddingsResponse> {
+        if (this.options.logRequests) {
+            console.log(Colorize.title('EMBEDDINGS REQUEST:'));
+            console.log(Colorize.output(inputs));
+        }
+
+        const startTime = Date.now();
         const response = await this.createEmbeddingRequest({
             input: inputs,
         });
 
+        if (this.options.logRequests) {
+            console.log(Colorize.title('RESPONSE:'));
+            console.log(Colorize.value('status', response.status));
+            console.log(Colorize.value('duration', Date.now() - startTime, 'ms'));
+            console.log(Colorize.output(response.data));
+        }
+
+
         // Process response
         if (response.status < 300) {
-            const {data,model,usage} = response.data
-            return { status: 'success', output: data.sort((a, b) => a.index - b.index).map((item) => item.embedding), model, usage };
+            return { status: 'success', output: response.data.data.sort((a, b) => a.index - b.index).map((item) => item.embedding) };
         } else if (response.status == 429) {
             return { status: 'rate_limited', message: `The embeddings API returned a rate limit error.` }
         } else {
-            console.log(inputs);
             return { status: 'error', message: `The embeddings API returned an error status of ${response.status}: ${response.statusText}` };
         }
     }
@@ -154,9 +195,14 @@ export class OpenAIEmbeddings implements EmbeddingsModel {
      * @private
      */
     protected createEmbeddingRequest(request: CreateEmbeddingRequest): Promise<AxiosResponse<CreateEmbeddingResponse>> {
-        if (this._useAzure) {
+        if (this._clientType == ClientType.AzureOpenAI) {
             const options = this.options as AzureOpenAIEmbeddingsOptions;
             const url = `${options.azureEndpoint}/openai/deployments/${options.azureDeployment}/embeddings?api-version=${options.azureApiVersion!}`;
+            return this.post(url, request);
+        } else if (this._clientType == ClientType.OSS) {
+            const options = this.options as OSSEmbeddingsOptions;
+            const url = `${options.ossEndpoint}/v1/embeddings`;
+            (request as OpenAICreateEmbeddingRequest).model = options.ossModel;
             return this.post(url, request);
         } else {
             const options = this.options as OpenAIEmbeddingsOptions;
@@ -183,10 +229,10 @@ export class OpenAIEmbeddings implements EmbeddingsModel {
         if (!requestConfig.headers['User-Agent']) {
             requestConfig.headers['User-Agent'] = this.UserAgent;
         }
-        if (this._useAzure) {
+        if (this._clientType == ClientType.AzureOpenAI) {
             const options = this.options as AzureOpenAIEmbeddingsOptions;
             requestConfig.headers['api-key'] = options.azureApiKey;
-        } else {
+        } else if (this._clientType == ClientType.OpenAI) {
             const options = this.options as OpenAIEmbeddingsOptions;
             requestConfig.headers['Authorization'] = `Bearer ${options.apiKey}`;
             if (options.organization) {
@@ -206,4 +252,10 @@ export class OpenAIEmbeddings implements EmbeddingsModel {
             return response;
         }
     }
+}
+
+enum ClientType {
+    OpenAI,
+    AzureOpenAI,
+    OSS
 }
