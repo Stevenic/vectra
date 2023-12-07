@@ -109,6 +109,8 @@ export class OpenAIEmbeddings implements EmbeddingsModel {
 
     private readonly UserAgent = 'AlphaWave';
 
+    public readonly maxTokens = 8000;
+    
     /**
      * Options the client was configured with.
      */

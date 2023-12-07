@@ -25,18 +25,20 @@ export class LocalDocumentResult extends LocalDocument {
         return this._score;
     }
 
-    public async renderSections(maxTokens: number, maxSections: number): Promise<DocumentTextSection[]> {
+    public async renderSections(maxTokens: number, maxSections: number, overlappingChunks = true): Promise<DocumentTextSection[]> {
         // Load text from disk
         const text = await this.loadText();
 
         // First check to see if the entire document is less than maxTokens
-        const tokens = this._tokenizer.encode(text);
-        if (tokens.length < maxTokens) {
-            return [{
-                text,
-                tokenCount: tokens.length,
-                score: 1.0
-            }];
+        if (text.length <= (maxTokens * 8)) {
+            const tokens = this._tokenizer.encode(text);
+            if (tokens.length < maxTokens) {
+                return [{
+                    text,
+                    tokenCount: tokens.length,
+                    score: 1.0
+                }];
+            }
         }
 
         // Otherwise, we need to split the document into sections
@@ -121,61 +123,63 @@ export class LocalDocumentResult extends LocalDocument {
         });
 
         // Add overlapping chunks of text to each section until the maxTokens is reached
-        const connector: SectionChunk = {
-            text: '\n\n...\n\n',
-            startPos: -1,
-            endPos: -1,
-            score: 0,
-            tokenCount: this._tokenizer.encode('\n\n...\n\n').length
-        };
-        sections.forEach(section => {
-            // Insert connectors between chunks
-            if (section.chunks.length > 1) {
-                for (let i = 0; i < section.chunks.length - 1; i++) {
-                    section.chunks.splice(i + 1, 0, connector);
-                    section.tokenCount += connector.tokenCount;
-                    i++;
-                }
-            }
-
-            // Add chunks to beginning and end of the section until maxTokens is reached
-            let budget = maxTokens - section.tokenCount;
-            if (budget > 40) {
-                const sectionStart = section.chunks[0].startPos;
-                const sectionEnd = section.chunks[section.chunks.length - 1].endPos;
-                if (sectionStart > 0) {
-                    const beforeTex = text.substring(0, section.chunks[0].startPos);
-                    const beforeTokens = this._tokenizer.encode(beforeTex);
-                    const beforeBudget = sectionEnd < text.length - 1 ? Math.min(beforeTokens.length, Math.ceil(budget/2)) : Math.min(beforeTokens.length, budget);
-                    const chunk: SectionChunk = {
-                        text: this._tokenizer.decode(beforeTokens.slice(-beforeBudget)),
-                        startPos: sectionStart - beforeBudget,
-                        endPos: sectionStart - 1,
-                        score: 0,
-                        tokenCount: beforeBudget
-                    };
-                    section.chunks.unshift(chunk);
-                    section.tokenCount += chunk.tokenCount;
-                    budget -= chunk.tokenCount;
+        if (overlappingChunks) {
+            const connector: SectionChunk = {
+                text: '\n\n...\n\n',
+                startPos: -1,
+                endPos: -1,
+                score: 0,
+                tokenCount: this._tokenizer.encode('\n\n...\n\n').length
+            };
+            sections.forEach(section => {
+                // Insert connectors between chunks
+                if (section.chunks.length > 1) {
+                    for (let i = 0; i < section.chunks.length - 1; i++) {
+                        section.chunks.splice(i + 1, 0, connector);
+                        section.tokenCount += connector.tokenCount;
+                        i++;
+                    }
                 }
 
-                if (sectionEnd < text.length - 1) {
-                    const afterText = text.substring(sectionEnd + 1);
-                    const afterTokens = this._tokenizer.encode(afterText);
-                    const afterBudget = Math.min(afterTokens.length, budget);
-                    const chunk: SectionChunk = {
-                        text: this._tokenizer.decode(afterTokens.slice(0, afterBudget)),
-                        startPos: sectionEnd + 1,
-                        endPos: sectionEnd + afterBudget,
-                        score: 0,
-                        tokenCount: afterBudget
-                    };
-                    section.chunks.push(chunk);
-                    section.tokenCount += chunk.tokenCount;
-                    budget -= chunk.tokenCount;
+                // Add chunks to beginning and end of the section until maxTokens is reached
+                let budget = maxTokens - section.tokenCount;
+                if (budget > 40) {
+                    const sectionStart = section.chunks[0].startPos;
+                    const sectionEnd = section.chunks[section.chunks.length - 1].endPos;
+                    if (sectionStart > 0) {
+                        const beforeTex = text.substring(0, section.chunks[0].startPos);
+                        const beforeTokens = this.encodeBeforeText(beforeTex, Math.ceil(budget/2));
+                        const beforeBudget = sectionEnd < text.length - 1 ? Math.min(beforeTokens.length, Math.ceil(budget/2)) : Math.min(beforeTokens.length, budget);
+                        const chunk: SectionChunk = {
+                            text: this._tokenizer.decode(beforeTokens.slice(-beforeBudget)),
+                            startPos: sectionStart - beforeBudget,
+                            endPos: sectionStart - 1,
+                            score: 0,
+                            tokenCount: beforeBudget
+                        };
+                        section.chunks.unshift(chunk);
+                        section.tokenCount += chunk.tokenCount;
+                        budget -= chunk.tokenCount;
+                    }
+
+                    if (sectionEnd < text.length - 1) {
+                        const afterText = text.substring(sectionEnd + 1);
+                        const afterTokens = this.encodeAfterText(afterText, budget);
+                        const afterBudget = Math.min(afterTokens.length, budget);
+                        const chunk: SectionChunk = {
+                            text: this._tokenizer.decode(afterTokens.slice(0, afterBudget)),
+                            startPos: sectionEnd + 1,
+                            endPos: sectionEnd + afterBudget,
+                            score: 0,
+                            tokenCount: afterBudget
+                        };
+                        section.chunks.push(chunk);
+                        section.tokenCount += chunk.tokenCount;
+                        budget -= chunk.tokenCount;
+                    }
                 }
-            }
-        });
+            });
+        }
 
         // Return final rendered sections
         return sections.map(section => {
@@ -188,6 +192,19 @@ export class LocalDocumentResult extends LocalDocument {
             };
         });
     }
+
+    private encodeBeforeText(text: string, budget: number): number[] {
+        const maxLength = budget * 8;
+        const substr = text.length <= maxLength ? text : text.substring(text.length - maxLength);
+        return this._tokenizer.encode(substr);
+    }
+    
+    private encodeAfterText(text: string, budget: number): number[] {
+        const maxLength = budget * 8;
+        const substr = text.length <= maxLength ? text : text.substring(0, maxLength);
+        return this._tokenizer.encode(substr);
+    }
+
 }
 
 interface SectionChunk {

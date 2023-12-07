@@ -174,6 +174,12 @@ export async function run() {
                     choices: ['sections', 'stats', 'chunks'],
                     default: 'sections'
                 })
+                .option('overlap', {
+                    alias: 'o',
+                    describe: `whether to add overlapping chunks to sections.`,
+                    type: 'boolean',
+                    default: true
+                })
                 .demandOption(['keys']);
         }, async (args) => {
             console.log(Colorize.title('Querying Index'));
@@ -202,7 +208,7 @@ export async function run() {
                 console.log(Colorize.value('score', result.score));
                 console.log(Colorize.value('chunks', result.chunks.length));
                 if (args.format == 'sections') {
-                    const sections = await result.renderSections(args.tokens, args.sectionCount);
+                    const sections = await result.renderSections(args.tokens, args.sectionCount, args.overlap);
                     for (let i = 0; i < sections.length; i++) {
                         const section = sections[i];
                         console.log(Colorize.title(args.sectionCount == 1 ? 'Section' : `Section ${i + 1}`));
