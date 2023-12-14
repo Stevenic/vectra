@@ -80,7 +80,7 @@ export class TextSplitter {
             if (separators.length > 0) {
                 // Split by separator
                 separator = separators[0];
-                parts = text.split(separator);
+                parts = separator == ' ' ? this.splitBySpaces(text) : text.split(separator);
             } else {
                 // Cut text in half
                 const half = Math.floor(text.length / 2);
@@ -174,6 +174,28 @@ export class TextSplitter {
             }
         }
         return false;
+    }
+
+    private splitBySpaces(text: string): string[] {
+        const parts: string[] = [];
+        const words = text.split(' ');
+        if (words.length > 0) {
+            let part = words[0];
+            for (let i = 1; i < words.length; i++) {
+                const nextWord = words[i];
+                if (this._config.tokenizer.encode(part + ' ' + nextWord).length <= this._config.chunkSize) {
+                    part += ' ' + nextWord;
+                } else {
+                    parts.push(part);
+                    part = nextWord;
+                }
+            }
+            parts.push(part);
+        } else {
+            parts.push(text);
+        }
+
+        return parts;
     }
 
     private getSeparators(docType?: string): string[] {

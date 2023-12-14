@@ -11,11 +11,10 @@ const ALLOWED_CONTENT_TYPES = [
     "text/plain",
 ];
 
-
 const DEFAULT_HEADERS = {
     Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
-    "Accept-Encoding": "gzip, deflate",
-    "Accept-Language": "en-US,en;q=0.5",
+    "Accept-Encoding": "gzip, deflate, sdch, br",
+    "Accept-Language": "en-US,en;q=0.8,ms;q=0.6",
     "Alt-Used": "LEAVE-THIS-KEY-SET-BY-TOOL",
     Connection: "keep-alive",
     Host: "LEAVE-THIS-KEY-SET-BY-TOOL",
@@ -24,7 +23,7 @@ const DEFAULT_HEADERS = {
     "Sec-Fetch-Mode": "navigate",
     "Sec-Fetch-Site": "cross-site",
     "Upgrade-Insecure-Requests": "1",
-    "User-Agent": "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/111.0",
+    "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36",
 };
 
 export interface WebFetcherConfig {

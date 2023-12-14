@@ -41,6 +41,11 @@ export async function run() {
                     describe: 'path to a file containing a list of web pages to add',
                     type: 'string'
                 })
+                .option('cookie', {
+                    alias: 'c',
+                    describe: 'optional cookies to add to web fetch requests',
+                    type: 'string'
+                })
                 .option('chunk-size', {
                     alias: 'cs',
                     describe: 'size of the generated chunks in tokens (defaults to 512)',
@@ -77,9 +82,9 @@ export async function run() {
             // Get list of url's
             const uris = await getItemList(args.uri as string[], args.list as string, 'web page');
 
-            // Fetch web pages
+            // Fetch documents
             const fileFetcher = new FileFetcher();
-            const webFetcher = new WebFetcher();
+            const webFetcher = args.cookie ? new WebFetcher({ headers: { "cookie": args.cookie }}) : new WebFetcher();
             for (const path of uris) {
                 try {
                     console.log(Colorize.progress(`fetching ${path}`));
