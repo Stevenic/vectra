@@ -1,5 +1,5 @@
 import { TextFetcher } from './types';
-import * as fs from 'fs/promises';
+import * as fs from './fs';
 import * as path from 'path';
 
 export class FileFetcher implements TextFetcher {
@@ -23,7 +23,7 @@ export class FileFetcher implements TextFetcher {
             return true;
         } else {
             // Read file and call onDocument
-            const text = await fs.readFile(uri, 'utf8');
+            const text = await fs.readText(uri);
             const parts = uri.split('.');
             return await onDocument(uri, text, parts.length > 0 ? parts[parts.length - 1].toLowerCase() : undefined);
         }
