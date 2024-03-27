@@ -32,7 +32,7 @@ export class LocalDocumentResult extends LocalDocument {
         // First check to see if the entire document is less than maxTokens
         if (text.length <= (maxTokens * 8)) {
             const tokens = this._tokenizer.encode(text);
-            if (tokens.length < maxTokens) {
+            if (tokens.length <= maxTokens) {
                 return [{
                     text,
                     tokenCount: tokens.length,
