@@ -1,4 +1,4 @@
-import * as fs from 'fs/promises';
+import * as fs from './fs';
 import * as path from 'path';
 import { v4 } from 'uuid';
 import { ItemSelector } from './ItemSelector';
@@ -78,7 +78,7 @@ export class LocalIndex {
      * This method creates a new folder on disk containing an index.json file.
      * @param config - Index configuration
      */
-    public async createIndex(config: CreateIndexConfig = {version: 1}): Promise<void> {
+    public async createIndex(config: CreateIndexConfig = { version: 1 }): Promise<void> {
         // Delete if exists
         if (await this.isIndexCreated()) {
             if (config.deleteIfExists) {
@@ -90,7 +90,7 @@ export class LocalIndex {
 
         try {
             // Create folder for index
-            await fs.mkdir(this._folderPath, { recursive: true });
+            await fs.mkdir(this._folderPath);
 
             // Initialize index.json file
             this._data = {
@@ -113,10 +113,7 @@ export class LocalIndex {
      */
     public deleteIndex(): Promise<void> {
         this._data = undefined;
-        return fs.rm(this._folderPath, {
-            recursive: true,
-            maxRetries: 3
-        });
+        return fs.rm(this._folderPath);
     }
 
     /**
@@ -154,7 +151,7 @@ export class LocalIndex {
             await fs.writeFile(path.join(this._folderPath, this._indexName), JSON.stringify(this._update));
             this._data = this._update;
             this._update = undefined;
-        } catch(err: unknown) {
+        } catch (err: unknown) {
             throw new Error(`Error saving index: ${(err as any).toString()}`);
         }
     }
@@ -177,7 +174,7 @@ export class LocalIndex {
      * @param id Item id
      * @returns Item or undefined if not found
      */
-    public async getItem<TMetadata = Record<string,MetadataTypes>>(id: string): Promise<IndexItem<TMetadata> | undefined> {
+    public async getItem<TMetadata = Record<string, MetadataTypes>>(id: string): Promise<IndexItem<TMetadata> | undefined> {
         await this.loadIndexData();
         return this._data!.items.find(i => i.id === id) as any | undefined;
     }
@@ -190,7 +187,7 @@ export class LocalIndex {
      * @param item Item to insert
      * @returns Inserted item
      */
-    public async insertItem<TMetadata = Record<string,MetadataTypes>>(item: Partial<IndexItem<TMetadata>>): Promise<IndexItem<TMetadata>> {
+    public async insertItem<TMetadata = Record<string, MetadataTypes>>(item: Partial<IndexItem<TMetadata>>): Promise<IndexItem<TMetadata>> {
         if (this._update) {
             return await this.addItemToUpdate(item, true) as any;
         } else {
@@ -220,7 +217,7 @@ export class LocalIndex {
      * array is returned so no modifications should be made to the array.
      * @returns All items in the index
      */
-    public async listItems<TMetadata = Record<string,MetadataTypes>>(): Promise<IndexItem<TMetadata>[]> {
+    public async listItems<TMetadata = Record<string, MetadataTypes>>(): Promise<IndexItem<TMetadata>[]> {
         await this.loadIndexData();
         return this._data!.items.slice() as any;
     }
@@ -232,7 +229,7 @@ export class LocalIndex {
      * @param filter Filter to apply
      * @returns Items matching the filter
      */
-    public async listItemsByMetadata<TMetadata = Record<string,MetadataTypes>>(filter: MetadataFilter): Promise<IndexItem<TMetadata>[]> {
+    public async listItemsByMetadata<TMetadata = Record<string, MetadataTypes>>(filter: MetadataFilter): Promise<IndexItem<TMetadata>[]> {
         await this.loadIndexData();
         return this._data!.items.filter(i => ItemSelector.select(i.metadata, filter)) as any;
     }
@@ -247,7 +244,7 @@ export class LocalIndex {
      * @param filter Optional filter to apply
      * @returns Similar items to the vector that matches the filter
      */
-    public async queryItems<TMetadata = Record<string,MetadataTypes>>(vector: number[], topK: number, filter?: MetadataFilter): Promise<QueryResult<TMetadata>[]> {
+    public async queryItems<TMetadata = Record<string, MetadataTypes>>(vector: number[], topK: number, filter?: MetadataFilter): Promise<QueryResult<TMetadata>[]> {
         await this.loadIndexData();
 
         // Filter items
@@ -280,8 +277,8 @@ export class LocalIndex {
         for (const item of top) {
             if (item.item.metadataFile) {
                 const metadataPath = path.join(this._folderPath, item.item.metadataFile);
-                const metadata = await fs.readFile(metadataPath);
-                item.item.metadata = JSON.parse(metadata.toString());
+                const metadata = await fs.readText(metadataPath);
+                item.item.metadata = JSON.parse(metadata);
             }
         }
 
@@ -296,7 +293,7 @@ export class LocalIndex {
      * @param item Item to insert or replace
      * @returns Upserted item
      */
-    public async upsertItem<TMetadata = Record<string,MetadataTypes>>(item: Partial<IndexItem<TMetadata>>): Promise<IndexItem<TMetadata>> {
+    public async upsertItem<TMetadata = Record<string, MetadataTypes>>(item: Partial<IndexItem<TMetadata>>): Promise<IndexItem<TMetadata>> {
         if (this._update) {
             return await this.addItemToUpdate(item, false) as any;
         } else {
@@ -319,8 +316,8 @@ export class LocalIndex {
             throw new Error('Index does not exist');
         }
 
-        const data = await fs.readFile(path.join(this._folderPath, this.indexName));
-        this._data = JSON.parse(data.toString());
+        const data = await fs.readText(path.join(this._folderPath, this.indexName));
+        this._data = JSON.parse(data);
     }
 
     private async addItemToUpdate(item: Partial<IndexItem<any>>, unique: boolean): Promise<IndexItem> {
@@ -339,7 +336,7 @@ export class LocalIndex {
         }
 
         // Check for indexed metadata
-        let metadata: Record<string,any> = {};
+        let metadata: Record<string, any> = {};
         let metadataFile: string | undefined;
         if (this._update!.metadata_config.indexed && this._update!.metadata_config.indexed.length > 0 && item.metadata) {
             // Copy only indexed metadata
