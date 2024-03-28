@@ -142,9 +142,9 @@ export class ItemSelector {
                 case '$in':
                     if (typeof value == 'boolean') {
                         return false;
-                    } else if(typeof value == 'string' && !filter[key].includes(value)){
+                    } else if(typeof value == 'string' && !filter[key]!.includes(value)){
                         return false
-                    } else if(!filter[key].some(val => val.includes(value))){
+                    } else if(!filter[key]!.some(val => typeof val == 'string' && val.includes(value as string))){
                         return false
                     }
                     break;
