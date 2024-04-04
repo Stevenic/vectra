@@ -153,6 +153,7 @@ export class TextSplitter {
                     currentLength = chunk.tokens.length;
                 } else {
                     currentChunk.text += separator + chunk.text;
+                    currentChunk.endPos = chunk.endPos;
                     currentChunk.tokens.push(...chunk.tokens);
                     currentLength += chunk.tokens.length;
                 }
