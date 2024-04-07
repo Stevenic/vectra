@@ -5,11 +5,21 @@ import { Colorize } from "./internals";
 
 export interface BaseOpenAIEmbeddingsOptions {
     /**
+     * Optional. Number of embedding dimensions to return.
+     */
+    dimensions?: number;
+
+    /**
      * Optional. Whether to log requests to the console.
      * @remarks
      * This is useful for debugging prompts and defaults to `false`.
      */
     logRequests?: boolean;
+
+    /**
+     * Optional. Maximum number of tokens that can be sent to the embedding model.
+     */
+    maxTokens?: number;
 
     /**
      * Optional. Retry policy to use when calling the OpenAI API.
@@ -68,8 +78,6 @@ export interface OpenAIEmbeddingsOptions extends BaseOpenAIEmbeddingsOptions {
 
     /**
      * Optional. Endpoint to use when calling the OpenAI API.
-     * @remarks
-     * For Azure OpenAI this is the deployment endpoint.
      */
     endpoint?: string;
 }
@@ -109,7 +117,7 @@ export class OpenAIEmbeddings implements EmbeddingsModel {
 
     private readonly UserAgent = 'AlphaWave';
 
-    public readonly maxTokens = 8000;
+    public readonly maxTokens;
     
     /**
      * Options the client was configured with.
@@ -121,6 +129,8 @@ export class OpenAIEmbeddings implements EmbeddingsModel {
      * @param options Options for configuring an `OpenAIClient`.
      */
     public constructor(options: OSSEmbeddingsOptions|OpenAIEmbeddingsOptions|AzureOpenAIEmbeddingsOptions) {
+        this.maxTokens = options.maxTokens ?? 500;
+
         // Check for azure config
         if ((options as AzureOpenAIEmbeddingsOptions).azureApiKey) {
             this._clientType = ClientType.AzureOpenAI;
@@ -197,6 +207,9 @@ export class OpenAIEmbeddings implements EmbeddingsModel {
      * @private
      */
     protected createEmbeddingRequest(request: CreateEmbeddingRequest): Promise<AxiosResponse<CreateEmbeddingResponse>> {
+        if (this.options.dimensions) {
+            request.dimensions = this.options.dimensions;
+        }
         if (this._clientType == ClientType.AzureOpenAI) {
             const options = this.options as AzureOpenAIEmbeddingsOptions;
             const url = `${options.azureEndpoint}/openai/deployments/${options.azureDeployment}/embeddings?api-version=${options.azureApiVersion!}`;

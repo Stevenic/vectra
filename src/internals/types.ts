@@ -3,6 +3,7 @@
  */
 export interface CreateEmbeddingRequest {
     input: CreateEmbeddingRequestInput;
+    dimensions?: number;
     user?: string;
 }
 

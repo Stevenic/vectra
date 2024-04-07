@@ -1,5 +1,8 @@
 {
     "azureApiKey": "<YOUR API KEY>",
     "azureEndpoint": "<DEPLOYMENT ENDPOINT>",
-    "azureDeployment": "<NAME OF DEPLOYMENT>"
+    "azureDeployment": "<NAME OF DEPLOYMENT>",
+    "azureApiVersion": "<OPTIONAL API VERSION>",
+    "maxTokens": <OPTIONAL MAX TOKENS>",
+    "dimensions": "<OPTIONAL EMBEDDING DIMENSIONS>"
 }
