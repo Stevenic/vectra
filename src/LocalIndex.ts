@@ -177,7 +177,7 @@ export class LocalIndex<TMetadata extends Record<string,MetadataTypes> = Record<
      * @param id ID of the item to retrieve.
      * @returns Item or undefined if not found.
      */
-    public async getItem(id: string): Promise<IndexItem<TMetadata> | undefined> {
+    public async getItem<TItemMetadata extends TMetadata = TMetadata>(id: string): Promise<IndexItem<TItemMetadata> | undefined> {
         await this.loadIndexData();
         return this._data!.items.find(i => i.id === id) as any | undefined;
     }
@@ -190,7 +190,7 @@ export class LocalIndex<TMetadata extends Record<string,MetadataTypes> = Record<
      * @param item Item to insert.
      * @returns Inserted item.
      */
-    public async insertItem(item: Partial<IndexItem<TMetadata>>): Promise<IndexItem<TMetadata>> {
+    public async insertItem<TItemMetadata extends TMetadata = TMetadata>(item: Partial<IndexItem<TItemMetadata>>): Promise<IndexItem<TItemMetadata>> {
         if (this._update) {
             return await this.addItemToUpdate(item, true) as any;
         } else {
@@ -220,7 +220,7 @@ export class LocalIndex<TMetadata extends Record<string,MetadataTypes> = Record<
      * array is returned so no modifications should be made to the array.
      * @returns Array of all items in the index.
      */
-    public async listItems(): Promise<IndexItem<TMetadata>[]> {
+    public async listItems<TItemMetadata extends TMetadata = TMetadata>(): Promise<IndexItem<TItemMetadata>[]> {
         await this.loadIndexData();
         return this._data!.items.slice() as any;
     }
@@ -232,7 +232,7 @@ export class LocalIndex<TMetadata extends Record<string,MetadataTypes> = Record<
      * @param filter Filter to apply.
      * @returns Array of items matching the filter.
      */
-    public async listItemsByMetadata(filter: MetadataFilter): Promise<IndexItem<TMetadata>[]> {
+    public async listItemsByMetadata<TItemMetadata extends TMetadata = TMetadata>(filter: MetadataFilter): Promise<IndexItem<TItemMetadata>[]> {
         await this.loadIndexData();
         return this._data!.items.filter(i => ItemSelector.select(i.metadata, filter)) as any;
     }
@@ -247,7 +247,7 @@ export class LocalIndex<TMetadata extends Record<string,MetadataTypes> = Record<
      * @param filter Optional. Filter to apply.
      * @returns Similar items to the vector that matche the supplied filter.
      */
-    public async queryItems(vector: number[], topK: number, filter?: MetadataFilter): Promise<QueryResult<TMetadata>[]> {
+    public async queryItems<TItemMetadata extends TMetadata = TMetadata>(vector: number[], topK: number, filter?: MetadataFilter): Promise<QueryResult<TItemMetadata>[]> {
         await this.loadIndexData();
 
         // Filter items
@@ -269,7 +269,7 @@ export class LocalIndex<TMetadata extends Record<string,MetadataTypes> = Record<
         distances.sort((a, b) => b.distance - a.distance);
 
         // Find top k
-        const top: QueryResult<TMetadata>[] = distances.slice(0, topK).map(d => {
+        const top: QueryResult<TItemMetadata>[] = distances.slice(0, topK).map(d => {
             return {
                 item: Object.assign({}, items[d.index]) as any,
                 score: d.distance
@@ -296,7 +296,7 @@ export class LocalIndex<TMetadata extends Record<string,MetadataTypes> = Record<
      * @param item Item to insert or replace.
      * @returns Upserted item.
      */
-    public async upsertItem(item: Partial<IndexItem<TMetadata>>): Promise<IndexItem<TMetadata>> {
+    public async upsertItem<TItemMetadata extends TMetadata = TMetadata>(item: Partial<IndexItem<TItemMetadata>>): Promise<IndexItem<TItemMetadata>> {
         if (this._update) {
             return await this.addItemToUpdate(item, false) as any;
         } else {
