@@ -60,7 +60,7 @@ export interface LocalDocumentIndexConfig {
 /**
  * Represents a local index of documents stored on disk.
  */
-export class LocalDocumentIndex extends LocalIndex {
+export class LocalDocumentIndex extends LocalIndex<DocumentChunkMetadata> {
     private readonly _embeddings?: EmbeddingsModel;
     private readonly _tokenizer: Tokenizer;
     private readonly _chunkingConfig?: TextSplitterConfig;
@@ -158,7 +158,7 @@ export class LocalDocumentIndex extends LocalIndex {
         await this.beginUpdate();
         try {
             // Get list of chunks for document
-            const chunks = await this.listItemsByMetadata<DocumentChunkMetadata>({ documentId });
+            const chunks = await this.listItemsByMetadata({ documentId });
 
             // Delete chunks
             for (const chunk of chunks) {
@@ -326,7 +326,7 @@ export class LocalDocumentIndex extends LocalIndex {
     public async listDocuments(): Promise<LocalDocumentResult[]> {
         // Sort chunks by document ID
         const docs: { [documentId: string]: QueryResult<DocumentChunkMetadata>[]; } = {};
-        const chunks = await this.listItems<DocumentChunkMetadata>();
+        const chunks = await this.listItems();
         chunks.forEach(chunk => {
             const metadata = chunk.metadata;
             if (docs[metadata.documentId] == undefined) {
@@ -378,7 +378,7 @@ export class LocalDocumentIndex extends LocalIndex {
         }
 
         // Query index for chunks
-        const results = await this.queryItems<DocumentChunkMetadata>(embeddings.output![0], options.maxChunks!, options.filter);
+        const results = await this.queryItems(embeddings.output![0], options.maxChunks!, options.filter);
 
         // Group chunks by document
         const documentChunks: { [documentId: string]: QueryResult<DocumentChunkMetadata>[]; } = {};
