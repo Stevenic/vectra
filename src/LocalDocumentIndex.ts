@@ -8,27 +8,69 @@ import { MetadataFilter, EmbeddingsModel, Tokenizer, MetadataTypes, EmbeddingsRe
 import { LocalDocumentResult } from './LocalDocumentResult';
 import { LocalDocument } from './LocalDocument';
 
+/**
+ * Options for querying documents in the index.
+ */
 export interface DocumentQueryOptions {
+    /**
+     * Optional. Maximum number of documents to return.
+     * @remarks
+     * Default is 10.
+     */
     maxDocuments?: number;
+    
+    /**
+     * Maximum number of chunks to return per document.
+     * @remarks
+     * Default is 50.
+     */
     maxChunks?: number;
+
+    /**
+     * Optional. Filter to apply to the document metadata.
+     */
     filter?: MetadataFilter;
 }
 
+/**
+ * Configuration settings for a local document index.
+ */
 export interface LocalDocumentIndexConfig {
+    /**
+     * Folder path where the index is stored.
+     */
     folderPath: string;
+
+    /**
+     * Optional. Embeddings model to use for generating document embeddings.
+     */
     embeddings?: EmbeddingsModel;
+
+    /**
+     * Optional. Tokenizer to use for splitting text into tokens.
+     */
     tokenizer?: Tokenizer;
+
+    /**
+     * Optional. Configuration settings for splitting text into chunks.
+     */
     chunkingConfig?: Partial<TextSplitterConfig>;
 }
 
-export class LocalDocumentIndex extends LocalIndex {
+/**
+ * Represents a local index of documents stored on disk.
+ */
+export class LocalDocumentIndex extends LocalIndex<DocumentChunkMetadata> {
     private readonly _embeddings?: EmbeddingsModel;
     private readonly _tokenizer: Tokenizer;
     private readonly _chunkingConfig?: TextSplitterConfig;
     private _catalog?: DocumentCatalog;
     private _newCatalog?: DocumentCatalog;
 
-
+    /**
+     * Creates a new `LocalDocumentIndex` instance.
+     * @param config Configuration settings for the document index.
+     */
     public constructor(config: LocalDocumentIndexConfig) {
         super(config.folderPath);
         this._embeddings = config.embeddings;
@@ -39,6 +81,20 @@ export class LocalDocumentIndex extends LocalIndex {
         } as TextSplitterConfig, config.chunkingConfig);
         this._tokenizer = config.tokenizer ?? this._chunkingConfig.tokenizer ?? new GPT3Tokenizer();
         this._chunkingConfig.tokenizer = this._tokenizer;
+    }
+
+    /**
+     * Returns the embeddings model used by the index (if configured.)
+     */
+    public get embeddings(): EmbeddingsModel | undefined {
+        return this._embeddings;
+    }
+
+    /**
+     * Returns the tokenizer used by the index.
+     */
+    public get tokenizer(): Tokenizer {
+        return this._tokenizer;
     }
 
     /**
@@ -53,21 +109,44 @@ export class LocalDocumentIndex extends LocalIndex {
         }
     }
 
+    /**
+     * Returns the document ID for the given URI.
+     * @param uri URI of the document to lookup.
+     * @returns Document ID or undefined if not found.
+     */
     public async getDocumentId(uri: string): Promise<string | undefined> {
         await this.loadIndexData();
         return this._catalog?.uriToId[uri];
     }
 
+    /**
+     * Returns the document URI for the given ID.
+     * @param documentId ID of the document to lookup.
+     * @returns Document URI or undefined if not found.
+     */
     public async getDocumentUri(documentId: string): Promise<string | undefined> {
         await this.loadIndexData();
         return this._catalog?.idToUri[documentId];
     }
 
-    public async createIndex(config?: CreateIndexConfig): Promise<void> {
-        await super.createIndex(config);
-        await this.loadIndexData();
+    /**
+     * Loads the document catalog from disk and returns its stats.
+     * @returns Catalog stats.
+     */
+    public async getCatalogStats(): Promise<DocumentCatalogStats> {
+        const stats = await this.getIndexStats()
+        return {
+            version: this._catalog!.version,
+            documents: this._catalog!.count,
+            chunks: stats.items,
+            metadata_config: stats.metadata_config
+        };
     }
 
+    /**
+     * Deletes a document from the index.
+     * @param uri URI of the document to delete.
+     */
     public async deleteDocument(uri: string): Promise<void> {
         // Lookup document ID
         const documentId = await this.getDocumentId(uri);
@@ -79,7 +158,7 @@ export class LocalDocumentIndex extends LocalIndex {
         await this.beginUpdate();
         try {
             // Get list of chunks for document
-            const chunks = await this.listItemsByMetadata<DocumentChunkMetadata>({ documentId });
+            const chunks = await this.listItemsByMetadata({ documentId });
 
             // Delete chunks
             for (const chunk of chunks) {
@@ -112,16 +191,6 @@ export class LocalDocumentIndex extends LocalIndex {
         } catch (err: unknown) {
             // Ignore error
         }
-    }
-
-    public async getCatalogStats(): Promise<DocumentCatalogStats> {
-        const stats = await this.getIndexStats()
-        return {
-            version: this._catalog!.version,
-            documents: this._catalog!.count,
-            chunks: stats.items,
-            metadata_config: stats.metadata_config
-        };
     }
 
     /**
@@ -245,10 +314,44 @@ export class LocalDocumentIndex extends LocalIndex {
         }
 
         // Return document
-        return new LocalDocument(this.folderPath, documentId, uri);
+        return new LocalDocument(this, documentId, uri);
+    }
+    
+    /**
+     * Returns all documents in the index.
+     * @remarks
+     * Each document will contain all of the documents indexed chunks.
+     * @returns Array of documents.
+     */
+    public async listDocuments(): Promise<LocalDocumentResult[]> {
+        // Sort chunks by document ID
+        const docs: { [documentId: string]: QueryResult<DocumentChunkMetadata>[]; } = {};
+        const chunks = await this.listItems();
+        chunks.forEach(chunk => {
+            const metadata = chunk.metadata;
+            if (docs[metadata.documentId] == undefined) {
+                docs[metadata.documentId] = [];
+            }
+            docs[metadata.documentId].push({ item: chunk, score: 1.0 });
+        });
+
+        // Create document results
+        const results: LocalDocumentResult[] = [];
+        for (const documentId in docs) {
+            const uri = await this.getDocumentUri(documentId) as string;
+            const documentResult = new LocalDocumentResult(this, documentId, uri, docs[documentId], this._tokenizer);
+            results.push(documentResult);
+        }
+
+        return results;
     }
 
-
+    /**
+     * Queries the index for documents similar to the given query.
+     * @param query Text to query for.
+     * @param options Optional. Query options.
+     * @returns Array of document results.
+     */
     public async queryDocuments(query: string, options?: DocumentQueryOptions): Promise<LocalDocumentResult[]> {
         // Ensure embeddings configured
         if (!this._embeddings) {
@@ -275,7 +378,7 @@ export class LocalDocumentIndex extends LocalIndex {
         }
 
         // Query index for chunks
-        const results = await this.queryItems<DocumentChunkMetadata>(embeddings.output![0], options.maxChunks!, options.filter);
+        const results = await this.queryItems(embeddings.output![0], options.maxChunks!, options.filter);
 
         // Group chunks by document
         const documentChunks: { [documentId: string]: QueryResult<DocumentChunkMetadata>[]; } = {};
@@ -292,7 +395,7 @@ export class LocalDocumentIndex extends LocalIndex {
         for (const documentId in documentChunks) {
             const chunks = documentChunks[documentId];
             const uri = await this.getDocumentUri(documentId) as string;
-            const documentResult = new LocalDocumentResult(this.folderPath, documentId, uri, chunks, this._tokenizer);
+            const documentResult = new LocalDocumentResult(this, documentId, uri, chunks, this._tokenizer);
             documentResults.push(documentResult);
         }
 
@@ -310,6 +413,11 @@ export class LocalDocumentIndex extends LocalIndex {
     public cancelUpdate(): void {
         super.cancelUpdate();
         this._newCatalog = undefined;
+    }
+
+    public async createIndex(config?: CreateIndexConfig): Promise<void> {
+        await super.createIndex(config);
+        await this.loadIndexData();
     }
 
     public async endUpdate(): Promise<void> {

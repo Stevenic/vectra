@@ -3,7 +3,7 @@ import yargs from "yargs/yargs";
 import { hideBin } from "yargs/helpers";
 import { LocalDocumentIndex } from "./LocalDocumentIndex";
 import { WebFetcher } from './WebFetcher';
-import { OpenAIEmbeddings } from './OpenAIEmbeddings';
+import { AzureOpenAIEmbeddingsOptions, OSSEmbeddingsOptions, OpenAIEmbeddings, OpenAIEmbeddingsOptions } from './OpenAIEmbeddings';
 import { Colorize } from './internals';
 import { FileFetcher } from './FileFetcher';
 
@@ -65,9 +65,15 @@ export async function run() {
         }, async (args) => {
             console.log(Colorize.title('Adding Web Pages to Index'));
 
+            // Get embedding options
+            const options: OpenAIEmbeddingsOptions|AzureOpenAIEmbeddingsOptions|OSSEmbeddingsOptions = JSON.parse(await fs.readFile(args.keys as string, 'utf-8'));
+            if ((options as OpenAIEmbeddingsOptions).apiKey && !(options as OpenAIEmbeddingsOptions).model) {
+                (options as OpenAIEmbeddingsOptions).model = 'text-embedding-ada-002';
+                (options as OpenAIEmbeddingsOptions).maxTokens = 8000;
+            }
+
             // Create embeddings
-            const keys = JSON.parse(await fs.readText(args.keys as string));
-            const embeddings = new OpenAIEmbeddings(Object.assign({ model: 'text-embedding-ada-002' }, keys));
+            const embeddings = new OpenAIEmbeddings(options);
 
             // Initialize index
             const folderPath = args.index as string;
@@ -189,9 +195,15 @@ export async function run() {
         }, async (args) => {
             console.log(Colorize.title('Querying Index'));
 
+            // Get embedding options
+            const options: OpenAIEmbeddingsOptions|AzureOpenAIEmbeddingsOptions|OSSEmbeddingsOptions = JSON.parse(await fs.readFile(args.keys as string, 'utf-8'));
+            if ((options as OpenAIEmbeddingsOptions).apiKey && !(options as OpenAIEmbeddingsOptions).model) {
+                (options as OpenAIEmbeddingsOptions).model = 'text-embedding-ada-002';
+                (options as OpenAIEmbeddingsOptions).maxTokens = 8000;
+            }
+
             // Create embeddings
-            const keys = JSON.parse(await fs.readText(args.keys as string));
-            const embeddings = new OpenAIEmbeddings(Object.assign({ model: 'text-embedding-ada-002' }, keys));
+            const embeddings = new OpenAIEmbeddings(options);
 
             // Initialize index
             const folderPath = args.index as string;

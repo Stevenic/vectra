@@ -1,13 +1,21 @@
 import { LocalDocument } from "./LocalDocument";
+import { LocalDocumentIndex } from "./LocalDocumentIndex";
 import { QueryResult, DocumentChunkMetadata, Tokenizer, DocumentTextSection } from "./types";
 
+/**
+ * Represents a search result for a document stored on disk.
+ */
 export class LocalDocumentResult extends LocalDocument {
     private readonly _chunks: QueryResult<DocumentChunkMetadata>[];
     private readonly _tokenizer: Tokenizer;
     private readonly _score: number;
 
-    public constructor(folderPath: string, id: string, uri: string, chunks: QueryResult<DocumentChunkMetadata>[], tokenizer: Tokenizer) {
-        super(folderPath, id, uri);
+    /**
+     * @private
+     * Internal constructor for `LocalDocumentResult` instances.
+     */
+    public constructor(index: LocalDocumentIndex, id: string, uri: string, chunks: QueryResult<DocumentChunkMetadata>[], tokenizer: Tokenizer) {
+        super(index, id, uri);
         this._chunks = chunks;
         this._tokenizer = tokenizer;
 
@@ -17,28 +25,110 @@ export class LocalDocumentResult extends LocalDocument {
         this._score = score / this._chunks.length;
     }
 
+    /**
+     * Returns the chunks of the document that matched the query.
+     */
     public get chunks(): QueryResult<DocumentChunkMetadata>[] {
         return this._chunks;
     }
 
+    /**
+     * Returns the average score of the document result.
+     */
     public get score(): number {
         return this._score;
     }
 
+    /**
+     * Renders all of the results chunks as spans of text (sections.)
+     * @remarks
+     * The returned sections will be sorted by document order and limited to maxTokens in length.
+     * @param maxTokens Maximum number of tokens per section.
+     * @returns Array of rendered text sections.
+     */
+    public async renderAllSections(maxTokens: number): Promise<DocumentTextSection[]> {
+        // Load text from disk
+        const text = await this.loadText();
+
+        // Add chunks to a temp array and split any chunks that are longer than maxTokens.
+        const chunks: SectionChunk[]  = [];
+        for (let i = 0; i < this._chunks.length; i++) {
+            const chunk = this._chunks[i];
+            const startPos = chunk.item.metadata.startPos;
+            const endPos = chunk.item.metadata.endPos;
+            const chunkText = text.substring(startPos, endPos + 1);
+            const tokens = this._tokenizer.encode(chunkText);
+            let offset = 0;
+            while (offset < tokens.length) {
+                const chunkLength = Math.min(maxTokens, tokens.length - offset);
+                chunks.push({
+                    text: this._tokenizer.decode(tokens.slice(offset, offset + chunkLength)),
+                    startPos: startPos + offset,
+                    endPos: startPos + offset + chunkLength - 1,
+                    score: chunk.score,
+                    tokenCount: chunkLength
+                });
+                offset += chunkLength;
+            }
+        }
+
+        // Sort chunks by startPos
+        const sorted = chunks.sort((a, b) => a.startPos - b.startPos);
+
+        // Generate sections
+        const sections: Section[] = [];
+        for (let i = 0; i < sorted.length; i++) {
+            const chunk = sorted[i];
+            let section = sections[sections.length - 1];
+            if (!section || section.tokenCount + chunk.tokenCount > maxTokens) {
+                section = {
+                    chunks: [],
+                    score: 0,
+                    tokenCount: 0
+                };
+                sections.push(section);
+            }
+            section.chunks.push(chunk);
+            section.score += chunk.score;
+            section.tokenCount += chunk.tokenCount;
+        }
+        
+        // Normalize section scores
+        sections.forEach(section => section.score /= section.chunks.length);
+
+        // Return final rendered sections
+        return sections.map(section => {
+            let text = '';
+            section.chunks.forEach(chunk => text += chunk.text);
+            return {
+                text: text,
+                tokenCount: section.tokenCount,
+                score: section.score
+            };
+        });
+    }
+
+    /**
+     * Renders the top spans of text (sections) of the document based on the query result.
+     * @remarks
+     * The returned sections will be sorted by relevance and limited to the top `maxSections`.
+     * @param maxTokens Maximum number of tokens per section.
+     * @param maxSections Maximum number of sections to return.
+     * @param overlappingChunks Optional. If true, overlapping chunks of text will be added to each section until the maxTokens is reached.
+     * @returns Array of rendered text sections.
+     */
     public async renderSections(maxTokens: number, maxSections: number, overlappingChunks = true): Promise<DocumentTextSection[]> {
         // Load text from disk
         const text = await this.loadText();
 
-        // First check to see if the entire document is less than maxTokens
-        if (text.length <= (maxTokens * 8)) {
-            const tokens = this._tokenizer.encode(text);
-            if (tokens.length < maxTokens) {
-                return [{
-                    text,
-                    tokenCount: tokens.length,
-                    score: 1.0
-                }];
-            }
+        // First check to see if the entire document is shorter than maxTokens
+        const length = await this.getLength();
+        if (length <= maxTokens) {
+            return [{
+                text,
+                tokenCount: length,
+                score: 1.0
+            }];
         }
 
         // Otherwise, we need to split the document into sections
@@ -78,24 +168,21 @@ export class LocalDocumentResult extends LocalDocument {
         }
 
         // Generate sections
-        const sections: Section[] = [{
-            chunks: [],
-            score: 0,
-            tokenCount: 0
-        }];
+        const sections: Section[] = [];
         for (let i = 0; i < chunks.length; i++) {
             const chunk = chunks[i];
             let section = sections[sections.length - 1];
-            if (section.tokenCount + chunk.tokenCount > maxTokens) {
-                sections.push({
+            if (!section || section.tokenCount + chunk.tokenCount > maxTokens) {
+                section = {
                     chunks: [],
                     score: 0,
                     tokenCount: 0
-                });
+                };
+                sections.push(section);
             }
-            sections[sections.length - 1].chunks.push(chunk);
-            sections[sections.length - 1].score += chunk.score;
-            sections[sections.length - 1].tokenCount += chunk.tokenCount;
+            section.chunks.push(chunk);
+            section.score += chunk.score;
+            section.tokenCount += chunk.tokenCount;
         }
 
         // Normalize section scores

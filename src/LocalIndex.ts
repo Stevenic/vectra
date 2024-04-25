@@ -18,7 +18,7 @@ export interface CreateIndexConfig {
  * This class is used to create, update, and query a local vector index.
  * Each index is a folder on disk containing an index.json file and an optional set of metadata files.
  */
-export class LocalIndex {
+export class LocalIndex<TMetadata extends Record<string,MetadataTypes> = Record<string,MetadataTypes>>{
     private readonly _folderPath: string;
     private readonly _indexName: string;
 
@@ -27,8 +27,8 @@ export class LocalIndex {
 
     /**
      * Creates a new instance of LocalIndex.
-     * @param folderPath - Path to the index folder
-     * @param indexName - Optional name of the index file. Defaults to index.json
+     * @param folderPath Path to the index folder.
+     * @param indexName Optional name of the index file. Defaults to index.json.
      */
     public constructor(folderPath: string, indexName?: string) {
         this._folderPath = folderPath;
@@ -76,7 +76,7 @@ export class LocalIndex {
      * Creates a new index.
      * @remarks
      * This method creates a new folder on disk containing an index.json file.
-     * @param config - Index configuration
+     * @param config Index configuration.
      */
     public async createIndex(config: CreateIndexConfig = { version: 1 }): Promise<void> {
         // Delete if exists
@@ -118,7 +118,7 @@ export class LocalIndex {
 
     /**
      * Deletes an item from the index.
-     * @param id - Item id
+     * @param id ID of item to delete.
      */
     public async deleteItem(id: string): Promise<void> {
         if (this._update) {
@@ -158,7 +158,7 @@ export class LocalIndex {
 
     /**
      * Loads an index from disk and returns its stats.
-     * @returns Index stats
+     * @returns Index stats.
      */
     public async getIndexStats(): Promise<IndexStats> {
         await this.loadIndexData();
@@ -171,10 +171,10 @@ export class LocalIndex {
 
     /**
      * Returns an item from the index given its ID.
-     * @param id Item id
-     * @returns Item or undefined if not found
+     * @param id ID of the item to retrieve.
+     * @returns Item or undefined if not found.
      */
-    public async getItem<TMetadata = Record<string, MetadataTypes>>(id: string): Promise<IndexItem<TMetadata> | undefined> {
+    public async getItem<TItemMetadata extends TMetadata = TMetadata>(id: string): Promise<IndexItem<TItemMetadata> | undefined> {
         await this.loadIndexData();
         return this._data!.items.find(i => i.id === id) as any | undefined;
     }
@@ -184,10 +184,10 @@ export class LocalIndex {
      * @remarks
      * A new update is started if one is not already in progress. If an item with the same ID
      * already exists, an error will be thrown.
-     * @param item Item to insert
-     * @returns Inserted item
+     * @param item Item to insert.
+     * @returns Inserted item.
      */
-    public async insertItem<TMetadata = Record<string, MetadataTypes>>(item: Partial<IndexItem<TMetadata>>): Promise<IndexItem<TMetadata>> {
+    public async insertItem<TItemMetadata extends TMetadata = TMetadata>(item: Partial<IndexItem<TItemMetadata>>): Promise<IndexItem<TItemMetadata>> {
         if (this._update) {
             return await this.addItemToUpdate(item, true) as any;
         } else {
@@ -215,9 +215,9 @@ export class LocalIndex {
      * @remarks
      * This method loads the index into memory and returns all its items. A copy of the items
      * array is returned so no modifications should be made to the array.
-     * @returns All items in the index
+     * @returns Array of all items in the index.
      */
-    public async listItems<TMetadata = Record<string, MetadataTypes>>(): Promise<IndexItem<TMetadata>[]> {
+    public async listItems<TItemMetadata extends TMetadata = TMetadata>(): Promise<IndexItem<TItemMetadata>[]> {
         await this.loadIndexData();
         return this._data!.items.slice() as any;
     }
@@ -226,10 +226,10 @@ export class LocalIndex {
      * Returns all items in the index matching the filter.
      * @remarks
      * This method loads the index into memory and returns all its items matching the filter.
-     * @param filter Filter to apply
-     * @returns Items matching the filter
+     * @param filter Filter to apply.
+     * @returns Array of items matching the filter.
      */
-    public async listItemsByMetadata<TMetadata = Record<string, MetadataTypes>>(filter: MetadataFilter): Promise<IndexItem<TMetadata>[]> {
+    public async listItemsByMetadata<TItemMetadata extends TMetadata = TMetadata>(filter: MetadataFilter): Promise<IndexItem<TItemMetadata>[]> {
         await this.loadIndexData();
         return this._data!.items.filter(i => ItemSelector.select(i.metadata, filter)) as any;
     }
@@ -239,12 +239,12 @@ export class LocalIndex {
      * @remarks
      * This method loads the index into memory and returns the top k items that are most similar.
      * An optional filter can be applied to the metadata of the items.
-     * @param vector Vector to query against
-     * @param topK Number of items to return
-     * @param filter Optional filter to apply
-     * @returns Similar items to the vector that matches the filter
+     * @param vector Vector to query against.
+     * @param topK Number of items to return.
+     * @param filter Optional. Filter to apply.
+     * @returns Similar items to the vector that matche the supplied filter.
      */
-    public async queryItems<TMetadata = Record<string, MetadataTypes>>(vector: number[], topK: number, filter?: MetadataFilter): Promise<QueryResult<TMetadata>[]> {
+    public async queryItems<TItemMetadata extends TMetadata = TMetadata>(vector: number[], topK: number, filter?: MetadataFilter): Promise<QueryResult<TItemMetadata>[]> {
         await this.loadIndexData();
 
         // Filter items
@@ -266,7 +266,7 @@ export class LocalIndex {
         distances.sort((a, b) => b.distance - a.distance);
 
         // Find top k
-        const top: QueryResult<TMetadata>[] = distances.slice(0, topK).map(d => {
+        const top: QueryResult<TItemMetadata>[] = distances.slice(0, topK).map(d => {
             return {
                 item: Object.assign({}, items[d.index]) as any,
                 score: d.distance
@@ -290,10 +290,10 @@ export class LocalIndex {
      * @remarks
      * A new update is started if one is not already in progress. If an item with the same ID
      * already exists, it will be replaced.
-     * @param item Item to insert or replace
-     * @returns Upserted item
+     * @param item Item to insert or replace.
+     * @returns Upserted item.
      */
-    public async upsertItem<TMetadata = Record<string, MetadataTypes>>(item: Partial<IndexItem<TMetadata>>): Promise<IndexItem<TMetadata>> {
+    public async upsertItem<TItemMetadata extends TMetadata = TMetadata>(item: Partial<IndexItem<TItemMetadata>>): Promise<IndexItem<TItemMetadata>> {
         if (this._update) {
             return await this.addItemToUpdate(item, false) as any;
         } else {

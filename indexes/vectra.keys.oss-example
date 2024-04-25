@@ -1,0 +1,6 @@
+{
+    "ossModel": "<MODEL TO USE>",
+    "ossEndpoint": "<API ENDPOINT>",
+    "maxTokens": <OPTIONAL MAX TOKENS>",
+    "dimensions": "<OPTIONAL EMBEDDING DIMENSIONS>"
+}
