@@ -1,5 +1,6 @@
 # Vectra
-Vectra is a local vector database for Node.js with features similar to [Pinecone](https://www.pinecone.io/) or [Qdrant](https://qdrant.tech/) but built using local files. Each Vectra index is a folder on disk. There's an `index.json` file in the folder that contains all the vectors for the index along with any indexed metadata.  When you create an index you can specify which metadata properties to index and only those fields will be stored in the `index.json` file. All of the other metadata for an item will be stored on disk in a separate file keyed by a GUID.
+
+Vectra is a local vector database for Node.js with features similar to [Pinecone](https://www.pinecone.io/) or [Qdrant](https://qdrant.tech/) but built using local files. Each Vectra index is a folder on disk. There's an `index.json` file in the folder that contains all the vectors for the index along with any indexed metadata. When you create an index you can specify which metadata properties to index and only those fields will be stored in the `index.json` file. All of the other metadata for an item will be stored on disk in a separate file keyed by a GUID.
 
 When queryng Vectra you'll be able to use the same subset of [Mongo DB query operators](https://www.mongodb.com/docs/manual/reference/operator/query/) that Pinecone supports and the results will be returned sorted by simularity. Every item in the index will first be filtered by metadata and then ranked for simularity. Even though every item is evaluated its all in memory so it should by nearly instantanious. Likely 1ms - 2ms for even a rather large index. Smaller indexes should be <1ms.
 
@@ -8,9 +9,10 @@ Keep in mind that your entire Vectra index is loaded into memory so it's not wel
 Pinecone style namespaces aren't directly supported but you could easily mimic them by creating a separate Vectra index (and folder) for each namespace.
 
 ## Other Language Bindings
+
 This repo contains the TypeScript/JavaScript binding for Vectra but other language bindings are being created. Since Vectra is file based, any language binding can be used to read or write a Vectra index. That means you can build a Vectra index using JS and then read it using Python.
 
-- [vectra-py](https://github.com/BMS-geodev/vectra-py) - Python version of Vectra.
+-   [vectra-py](https://github.com/BMS-geodev/vectra-py) - Python version of Vectra.
 
 ## Installation
 
@@ -31,7 +33,7 @@ const index = new LocalIndex(path.join(__dirname, '..', 'index'));
 Next, from inside an async function, create your index:
 
 ```typescript
-if (!await index.isIndexCreated()) {
+if (!(await index.isIndexCreated())) {
     await index.createIndex();
 }
 ```
@@ -39,26 +41,24 @@ if (!await index.isIndexCreated()) {
 Add some items to your index:
 
 ```typescript
-import { OpenAIApi, Configuration } from 'openai';
+import { OpenAI } from 'openai';
 
-const configuration = new Configuration({
+const openai = new OpenAI({
     apiKey: `<YOUR_KEY>`,
 });
 
-const api = new OpenAIApi(configuration);
-
 async function getVector(text: string) {
-    const response = await api.createEmbedding({
+    const response = await openai.embeddings.create({
         'model': 'text-embedding-ada-002',
         'input': text,
     });
-    return response.data.data[0].embedding;
+    return response.data[0].embedding;
 }
 
 async function addItem(text: string) {
     await index.insertItem({
         vector: await getVector(text),
-        metadata: { text }
+        metadata: { text },
     });
 }
 
