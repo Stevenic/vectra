@@ -178,23 +178,18 @@ export class TextSplitter {
     }
 
     private splitBySpaces(text: string): string[] {
+        // Split text by tokens and return parts
         const parts: string[] = [];
-        const words = text.split(' ');
-        if (words.length > 0) {
-            let part = words[0];
-            for (let i = 1; i < words.length; i++) {
-                const nextWord = words[i];
-                if (this._config.tokenizer.encode(part + ' ' + nextWord).length <= this._config.chunkSize) {
-                    part += ' ' + nextWord;
-                } else {
-                    parts.push(part);
-                    part = nextWord;
-                }
+        let tokens = this._config.tokenizer.encode(text);
+        do {
+            if (tokens.length <= this._config.chunkSize) {
+                parts.push(this._config.tokenizer.decode(tokens));
+                break;
+            } else {
+                const span = tokens.splice(0, this._config.chunkSize);
+                parts.push(this._config.tokenizer.decode(span));
             }
-            parts.push(part);
-        } else {
-            parts.push(text);
-        }
+        } while (true);
 
         return parts;
     }
