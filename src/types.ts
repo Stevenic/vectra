@@ -24,7 +24,7 @@ export interface EmbeddingsModel {
  * `error` - An error occurred while creating the embeddings.
  * `rate_limited` - The request was rate limited.
  */
-export type EmbeddingsResponseStatus = 'success' | 'error' | 'rate_limited';
+export type EmbeddingsResponseStatus = 'success' | 'error' | 'rate_limited' | 'cancelled';
 
 /**
  * Response returned by a `EmbeddingsClient`.
