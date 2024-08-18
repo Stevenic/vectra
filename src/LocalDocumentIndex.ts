@@ -1,4 +1,4 @@
-import * as fs from 'fs/promises';
+import * as fs from './fs';
 import * as path from 'path';
 import { v4 } from 'uuid';
 import { GPT3Tokenizer } from "./GPT3Tokenizer";
@@ -443,8 +443,8 @@ export class LocalDocumentIndex extends LocalIndex<DocumentChunkMetadata> {
         const catalogPath = path.join(this.folderPath, 'catalog.json');
         if (await this.isCatalogCreated()) {
             // Load catalog
-            const buffer = await fs.readFile(catalogPath);
-            this._catalog = JSON.parse(buffer.toString());
+            const buffer = await fs.readText(catalogPath);
+            this._catalog = JSON.parse(buffer);
         } else {
             try {
                 // Initialize catalog

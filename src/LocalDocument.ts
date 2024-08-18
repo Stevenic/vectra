@@ -1,4 +1,4 @@
-import * as fs from 'fs/promises';
+import * as fs from './fs';
 import * as path from 'path';
 import { MetadataTypes } from './types';
 import { LocalDocumentIndex } from './LocalDocumentIndex';
@@ -10,8 +10,8 @@ export class LocalDocument {
     private readonly _index: LocalDocumentIndex;
     private readonly _id: string;
     private readonly _uri: string;
-    private _metadata: Record<string,MetadataTypes>|undefined;
-    private _text: string|undefined;
+    private _metadata: Record<string, MetadataTypes> | undefined;
+    private _text: string | undefined;
 
     /**
      * Creates a new `LocalDocument` instance.
@@ -82,7 +82,7 @@ export class LocalDocument {
         if (this._metadata == undefined) {
             let json: string;
             try {
-                json = (await fs.readFile(path.join(this.folderPath, `${this.id}.json`))).toString();
+                json = await fs.readText(path.join(this.folderPath, `${this.id}.json`));
             } catch (err: unknown) {
                 throw new Error(`Error reading metadata for document "${this.uri}": ${(err as any).toString()}`);
             }
@@ -104,7 +104,7 @@ export class LocalDocument {
     public async loadText(): Promise<string> {
         if (this._text == undefined) {
             try {
-                this._text = (await fs.readFile(path.join(this.folderPath, `${this.id}.txt`))).toString();
+                this._text = await fs.readText(path.join(this.folderPath, `${this.id}.txt`));
             } catch (err: unknown) {
                 throw new Error(`Error reading text file for document "${this.uri}": ${(err as any).toString()}`);
             }

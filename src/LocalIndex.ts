@@ -1,4 +1,4 @@
-import * as fs from 'fs/promises';
+import * as fs from './fs';
 import * as path from 'path';
 import { v4 } from 'uuid';
 import { ItemSelector } from './ItemSelector';
@@ -78,7 +78,7 @@ export class LocalIndex<TMetadata extends Record<string,MetadataTypes> = Record<
      * This method creates a new folder on disk containing an index.json file.
      * @param config Index configuration.
      */
-    public async createIndex(config: CreateIndexConfig = {version: 1}): Promise<void> {
+    public async createIndex(config: CreateIndexConfig = { version: 1 }): Promise<void> {
         // Delete if exists
         if (await this.isIndexCreated()) {
             if (config.deleteIfExists) {
@@ -90,7 +90,7 @@ export class LocalIndex<TMetadata extends Record<string,MetadataTypes> = Record<
 
         try {
             // Create folder for index
-            await fs.mkdir(this._folderPath, { recursive: true });
+            await fs.mkdir(this._folderPath);
 
             // Initialize index.json file
             this._data = {
@@ -113,10 +113,7 @@ export class LocalIndex<TMetadata extends Record<string,MetadataTypes> = Record<
      */
     public deleteIndex(): Promise<void> {
         this._data = undefined;
-        return fs.rm(this._folderPath, {
-            recursive: true,
-            maxRetries: 3
-        });
+        return fs.rm(this._folderPath);
     }
 
     /**
@@ -154,7 +151,7 @@ export class LocalIndex<TMetadata extends Record<string,MetadataTypes> = Record<
             await fs.writeFile(path.join(this._folderPath, this._indexName), JSON.stringify(this._update));
             this._data = this._update;
             this._update = undefined;
-        } catch(err: unknown) {
+        } catch (err: unknown) {
             throw new Error(`Error saving index: ${(err as any).toString()}`);
         }
     }
@@ -280,8 +277,8 @@ export class LocalIndex<TMetadata extends Record<string,MetadataTypes> = Record<
         for (const item of top) {
             if (item.item.metadataFile) {
                 const metadataPath = path.join(this._folderPath, item.item.metadataFile);
-                const metadata = await fs.readFile(metadataPath);
-                item.item.metadata = JSON.parse(metadata.toString());
+                const metadata = await fs.readText(metadataPath);
+                item.item.metadata = JSON.parse(metadata);
             }
         }
 
@@ -319,8 +316,8 @@ export class LocalIndex<TMetadata extends Record<string,MetadataTypes> = Record<
             throw new Error('Index does not exist');
         }
 
-        const data = await fs.readFile(path.join(this._folderPath, this.indexName));
-        this._data = JSON.parse(data.toString());
+        const data = await fs.readText(path.join(this._folderPath, this.indexName));
+        this._data = JSON.parse(data);
     }
 
     private async addItemToUpdate(item: Partial<IndexItem<any>>, unique: boolean): Promise<IndexItem> {
@@ -339,7 +336,7 @@ export class LocalIndex<TMetadata extends Record<string,MetadataTypes> = Record<
         }
 
         // Check for indexed metadata
-        let metadata: Record<string,any> = {};
+        let metadata: Record<string, any> = {};
         let metadataFile: string | undefined;
         if (this._update!.metadata_config.indexed && this._update!.metadata_config.indexed.length > 0 && item.metadata) {
             // Copy only indexed metadata

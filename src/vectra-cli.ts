@@ -1,4 +1,4 @@
-import * as fs from 'fs/promises';
+import * as fs from './fs';
 import yargs from "yargs/yargs";
 import { hideBin } from "yargs/helpers";
 import { LocalDocumentIndex } from "./LocalDocumentIndex";
@@ -90,7 +90,7 @@ export async function run() {
 
             // Fetch documents
             const fileFetcher = new FileFetcher();
-            const webFetcher = args.cookie ? new WebFetcher({ headers: { "cookie": args.cookie }}) : new WebFetcher();
+            const webFetcher = args.cookie ? new WebFetcher({ headers: { "cookie": args.cookie } }) : new WebFetcher();
             for (const path of uris) {
                 try {
                     console.log(Colorize.progress(`fetching ${path}`));
@@ -258,7 +258,7 @@ async function getItemList(items: string[], listFile: string, uriType: string): 
     if (Array.isArray(items) && items.length > 0) {
         return items;
     } else if (typeof listFile == 'string' && listFile.trim().length > 0) {
-        const list = await fs.readFile(listFile, 'utf-8');
+        const list = await fs.readText(listFile);
         return list.split('\n').map((item) => item.trim()).filter((item) => item.length > 0);
     } else {
         throw new Error(`you must specify either one or more "--uri <${uriType}>" for the items or a "--list <file path>" for a file containing the items.`)

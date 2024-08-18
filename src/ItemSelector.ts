@@ -140,7 +140,7 @@ export class ItemSelector {
                     }
                     break;
                 case '$in':
-                    if (typeof value == 'boolean') {
+                    if (typeof value == 'boolean' || typeof value === 'number') {
                         return false;
                     } else if(typeof value == 'string' && !filter[key]!.includes(value)){
                         return false
