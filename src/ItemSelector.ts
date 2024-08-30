@@ -149,7 +149,13 @@ export class ItemSelector {
                     }
                     break;
                 case '$nin':
-                    if (typeof value == 'boolean' || filter[key]!.includes(value)) {
+                    if (typeof value == 'boolean') {
+                        return false;
+                    }
+                    else if (typeof value == 'string' && filter[key]!.includes(value)) {
+                        return false;
+                    }
+                    else if (filter[key]!.some(val => typeof val == 'string' && val.includes(value))) {
                         return false;
                     }
                     break;
