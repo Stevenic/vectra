@@ -66,7 +66,8 @@ export class LocalDocumentResult extends LocalDocument {
                     startPos: startPos + offset,
                     endPos: startPos + offset + chunkLength - 1,
                     score: chunk.score,
-                    tokenCount: chunkLength
+                    tokenCount: chunkLength,
+                    isBm25: false
                 });
                 offset += chunkLength;
             }
@@ -103,7 +104,8 @@ export class LocalDocumentResult extends LocalDocument {
             return {
                 text: text,
                 tokenCount: section.tokenCount,
-                score: section.score
+                score: section.score,
+                isBm25: false,
             };
         });
     }
@@ -127,7 +129,8 @@ export class LocalDocumentResult extends LocalDocument {
             return [{
                 text,
                 tokenCount: length,
-                score: 1.0
+                score: 1.0,
+                isBm25: false,
             }];
         }
 
@@ -148,7 +151,8 @@ export class LocalDocumentResult extends LocalDocument {
                 startPos,
                 endPos,
                 score: chunk.score,
-                tokenCount: this._tokenizer.encode(chunkText).length
+                tokenCount: this._tokenizer.encode(chunkText).length,
+                isBm25: Boolean(chunk.item.metadata.isBm25),
             };
         }).filter(chunk => chunk.tokenCount <= maxTokens).sort((a, b) => a.startPos - b.startPos);
 
@@ -163,35 +167,62 @@ export class LocalDocumentResult extends LocalDocument {
             return [{
                 text: this._tokenizer.decode(tokens.slice(0, maxTokens)),
                 tokenCount: maxTokens,
-                score: topChunk.score
+                score: topChunk.score,
+                isBm25: false,
             }];
         }
 
-        // Generate sections
+        // Generate semantic sections
         const sections: Section[] = [];
         for (let i = 0; i < chunks.length; i++) {
             const chunk = chunks[i];
             let section = sections[sections.length - 1];
-            if (!section || section.tokenCount + chunk.tokenCount > maxTokens) {
-                section = {
-                    chunks: [],
-                    score: 0,
-                    tokenCount: 0
-                };
-                sections.push(section);
+            if (!chunk.isBm25) {
+                if (!section || section.tokenCount + chunk.tokenCount > maxTokens) {
+                    section = {
+                        chunks: [],
+                        score: 0,
+                        tokenCount: 0
+                    };
+                    sections.push(section);
+                }
+                section.chunks.push(chunk);
+                section.score += chunk.score;
+                section.tokenCount += chunk.tokenCount;
             }
-            section.chunks.push(chunk);
-            section.score += chunk.score;
-            section.tokenCount += chunk.tokenCount;
         }
 
+        // Generate bm25 sections
+        const bm25Sections: Section[] = [];
+        for (let i = 0; i < chunks.length; i++) {
+            const chunk = chunks[i];
+            let section = bm25Sections[bm25Sections.length - 1];
+            if (chunk.isBm25) {
+                if (!section || section.tokenCount + chunk.tokenCount > maxTokens) {
+                    section = {
+                        chunks: [],
+                        score: 0,
+                        tokenCount: 0
+                    };
+                    bm25Sections.push(section);
+                }
+                section.chunks.push(chunk);
+                section.score += chunk.score;
+                section.tokenCount += chunk.tokenCount;
+            }
+        }        
         // Normalize section scores
         sections.forEach(section => section.score /= section.chunks.length);
+        bm25Sections.forEach(section => section.score /= section.chunks.length);
 
         // Sort sections by score and limit to maxSections
         sections.sort((a, b) => b.score - a.score);
+        bm25Sections.sort((a, b) => b.score - a.score);
         if (sections.length > maxSections) {
             sections.splice(maxSections, sections.length - maxSections);
+        }
+        if (bm25Sections.length > maxSections) {
+            bm25Sections.splice(maxSections, bm25Sections.length - maxSections);
         }
 
         // Combine adjacent chunks of text
@@ -216,7 +247,8 @@ export class LocalDocumentResult extends LocalDocument {
                 startPos: -1,
                 endPos: -1,
                 score: 0,
-                tokenCount: this._tokenizer.encode('\n\n...\n\n').length
+                tokenCount: this._tokenizer.encode('\n\n...\n\n').length,
+                isBm25: false,
             };
             sections.forEach(section => {
                 // Insert connectors between chunks
@@ -242,7 +274,8 @@ export class LocalDocumentResult extends LocalDocument {
                             startPos: sectionStart - beforeBudget,
                             endPos: sectionStart - 1,
                             score: 0,
-                            tokenCount: beforeBudget
+                            tokenCount: beforeBudget,
+                            isBm25: false,
                         };
                         section.chunks.unshift(chunk);
                         section.tokenCount += chunk.tokenCount;
@@ -258,7 +291,8 @@ export class LocalDocumentResult extends LocalDocument {
                             startPos: sectionEnd + 1,
                             endPos: sectionEnd + afterBudget,
                             score: 0,
-                            tokenCount: afterBudget
+                            tokenCount: afterBudget,
+                            isBm25: false,
                         };
                         section.chunks.push(chunk);
                         section.tokenCount += chunk.tokenCount;
@@ -268,16 +302,29 @@ export class LocalDocumentResult extends LocalDocument {
             });
         }
 
-        // Return final rendered sections
-        return sections.map(section => {
+        const semanticDocTextSections = sections.map(section => {
             let text = '';
             section.chunks.forEach(chunk => text += chunk.text);
             return {
                 text: text,
                 tokenCount: section.tokenCount,
-                score: section.score
+                score: section.score,
+                isBm25: false,
             };
         });
+        const bm25DocTextSections = bm25Sections.map(section => {
+            let text = '';
+            section.chunks.forEach(chunk => text += chunk.text);
+            return {
+                text: text,
+                tokenCount: section.tokenCount,
+                score: section.score,
+                isBm25: true,
+            };
+        });
+
+        // Return final rendered sections
+        return [...semanticDocTextSections, ...bm25DocTextSections];
     }
 
     private encodeBeforeText(text: string, budget: number): number[] {
@@ -300,6 +347,7 @@ interface SectionChunk {
     endPos: number;
     score: number;
     tokenCount: number;
+    isBm25: boolean;
 }
 
 interface Section {

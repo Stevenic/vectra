@@ -16,9 +16,9 @@ export class Colorize {
         }
     }
 
-    public static output(output: object | string, quote: string = '', units: string = ''): string {
+    public static output(output: object | string, isBm25: boolean = false, quote: string = '', units: string = ''): string {
         if (typeof output === 'string') {
-            return `\x1b[32m${quote}${output}${quote}\x1b[0m`;
+            return isBm25 ? `\x1b[34m${quote}${output}${quote}\x1b[0m` : `\x1b[32m${quote}${output}${quote}\x1b[0m`;
         } else if (typeof output === 'object' && output !== null) {
             return colorizer(output, {
                 pretty: true,
@@ -54,7 +54,7 @@ export class Colorize {
     }
 
     public static value(field: string, value: any, units: string = ''): string {
-        return `${field}: ${Colorize.output(value, '"', units)}`;
+        return `${field}: ${Colorize.output(value, false, '"', units)}`;
     }
 
     public static warning(warning: string): string {

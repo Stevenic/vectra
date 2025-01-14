@@ -30,6 +30,12 @@ export interface DocumentQueryOptions {
      * Optional. Filter to apply to the document metadata.
      */
     filter?: MetadataFilter;
+
+    /**
+     * Optional. Turn on bm25 keyword search to perform hybrid search - semantic + keyword
+     */
+    isBm25?: boolean;
+
 }
 
 /**
@@ -378,7 +384,7 @@ export class LocalDocumentIndex extends LocalIndex<DocumentChunkMetadata> {
         }
 
         // Query index for chunks
-        const results = await this.queryItems(embeddings.output![0], options.maxChunks!, options.filter);
+        const results = await this.queryItems(embeddings.output![0], query, options.maxChunks!, options.filter, options.isBm25);
 
         // Group chunks by document
         const documentChunks: { [documentId: string]: QueryResult<DocumentChunkMetadata>[]; } = {};
