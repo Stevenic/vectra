@@ -155,7 +155,7 @@ export class ItemSelector {
                     else if (typeof value == 'string' && filter[key]!.includes(value)) {
                         return false;
                     }
-                    else if (filter[key]!.some(val => typeof val == 'string' && val.includes(value))) {
+                    else if (filter[key]!.some(val => typeof val == 'string' && val.includes(value as string))) {
                         return false;
                     }
                     break;
