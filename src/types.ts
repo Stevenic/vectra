@@ -172,4 +172,5 @@ export interface DocumentTextSection {
     text: string;
     tokenCount: number;
     score: number;
+    isBm25: boolean;
 }

@@ -3,7 +3,11 @@ import * as path from 'path';
 import { v4 } from 'uuid';
 import { ItemSelector } from './ItemSelector';
 import { IndexItem, IndexStats, MetadataFilter, MetadataTypes, QueryResult } from './types';
-
+import { LocalDocument } from './LocalDocument';
+import { LocalDocumentIndex } from './LocalDocumentIndex';
+import bm25 from 'wink-bm25-text-search';
+import winkNLP from 'wink-nlp';
+import model from 'wink-eng-lite-web-model';
 export interface CreateIndexConfig {
     version: number;
     deleteIfExists?: boolean;
@@ -24,6 +28,8 @@ export class LocalIndex<TMetadata extends Record<string,MetadataTypes> = Record<
 
     private _data?: IndexData;
     private _update?: IndexData;
+    //member fields for BM25
+    private _bm25Engine: any;
 
     /**
      * Creates a new instance of LocalIndex.
@@ -247,7 +253,7 @@ export class LocalIndex<TMetadata extends Record<string,MetadataTypes> = Record<
      * @param filter Optional. Filter to apply.
      * @returns Similar items to the vector that matche the supplied filter.
      */
-    public async queryItems<TItemMetadata extends TMetadata = TMetadata>(vector: number[], topK: number, filter?: MetadataFilter): Promise<QueryResult<TItemMetadata>[]> {
+    public async queryItems<TItemMetadata extends TMetadata = TMetadata>(vector: number[], query: string, topK: number, filter?: MetadataFilter, isBm25?: boolean): Promise<QueryResult<TItemMetadata>[]> {
         await this.loadIndexData();
 
         // Filter items
@@ -285,6 +291,36 @@ export class LocalIndex<TMetadata extends Record<string,MetadataTypes> = Record<
             }
         }
 
+        //Peform bm25 search only if enabled. Avoid duplicate chunks, which are already selected during semantic search.
+        if (isBm25) {
+            const itemSet = new Set();
+            for (const item of top) itemSet.add(item.item.id);
+            
+            this.setupbm25();
+
+            let currDoc;
+            let currDocTxt;
+            for (let i = 0; i < items.length; i++) {
+                if (!itemSet.has(items[i].id)) {
+                    const item = items[i];
+                    currDoc = new LocalDocument((this as unknown) as LocalDocumentIndex, item.metadata.documentId.toString(), '');
+                    currDocTxt = await currDoc.loadText();
+                    const startPos = item.metadata.startPos;
+                    const endPos = item.metadata.endPos;
+                    const chunkText = currDocTxt.substring(Number(startPos), Number(endPos) + 1);
+                    this._bm25Engine.addDoc({body: chunkText}, i);
+                }
+            }
+            this._bm25Engine.consolidate();
+            var results = await this.bm25Search(query, items, topK);
+            results.forEach((res: any) => {
+                top.push({
+                    item: Object.assign({}, {...items[res[0]], metadata: {...items[res[0]].metadata, isBm25: true}}) as any,
+                    score: res[1]
+                });
+            });
+            
+        }
         return top;
     }
 
@@ -385,6 +421,37 @@ export class LocalIndex<TMetadata extends Record<string,MetadataTypes> = Record<
             return newItem;
         }
     }
+
+    private async setupbm25(): Promise<any> {
+        this._bm25Engine = bm25();
+        const nlp = winkNLP( model );
+        const its = nlp.its;
+
+        const prepTask = function ( text: string ) {
+            const tokens: any[] = [];
+            nlp.readDoc(text)
+                .tokens()
+                // Use only words ignoring punctuations etc and from them remove stop words
+                .filter( (t: any) => ( t.out(its.type) === 'word' && !t.out(its.stopWordFlag) ) )
+                // Handle negation and extract stem of the word
+                .each( (t: any) => tokens.push( (t.out(its.negationFlag)) ? '!' + t.out(its.stem) : t.out(its.stem) ) );
+
+            return tokens;
+        };
+
+        this._bm25Engine.defineConfig( { fldWeights: { body: 1 } } );
+        // Step II: Define PrepTasks pipe.
+        this._bm25Engine.definePrepTasks( [ prepTask ] );
+    }
+
+    private async bm25Search(searchQuery: string, items: any, topK: number): Promise<any> {
+        var query = searchQuery;
+        // `results` is an array of [ doc-id, score ], sorted by score
+        var results = this._bm25Engine.search( query );
+
+        return results.slice(0, topK);
+    }
+
 }
 
 interface IndexData {

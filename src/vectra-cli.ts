@@ -191,6 +191,12 @@ export async function run() {
                     type: 'boolean',
                     default: true
                 })
+                .option('bm25', {
+                    alias: 'b',
+                    describe: 'Use Okapi-bm25 keyword search alogrithm to perform hybrid search - semantic + keyword. Displayed in blue during search.',
+                    type: 'boolean',
+                    default: false      
+                })
                 .demandOption(['keys']);
         }, async (args) => {
             console.log(Colorize.title('Querying Index'));
@@ -217,6 +223,7 @@ export async function run() {
             const results = await index.queryDocuments(query, {
                 maxDocuments: args.documentCount,
                 maxChunks: args.chunkCount,
+                isBm25: args.bm25 as boolean,
             });
 
             // Render results
@@ -226,12 +233,15 @@ export async function run() {
                 console.log(Colorize.value('chunks', result.chunks.length));
                 if (args.format == 'sections') {
                     const sections = await result.renderSections(args.tokens, args.sectionCount, args.overlap);
+                    console.log(sections.length);
                     for (let i = 0; i < sections.length; i++) {
                         const section = sections[i];
+                        const isBm25 = sections[i].isBm25;
+                        console.log(isBm25);
                         console.log(Colorize.title(args.sectionCount == 1 ? 'Section' : `Section ${i + 1}`));
                         console.log(Colorize.value('score', section.score));
                         console.log(Colorize.value('tokens', section.tokenCount));
-                        console.log(Colorize.output(section.text));
+                        console.log(Colorize.output(section.text, isBm25));
                     }
                 } else if (args.format == 'chunks') {
                     const text = await result.loadText();
@@ -239,11 +249,12 @@ export async function run() {
                         const chunk = result.chunks[i];
                         const startPos = chunk.item.metadata.startPos;
                         const endPos = chunk.item.metadata.endPos;
+                        const isBm25 = Boolean(chunk.item.metadata.isBm25);
                         console.log(Colorize.title(`Chunk ${i + 1}`));
                         console.log(Colorize.value('score', chunk.score));
                         console.log(Colorize.value('startPos', startPos));
                         console.log(Colorize.value('endPos', endPos));
-                        console.log(Colorize.output(text.substring(startPos, endPos + 1)));
+                        console.log(Colorize.output(text.substring(startPos, endPos + 1), isBm25));
                     }
                 }
             }
