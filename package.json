@@ -2,7 +2,7 @@
     "name": "vectra",
     "author": "Steven Ickman",
     "description": "A vector database that uses the local file system for storage.",
-    "version": "0.9.0",
+    "version": "0.10.0",
     "license": "MIT",
     "keywords": [
         "gpt"
