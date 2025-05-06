@@ -7,12 +7,15 @@
         "module": "commonjs",
         "sourceMap": true,
         "strict": true,
-        "target": "es6",
+        "target": "es2018",
         "esModuleInterop": true,
-        "lib": ["es2015"],
+        "lib": ["es2018", "dom", "esnext"],
         "outDir": "./lib",
         "rootDir": "./src",
-        "skipLibCheck": true
+        "skipLibCheck": true,
+        "moduleResolution": "node",
+        "noImplicitAny": false,
+        "strictNullChecks": false
     },
     "include": [
         "src/**/*"

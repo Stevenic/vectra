@@ -1,7 +1,11 @@
-import { TextFetcher } from './types';
-import * as fs from 'fs/promises';
-import * as path from 'path';
+import { TextFetcher } from "./types";
+import * as fs from "fs/promises";
+import * as path from "path";
 
+/**
+ * Fetches text content from local files.
+ * @public
+ */
 export class FileFetcher implements TextFetcher {
     public async fetch(uri: string, onDocument: (uri: string, text: string, docType?: string | undefined) => Promise<boolean>): Promise<boolean> {
         // Does path exist and is it a directory?
@@ -23,8 +27,8 @@ export class FileFetcher implements TextFetcher {
             return true;
         } else {
             // Read file and call onDocument
-            const text = await fs.readFile(uri, 'utf8');
-            const parts = uri.split('.');
+            const text = await fs.readFile(uri, "utf8");
+            const parts = uri.split(".");
             return await onDocument(uri, text, parts.length > 0 ? parts[parts.length - 1].toLowerCase() : undefined);
         }
     }

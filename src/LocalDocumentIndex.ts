@@ -1,15 +1,16 @@
-import * as fs from 'fs/promises';
-import * as path from 'path';
-import { v4 } from 'uuid';
+import * as fs from "fs/promises";
+import * as path from "path";
+import { v4 } from "uuid";
 import { GPT3Tokenizer } from "./GPT3Tokenizer";
 import { CreateIndexConfig, LocalIndex } from "./LocalIndex";
 import { TextSplitter, TextSplitterConfig } from "./TextSplitter";
 import { MetadataFilter, EmbeddingsModel, Tokenizer, MetadataTypes, EmbeddingsResponse, QueryResult, DocumentChunkMetadata, DocumentCatalogStats } from "./types";
-import { LocalDocumentResult } from './LocalDocumentResult';
-import { LocalDocument } from './LocalDocument';
+import { LocalDocumentResult } from "./LocalDocumentResult";
+import { LocalDocument } from "./LocalDocument";
 
 /**
- * Options for querying documents in the index.
+ * Options for querying documents.
+ * @public
  */
 export interface DocumentQueryOptions {
     /**
@@ -39,7 +40,8 @@ export interface DocumentQueryOptions {
 }
 
 /**
- * Configuration settings for a local document index.
+ * Configuration for a local document index.
+ * @public
  */
 export interface LocalDocumentIndexConfig {
     /**
@@ -65,6 +67,7 @@ export interface LocalDocumentIndexConfig {
 
 /**
  * Represents a local index of documents stored on disk.
+ * @public
  */
 export class LocalDocumentIndex extends LocalIndex<DocumentChunkMetadata> {
     private readonly _embeddings?: EmbeddingsModel;
@@ -74,8 +77,8 @@ export class LocalDocumentIndex extends LocalIndex<DocumentChunkMetadata> {
     private _newCatalog?: DocumentCatalog;
 
     /**
-     * Creates a new `LocalDocumentIndex` instance.
-     * @param config Configuration settings for the document index.
+     * Creates a new instance of LocalDocumentIndex.
+     * @param config - Configuration settings for the document index.
      */
     public constructor(config: LocalDocumentIndexConfig) {
         super(config.folderPath);
@@ -90,35 +93,42 @@ export class LocalDocumentIndex extends LocalIndex<DocumentChunkMetadata> {
     }
 
     /**
-     * Returns the embeddings model used by the index (if configured.)
+     * Gets the embeddings model.
+     * @returns The embeddings model
+     * @public
      */
     public get embeddings(): EmbeddingsModel | undefined {
         return this._embeddings;
     }
 
     /**
-     * Returns the tokenizer used by the index.
+     * Gets the tokenizer.
+     * @returns The tokenizer
+     * @public
      */
     public get tokenizer(): Tokenizer {
         return this._tokenizer;
     }
 
     /**
-     * Returns true if the document catalog exists.
+     * Checks if the document catalog exists.
+     * @returns True if the catalog exists, false otherwise
+     * @public
      */
     public async isCatalogCreated(): Promise<boolean> {
         try {
-            await fs.access(path.join(this.folderPath, 'catalog.json'));
+            await fs.access(path.join(this.folderPath, "catalog.json"));
             return true;
-        } catch (err: unknown) {
+        } catch {
             return false;
         }
     }
 
     /**
-     * Returns the document ID for the given URI.
-     * @param uri URI of the document to lookup.
-     * @returns Document ID or undefined if not found.
+     * Gets the document ID for a URI.
+     * @param uri - The URI to get the document ID for
+     * @returns The document ID, or undefined if not found
+     * @public
      */
     public async getDocumentId(uri: string): Promise<string | undefined> {
         await this.loadIndexData();
@@ -126,9 +136,10 @@ export class LocalDocumentIndex extends LocalIndex<DocumentChunkMetadata> {
     }
 
     /**
-     * Returns the document URI for the given ID.
-     * @param documentId ID of the document to lookup.
-     * @returns Document URI or undefined if not found.
+     * Gets the document URI for a document ID.
+     * @param documentId - The document ID to get the URI for
+     * @returns The document URI, or undefined if not found
+     * @public
      */
     public async getDocumentUri(documentId: string): Promise<string | undefined> {
         await this.loadIndexData();
@@ -136,11 +147,12 @@ export class LocalDocumentIndex extends LocalIndex<DocumentChunkMetadata> {
     }
 
     /**
-     * Loads the document catalog from disk and returns its stats.
-     * @returns Catalog stats.
+     * Gets the catalog statistics.
+     * @returns The catalog statistics
+     * @public
      */
     public async getCatalogStats(): Promise<DocumentCatalogStats> {
-        const stats = await this.getIndexStats()
+        const stats = await this.getIndexStats();
         return {
             version: this._catalog!.version,
             documents: this._catalog!.count,
@@ -151,7 +163,7 @@ export class LocalDocumentIndex extends LocalIndex<DocumentChunkMetadata> {
 
     /**
      * Deletes a document from the index.
-     * @param uri URI of the document to delete.
+     * @param uri - URI of the document to delete.
      */
     public async deleteDocument(uri: string): Promise<void> {
         // Lookup document ID
@@ -181,39 +193,37 @@ export class LocalDocumentIndex extends LocalIndex<DocumentChunkMetadata> {
         } catch (err: unknown) {
             // Cancel update and raise error
             this.cancelUpdate();
-            throw new Error(`Error deleting document "${uri}": ${(err as any).toString()}`);
+            throw new Error(`Error deleting document "${uri}": ${err instanceof Error ? err.message : String(err)}`);
         }
 
         // Delete text file from disk
         try {
             await fs.unlink(path.join(this.folderPath, `${documentId}.txt`));
         } catch (err: unknown) {
-            throw new Error(`Error removing text file for document "${uri}" from disk: ${(err as any).toString()}`);
+            throw new Error(`Error removing text file for document "${uri}" from disk: ${err instanceof Error ? err.message : String(err)}`);
         }
 
         // Delete metadata file from disk
         try {
             await fs.unlink(path.join(this.folderPath, `${documentId}.json`));
-        } catch (err: unknown) {
+        } catch {
             // Ignore error
         }
     }
 
     /**
-     * Adds a document to the catalog.
-     * @remarks
-     * A new update is started if one is not already in progress. If an document with the same uri
-     * already exists, it will be replaced.
-     * @param uri - Document URI
-     * @param text - Document text
-     * @param docType - Optional. Document type
-     * @param metadata - Optional. Document metadata to index
-     * @returns Inserted document
+     * Upserts a document into the index.
+     * @param uri - URI of the document
+     * @param text - Text of the document
+     * @param docType - Optional. Type of the document
+     * @param metadata - Optional. Metadata for the document
+     * @returns The upserted document
+     * @public
      */
     public async upsertDocument(uri: string, text: string, docType?: string, metadata?: Record<string, MetadataTypes>): Promise<LocalDocument> {
         // Ensure embeddings configured
         if (!this._embeddings) {
-            throw new Error(`Embeddings model not configured.`);
+            throw new Error("Embeddings model not configured.");
         }
 
         // Check for existing document ID
@@ -230,7 +240,7 @@ export class LocalDocumentIndex extends LocalIndex<DocumentChunkMetadata> {
         const config = Object.assign({ docType }, this._chunkingConfig);
         if (config.docType == undefined) {
             // Populate docType based on extension
-            const pos = uri.lastIndexOf('.');
+            const pos = uri.lastIndexOf(".");
             if (pos >= 0) {
                 const ext = uri.substring(pos + 1).toLowerCase();
                 config.docType = ext;
@@ -252,7 +262,7 @@ export class LocalDocumentIndex extends LocalIndex<DocumentChunkMetadata> {
                 currentBatch = [];
                 totalTokens = chunk.tokens.length;
             }
-            currentBatch.push(chunk.text.replace(/\n/g, ' '));
+            currentBatch.push(chunk.text.replace(/\n/g, " "));
         }
         if (currentBatch.length > 0) {
             chunkBatches.push(currentBatch);
@@ -265,11 +275,11 @@ export class LocalDocumentIndex extends LocalIndex<DocumentChunkMetadata> {
             try {
                 response = await this._embeddings.createEmbeddings(batch);
             } catch (err: unknown) {
-                throw new Error(`Error generating embeddings: ${(err as any).toString()}`);
+                throw new Error(`Error generating embeddings: ${err instanceof Error ? err.message : String(err)}`);
             }
 
             // Check for error
-            if (response.status != 'success') {
+            if (response.status != "success") {
                 throw new Error(`Error generating embeddings: ${response.message}`);
             }
 
@@ -316,7 +326,7 @@ export class LocalDocumentIndex extends LocalIndex<DocumentChunkMetadata> {
         } catch (err: unknown) {
             // Cancel update and raise error
             this.cancelUpdate();
-            throw new Error(`Error adding document "${uri}": ${(err as any).toString()}`);
+            throw new Error(`Error adding document "${uri}": ${err instanceof Error ? err.message : String(err)}`);
         }
 
         // Return document
@@ -324,10 +334,9 @@ export class LocalDocumentIndex extends LocalIndex<DocumentChunkMetadata> {
     }
     
     /**
-     * Returns all documents in the index.
-     * @remarks
-     * Each document will contain all of the documents indexed chunks.
-     * @returns Array of documents.
+     * Lists all documents in the index.
+     * @returns Array of document results
+     * @public
      */
     public async listDocuments(): Promise<LocalDocumentResult[]> {
         // Sort chunks by document ID
@@ -354,59 +363,54 @@ export class LocalDocumentIndex extends LocalIndex<DocumentChunkMetadata> {
 
     /**
      * Queries the index for documents similar to the given query.
-     * @param query Text to query for.
-     * @param options Optional. Query options.
-     * @returns Array of document results.
+     * @param query - Text to query for
+     * @param options - Optional. Query options
+     * @returns Array of document results
+     * @public
      */
     public async queryDocuments(query: string, options?: DocumentQueryOptions): Promise<LocalDocumentResult[]> {
         // Ensure embeddings configured
         if (!this._embeddings) {
-            throw new Error(`Embeddings model not configured.`);
+            throw new Error("Embeddings model not configured.");
         }
 
-        // Ensure options are defined
-        options = Object.assign({
-            maxDocuments: 10,
-            maxChunks: 50,
-        }, options);
+        // Get query options
+        const maxDocuments = options?.maxDocuments ?? 10;
+        const maxChunks = options?.maxChunks ?? 50;
+        const filter = options?.filter;
+        const isBm25 = options?.isBm25 ?? false;
 
-        // Generate embeddings for query
-        let embeddings: EmbeddingsResponse;
-        try {
-            embeddings = await this._embeddings.createEmbeddings(query.replace(/\n/g, ' '));
-        } catch (err: unknown) {
-            throw new Error(`Error generating embeddings for query: ${(err as any).toString()}`);
+        // Create query embedding
+        const response = await this._embeddings.createEmbeddings(query);
+        if (response.status !== "success") {
+            throw new Error(`Error creating query embedding: ${response.message}`);
         }
 
-        // Check for error
-        if (embeddings.status != 'success') {
-            throw new Error(`Error generating embeddings for query: ${embeddings.message}`);
-        }
-
-        // Query index for chunks
-        const results = await this.queryItems(embeddings.output![0], query, options.maxChunks!, options.filter, options.isBm25);
+        // Query index
+        const queryVector = response.output![0];
+        const chunks = await this.queryItems<DocumentChunkMetadata>(queryVector, query, maxChunks, filter, isBm25);
 
         // Group chunks by document
-        const documentChunks: { [documentId: string]: QueryResult<DocumentChunkMetadata>[]; } = {};
-        for (const result  of results) {
-            const metadata = result.item.metadata;
-            if (documentChunks[metadata.documentId] == undefined) {
-                documentChunks[metadata.documentId] = [];
+        const documents = new Map<string, { uri: string; chunks: QueryResult<DocumentChunkMetadata>[]; score: number }>();
+        for (const chunk of chunks) {
+            const documentId = chunk.item.metadata.documentId;
+            const uri = await this.getDocumentUri(documentId);
+            if (uri) {
+                let document = documents.get(documentId);
+                if (!document) {
+                    document = { uri, chunks: [], score: 0 };
+                    documents.set(documentId, document);
+                }
+                document.chunks.push(chunk);
+                document.score = Math.max(document.score, chunk.score);
             }
-            documentChunks[metadata.documentId].push(result);
         }
 
-        // Create a document result for each document
-        const documentResults: LocalDocumentResult[] = [];
-        for (const documentId in documentChunks) {
-            const chunks = documentChunks[documentId];
-            const uri = await this.getDocumentUri(documentId) as string;
-            const documentResult = new LocalDocumentResult(this, documentId, uri, chunks, this._tokenizer);
-            documentResults.push(documentResult);
-        }
-
-        // Sort document results by score and return top results
-        return documentResults.sort((a, b) => b.score - a.score).slice(0, options.maxDocuments!);
+        // Sort documents by score and return results
+        return Array.from(documents.values())
+            .sort((a, b) => b.score - a.score)
+            .slice(0, maxDocuments)
+            .map(doc => new LocalDocumentResult(this, doc.uri, doc.uri, doc.chunks, this._tokenizer));
     }
 
     // Overrides
@@ -431,11 +435,11 @@ export class LocalDocumentIndex extends LocalIndex<DocumentChunkMetadata> {
 
         try {
             // Save catalog
-            await fs.writeFile(path.join(this.folderPath, 'catalog.json'), JSON.stringify(this._newCatalog));
+            await fs.writeFile(path.join(this.folderPath, "catalog.json"), JSON.stringify(this._newCatalog));
             this._catalog = this._newCatalog;
             this._newCatalog = undefined;
-        } catch(err: unknown) {
-            throw new Error(`Error saving document catalog: ${(err as any).toString()}`);
+        } catch (err: unknown) {
+            throw new Error(`Error saving document catalog: ${err instanceof Error ? err.message : String(err)}`);
         }
     }
 
@@ -446,7 +450,7 @@ export class LocalDocumentIndex extends LocalIndex<DocumentChunkMetadata> {
             return;
         }
 
-        const catalogPath = path.join(this.folderPath, 'catalog.json');
+        const catalogPath = path.join(this.folderPath, "catalog.json");
         if (await this.isCatalogCreated()) {
             // Load catalog
             const buffer = await fs.readFile(catalogPath);
@@ -461,8 +465,8 @@ export class LocalDocumentIndex extends LocalIndex<DocumentChunkMetadata> {
                     idToUri: {},
                 };
                 await fs.writeFile(catalogPath, JSON.stringify(this._catalog));
-            } catch(err: unknown) {
-                throw new Error(`Error creating document catalog: ${(err as any).toString()}`);
+            } catch (err: unknown) {
+                throw new Error(`Error creating document catalog: ${err instanceof Error ? err.message : String(err)}`);
             }
         }
     }

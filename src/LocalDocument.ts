@@ -1,27 +1,28 @@
-import * as fs from 'fs/promises';
-import * as path from 'path';
-import { MetadataTypes } from './types';
-import { LocalDocumentIndex } from './LocalDocumentIndex';
+import * as fs from "fs/promises";
+import * as path from "path";
+import { MetadataTypes } from "./types";
+import { LocalDocumentIndex } from "./LocalDocumentIndex";
 
 /**
- * Represents an indexed document stored on disk.
+ * Represents a document stored in a local index.
+ * @public
  */
 export class LocalDocument {
     private readonly _index: LocalDocumentIndex;
-    private readonly _id: string;
+    private readonly _documentId: string;
     private readonly _uri: string;
     private _metadata: Record<string,MetadataTypes>|undefined;
-    private _text: string|undefined;
+    private _text?: string;
 
     /**
-     * Creates a new `LocalDocument` instance.
-     * @param index Parent index that contains the document.
-     * @param id ID of the document.
-     * @param uri URI of the document.
+     * Creates a new instance of LocalDocument.
+     * @param index - The document index this document belongs to.
+     * @param documentId - The ID of the document.
+     * @param uri - The URI of the document.
      */
-    public constructor(index: LocalDocumentIndex, id: string, uri: string) {
+    public constructor(index: LocalDocumentIndex, documentId: string, uri: string) {
         this._index = index;
-        this._id = id;
+        this._documentId = documentId;
         this._uri = uri;
     }
 
@@ -36,7 +37,7 @@ export class LocalDocument {
      * Returns the ID of the document.
      */
     public get id(): string {
-        return this._id;
+        return this._documentId;
     }
 
     /**
@@ -69,7 +70,7 @@ export class LocalDocument {
         try {
             await fs.access(path.join(this.folderPath, `${this.id}.json`));
             return true;
-        } catch (err: unknown) {
+        } catch {
             return false;
         }
     }
@@ -83,14 +84,14 @@ export class LocalDocument {
             let json: string;
             try {
                 json = (await fs.readFile(path.join(this.folderPath, `${this.id}.json`))).toString();
-            } catch (err: unknown) {
-                throw new Error(`Error reading metadata for document "${this.uri}": ${(err as any).toString()}`);
+            } catch (error: unknown) {
+                throw new Error(`Error reading metadata for document "${this.uri}": ${error instanceof Error ? error.message : String(error)}`);
             }
 
             try {
                 this._metadata = JSON.parse(json);
-            } catch (err: unknown) {
-                throw new Error(`Error parsing metadata for document "${this.uri}": ${(err as any).toString()}`);
+            } catch (error: unknown) {
+                throw new Error(`Error parsing metadata for document "${this.uri}": ${error instanceof Error ? error.message : String(error)}`);
             }
         }
 
@@ -105,8 +106,8 @@ export class LocalDocument {
         if (this._text == undefined) {
             try {
                 this._text = (await fs.readFile(path.join(this.folderPath, `${this.id}.txt`))).toString();
-            } catch (err: unknown) {
-                throw new Error(`Error reading text file for document "${this.uri}": ${(err as any).toString()}`);
+            } catch (error: unknown) {
+                throw new Error(`Error reading text file for document "${this.uri}": ${error instanceof Error ? error.message : String(error)}`);
             }
         }
 
