@@ -66,7 +66,7 @@ export async function run() {
             console.log(Colorize.title("Adding Web Pages to Index"));
 
             // Get embedding options
-            const options: OpenAIEmbeddingsOptions|AzureOpenAIEmbeddingsOptions|OSSEmbeddingsOptions = JSON.parse(await fs.readFile(args.keys as string, "utf-8"));
+            const options: OpenAIEmbeddingsOptions|AzureOpenAIEmbeddingsOptions|OSSEmbeddingsOptions = JSON.parse(await fs.readFile(args.keys, "utf-8"));
             if ((options as OpenAIEmbeddingsOptions).apiKey && !(options as OpenAIEmbeddingsOptions).model) {
                 (options as OpenAIEmbeddingsOptions).model = "text-embedding-ada-002";
                 (options as OpenAIEmbeddingsOptions).maxTokens = 8000;
@@ -86,7 +86,7 @@ export async function run() {
             });
 
             // Get list of url's
-            const uris = await getItemList(args.uri as string[], args.list as string, "web page");
+            const uris = await getItemList(args.uri, args.list, "web page");
 
             // Fetch documents
             const fileFetcher = new FileFetcher();
@@ -134,7 +134,7 @@ export async function run() {
             const index = new LocalDocumentIndex({ folderPath });
 
             // Get list of uri's
-            const uris = await getItemList(args.uri as string[], args.list as string, "document");
+            const uris = await getItemList(args.uri, args.list, "document");
 
             // Remove documents
             for (const uri of uris) {
@@ -223,7 +223,7 @@ export async function run() {
             const results = await index.queryDocuments(query, {
                 maxDocuments: args.documentCount,
                 maxChunks: args.chunkCount,
-                isBm25: args.bm25 as boolean,
+                isBm25: args.bm25,
             });
 
             // Render results
