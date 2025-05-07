@@ -1,5 +1,7 @@
+// This file intentionally left empty as all types have been moved to the public API.
+
 /**
- * @private
+ * @internal
  */
 export interface CreateEmbeddingRequest {
     input: CreateEmbeddingRequestInput;
@@ -8,14 +10,14 @@ export interface CreateEmbeddingRequest {
 }
 
 /**
- * @private
+ * @internal
  */
 export interface OpenAICreateEmbeddingRequest extends CreateEmbeddingRequest {
     model: string;
 }
 
 /**
- * @private
+ * @internal
  */
 export interface CreateEmbeddingResponse {
     object: string;
@@ -25,7 +27,7 @@ export interface CreateEmbeddingResponse {
 }
 
 /**
- * @private
+ * @internal
  */
 export interface CreateEmbeddingResponseDataInner {
     index: number;
@@ -34,7 +36,7 @@ export interface CreateEmbeddingResponseDataInner {
 }
 
 /**
- * @private
+ * @internal
  */
 export interface CreateEmbeddingResponseUsage {
     prompt_tokens: number;
@@ -42,6 +44,6 @@ export interface CreateEmbeddingResponseUsage {
 }
 
 /**
- * @private
+ * @internal
  */
-export type CreateEmbeddingRequestInput = Array<any> | Array<number> | Array<string> | string;
+export type CreateEmbeddingRequestInput = Array<string | number | boolean | null | object> | Array<number> | Array<string> | string;

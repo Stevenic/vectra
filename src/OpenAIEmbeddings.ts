@@ -1,8 +1,13 @@
-import axios, { AxiosInstance, AxiosResponse, AxiosRequestConfig } from 'axios';
-import { EmbeddingsModel, EmbeddingsResponse } from "./types";
-import { CreateEmbeddingRequest, CreateEmbeddingResponse, OpenAICreateEmbeddingRequest } from "./internals";
+import type { AxiosResponse, AxiosRequestConfig } from "axios/index";
+import axios from "axios";
+import { EmbeddingsModel, EmbeddingsResponse, CreateEmbeddingRequest, CreateEmbeddingResponse, OpenAICreateEmbeddingRequest } from "./types";
 import { Colorize } from "./internals";
+import OpenAI from "openai";
 
+/**
+ * Base options for OpenAI embeddings.
+ * @public
+ */
 export interface BaseOpenAIEmbeddingsOptions {
     /**
      * Optional. Number of embedding dimensions to return.
@@ -35,9 +40,9 @@ export interface BaseOpenAIEmbeddingsOptions {
     requestConfig?: AxiosRequestConfig;
 }
 
-
 /**
- * Options for configuring an `OpenAIEmbeddings` to generate embeddings using an OSS hosted model.
+ * Options for OSS embeddings.
+ * @public
  */
 export interface OSSEmbeddingsOptions extends BaseOpenAIEmbeddingsOptions {
     /**
@@ -54,7 +59,8 @@ export interface OSSEmbeddingsOptions extends BaseOpenAIEmbeddingsOptions {
 }
 
 /**
- * Options for configuring an `OpenAIEmbeddings` to generate embeddings using an OpenAI hosted model.
+ * Options for OpenAI embeddings.
+ * @public
  */
 export interface OpenAIEmbeddingsOptions extends BaseOpenAIEmbeddingsOptions {
     /**
@@ -83,7 +89,8 @@ export interface OpenAIEmbeddingsOptions extends BaseOpenAIEmbeddingsOptions {
 }
 
 /**
- * Options for configuring an `OpenAIEmbeddings` to generate embeddings using an Azure OpenAI hosted model.
+ * Options for Azure OpenAI embeddings.
+ * @public
  */
 export interface AzureOpenAIEmbeddingsOptions extends BaseOpenAIEmbeddingsOptions {
     /**
@@ -108,169 +115,163 @@ export interface AzureOpenAIEmbeddingsOptions extends BaseOpenAIEmbeddingsOption
 }
 
 /**
- * A `PromptCompletionModel` for calling OpenAI and Azure OpenAI hosted models.
- * @remarks
+ * Embeddings model that uses OpenAI's API.
+ * @public
  */
 export class OpenAIEmbeddings implements EmbeddingsModel {
-    private readonly _httpClient: AxiosInstance;
-    private readonly _clientType: ClientType;
-
-    private readonly UserAgent = 'AlphaWave';
-
-    public readonly maxTokens;
-    
-    /**
-     * Options the client was configured with.
-     */
-    public readonly options: OSSEmbeddingsOptions|OpenAIEmbeddingsOptions|AzureOpenAIEmbeddingsOptions;
+    private readonly _options: OpenAIEmbeddingsOptions | AzureOpenAIEmbeddingsOptions | OSSEmbeddingsOptions;
+    private readonly _client: OpenAI;
+    private readonly UserAgent = "AlphaWave";
 
     /**
-     * Creates a new `OpenAIClient` instance.
-     * @param options Options for configuring an `OpenAIClient`.
+     * Sets up headers for the API request.
+     * @param headers - Existing headers to merge with.
+     * @returns The updated headers object.
      */
-    public constructor(options: OSSEmbeddingsOptions|OpenAIEmbeddingsOptions|AzureOpenAIEmbeddingsOptions) {
-        this.maxTokens = options.maxTokens ?? 500;
+    private setupHeaders(headers: Record<string, string> = {}): Record<string, string> {
+        headers["User-Agent"] = headers["User-Agent"] || this.UserAgent;
 
-        // Check for azure config
-        if ((options as AzureOpenAIEmbeddingsOptions).azureApiKey) {
-            this._clientType = ClientType.AzureOpenAI;
-            this.options = Object.assign({
-                retryPolicy: [2000, 5000],
-                azureApiVersion: '2023-05-15',
-            }, options) as AzureOpenAIEmbeddingsOptions;
-
-            // Cleanup and validate endpoint
-            let endpoint = this.options.azureEndpoint.trim();
-            if (endpoint.endsWith('/')) {
-                endpoint = endpoint.substring(0, endpoint.length - 1);
+        if ("azureApiKey" in this._options) {
+            const options = this._options as AzureOpenAIEmbeddingsOptions;
+            headers["api-key"] = options.azureApiKey;
+        } else if ("apiKey" in this._options) {
+            const options = this._options as OpenAIEmbeddingsOptions;
+            headers["Authorization"] = `Bearer ${options.apiKey}`;
+            if (options.organization) {
+                headers["OpenAI-Organization"] = options.organization;
             }
-
-            if (!endpoint.toLowerCase().startsWith('https://')) {
-                throw new Error(`Client created with an invalid endpoint of '${endpoint}'. The endpoint must be a valid HTTPS url.`);
-            }
-
-            this.options.azureEndpoint = endpoint;
-        } else if ((options as OSSEmbeddingsOptions).ossModel) {
-            this._clientType = ClientType.OSS;
-            this.options = Object.assign({
-                retryPolicy: [2000, 5000]
-            }, options) as OSSEmbeddingsOptions;
-        } else {
-            this._clientType = ClientType.OpenAI;
-            this.options = Object.assign({
-                retryPolicy: [2000, 5000]
-            }, options) as OpenAIEmbeddingsOptions;
         }
 
-        // Create client
-        this._httpClient = axios.create({
-            validateStatus: (status) => status < 400 || status == 429
+        return headers;
+    }
+
+    /**
+     * Creates a new instance of OpenAIEmbeddings.
+     * @param options - Configuration options for the embeddings model.
+     */
+    public constructor(options: OpenAIEmbeddingsOptions | AzureOpenAIEmbeddingsOptions | OSSEmbeddingsOptions) {
+        this._options = options;
+        this._client = new OpenAI({
+            apiKey: "apiKey" in options ? options.apiKey : undefined,
+            organization: "organization" in options ? options.organization : undefined,
+            baseURL: "endpoint" in options ? options.endpoint : undefined,
+            defaultQuery: "apiVersion" in options ? { "api-version": options.apiVersion as string } : undefined,
+            defaultHeaders: "deploymentName" in options ? { "x-ms-useragent": this.UserAgent } : undefined,
         });
     }
 
     /**
-     * Creates embeddings for the given inputs using the OpenAI API.
-     * @param model Name of the model to use (or deployment for Azure).
-     * @param inputs Text inputs to create embeddings for.
+     * Gets the maximum number of tokens.
+     */
+    public get maxTokens(): number {
+        return this._options.maxTokens;
+    }
+
+    /**
+     * Creates embeddings for the given inputs.
+     * @param inputs - Text inputs to create embeddings for.
      * @returns A `EmbeddingsResponse` with a status and the generated embeddings or a message when an error occurs.
      */
-    public async createEmbeddings(inputs: string | string[]): Promise<EmbeddingsResponse> {
-        if (this.options.logRequests) {
-            console.log(Colorize.title('EMBEDDINGS REQUEST:'));
+    public async createEmbeddings(inputs: string|string[]): Promise<EmbeddingsResponse> {
+        if (this._options.logRequests) {
+            console.log(Colorize.title("EMBEDDINGS REQUEST:"));
             console.log(Colorize.output(inputs));
         }
 
-        const startTime = Date.now();
-        const response = await this.createEmbeddingRequest({
-            input: inputs,
-        });
+        try {
+            if ("model" in this._options) {
+                const result = await this._client.embeddings.create({
+                    model: this._options.model,
+                    input: inputs,
+                    dimensions: this._options.dimensions,
+                });
+                
+                return {
+                    status: "success",
+                    output: result.data.map(item => item.embedding),
+                    model: result.model,
+                    usage: result.usage as { [key: string]: number; prompt_tokens: number; total_tokens: number }
+                };
+            } else {
+                // Use existing implementation for Azure and OSS
+                const response = await this.createEmbeddingRequest({
+                    input: inputs,
+                });
 
-        if (this.options.logRequests) {
-            console.log(Colorize.title('RESPONSE:'));
-            console.log(Colorize.value('status', response.status));
-            console.log(Colorize.value('duration', Date.now() - startTime, 'ms'));
-            console.log(Colorize.output(response.data));
-        }
+                if (response.status >= 400) {
+                    return {
+                        status: "error",
+                        message: `Error: ${response.status} ${response.statusText}`
+                    };
+                }
 
-
-        // Process response
-        if (response.status < 300) {
-            return { status: 'success', output: response.data.data.sort((a, b) => a.index - b.index).map((item) => item.embedding) };
-        } else if (response.status == 429) {
-            return { status: 'rate_limited', message: `The embeddings API returned a rate limit error.` }
-        } else {
-            return { status: 'error', message: `The embeddings API returned an error status of ${response.status}: ${response.statusText}` };
+                const result = response.data;
+                return {
+                    status: "success",
+                    output: result.data.map(item => item.embedding),
+                    model: result.model,
+                    usage: result.usage as { [key: string]: number; prompt_tokens: number; total_tokens: number }
+                };
+            }
+        } catch (err: unknown) {
+            return {
+                status: "error",
+                message: (err as Error).message
+            };
         }
     }
 
     /**
-     * @private
+     * Creates an embedding request.
+     * @param request - The request to create.
+     * @returns The response from the API.
      */
     protected createEmbeddingRequest(request: CreateEmbeddingRequest): Promise<AxiosResponse<CreateEmbeddingResponse>> {
-        if (this.options.dimensions) {
-            request.dimensions = this.options.dimensions;
+        if (this._options.dimensions) {
+            request.dimensions = this._options.dimensions;
         }
-        if (this._clientType == ClientType.AzureOpenAI) {
-            const options = this.options as AzureOpenAIEmbeddingsOptions;
+
+        if ("azureEndpoint" in this._options) {
+            const options = this._options as AzureOpenAIEmbeddingsOptions;
             const url = `${options.azureEndpoint}/openai/deployments/${options.azureDeployment}/embeddings?api-version=${options.azureApiVersion!}`;
             return this.post(url, request);
-        } else if (this._clientType == ClientType.OSS) {
-            const options = this.options as OSSEmbeddingsOptions;
+        } else if ("ossEndpoint" in this._options) {
+            const options = this._options as OSSEmbeddingsOptions;
             const url = `${options.ossEndpoint}/v1/embeddings`;
             (request as OpenAICreateEmbeddingRequest).model = options.ossModel;
             return this.post(url, request);
         } else {
-            const options = this.options as OpenAIEmbeddingsOptions;
-            const url = `${options.endpoint ?? 'https://api.openai.com'}/v1/embeddings`;
+            const options = this._options as OpenAIEmbeddingsOptions;
+            const url = `${options.endpoint ?? "https://api.openai.com"}/v1/embeddings`;
             (request as OpenAICreateEmbeddingRequest).model = options.model;
             return this.post(url, request);
         }
     }
 
     /**
-     * @private
+     * Posts a request to the API.
+     * @param url - The URL to post to.
+     * @param body - The body of the request.
+     * @param retryCount - The number of retries.
+     * @returns The response from the API.
      */
     protected async post<TData>(url: string, body: object, retryCount = 0): Promise<AxiosResponse<TData>> {
         // Initialize request config
-        const requestConfig: AxiosRequestConfig = Object.assign({}, this.options.requestConfig);
+        const requestConfig: AxiosRequestConfig = Object.assign({}, this._options.requestConfig);
 
         // Initialize request headers
-        if (!requestConfig.headers) {
-            requestConfig.headers = {};
-        }
-        if (!requestConfig.headers['Content-Type']) {
-            requestConfig.headers['Content-Type'] = 'application/json';
-        }
-        if (!requestConfig.headers['User-Agent']) {
-            requestConfig.headers['User-Agent'] = this.UserAgent;
-        }
-        if (this._clientType == ClientType.AzureOpenAI) {
-            const options = this.options as AzureOpenAIEmbeddingsOptions;
-            requestConfig.headers['api-key'] = options.azureApiKey;
-        } else if (this._clientType == ClientType.OpenAI) {
-            const options = this.options as OpenAIEmbeddingsOptions;
-            requestConfig.headers['Authorization'] = `Bearer ${options.apiKey}`;
-            if (options.organization) {
-                requestConfig.headers['OpenAI-Organization'] = options.organization;
-            }
-        }
+        requestConfig.headers = this.setupHeaders(requestConfig.headers as Record<string, string>);
 
         // Send request
-        const response = await this._httpClient.post(url, body, requestConfig);
+        const response = await axios.post(url, body, requestConfig);
 
         // Check for rate limit error
-        if (response.status == 429 && Array.isArray(this.options.retryPolicy) && retryCount < this.options.retryPolicy.length) {
-            const delay = this.options.retryPolicy[retryCount];
+        if (response.status == 429 && Array.isArray(this._options.retryPolicy) && retryCount < this._options.retryPolicy.length) {
+            const delay = this._options.retryPolicy[retryCount];
             await new Promise((resolve) => setTimeout(resolve, delay));
             return this.post(url, body, retryCount + 1);
-        } else {
-            return response;
         }
-    }
-}
 
-enum ClientType {
-    OpenAI,
-    AzureOpenAI,
-    OSS
+        return response;
+    }
 }
