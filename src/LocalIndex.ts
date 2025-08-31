@@ -66,7 +66,7 @@ export class LocalIndex<TMetadata extends Record<string,MetadataTypes> = Record<
         }
 
         await this.loadIndexData();
-        this._update = Object.assign({}, structuredClone(this._data));
+        this._update = structuredClone(this._data);
     }
 
     /**
