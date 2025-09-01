@@ -41,7 +41,6 @@ describe('LocalIndex', () => {
     });
 
     it('on id collision - cancel batch insert & bubble up error', async () => {
-      debugger
       const index = new LocalIndex(testIndexDir);
       await index.createIndex();
 

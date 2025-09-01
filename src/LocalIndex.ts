@@ -217,7 +217,6 @@ export class LocalIndex<TMetadata extends Record<string,MetadataTypes> = Record<
      * @returns Inserted items.
      */
     public async batchInsertItems<TItemMetadata extends TMetadata = TMetadata>(items: Partial<IndexItem<TItemMetadata>>[]): Promise<IndexItem<TItemMetadata>> {
-        debugger
         await this.beginUpdate();
         try {
             const newItems: any = [];
