@@ -66,7 +66,7 @@ export class LocalIndex<TMetadata extends Record<string,MetadataTypes> = Record<
         }
 
         await this.loadIndexData();
-        this._update = Object.assign({}, this._data);
+        this._update = structuredClone(this._data);
     }
 
     /**
@@ -204,6 +204,32 @@ export class LocalIndex<TMetadata extends Record<string,MetadataTypes> = Record<
             const newItem = await this.addItemToUpdate(item, true);
             await this.endUpdate();
             return newItem as any;
+        }
+    }
+
+    /**
+     * Adds a batch of items to the index.
+     * @remarks
+     * Batch update requires no update to be in progress. This is necessary so that if any one
+     * insert operation fails, the entire update can be safely cancelled. This prevents partial
+     * updates from being applied to the local index.
+     * @param items Items to insert.
+     * @returns Inserted items.
+     */
+    public async batchInsertItems<TItemMetadata extends TMetadata = TMetadata>(items: Partial<IndexItem<TItemMetadata>>[]): Promise<IndexItem<TItemMetadata>> {
+        await this.beginUpdate();
+        try {
+            const newItems: any = [];
+            for (const item of items) {
+                const newItem = await this.addItemToUpdate(item, true);
+                newItems.push(newItem);
+            }
+            await this.endUpdate();
+            return newItems;
+        } catch (e) {
+            // cancels this update to prevent partial batch updates. allows error to bubble up.
+            await this.cancelUpdate();
+            throw e;
         }
     }
 
