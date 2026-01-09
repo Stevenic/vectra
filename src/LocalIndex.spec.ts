@@ -1,5 +1,6 @@
 import assert from 'node:assert'
-import { LocalIndex, IndexItem } from '../lib/LocalIndex'
+import { LocalIndex } from './LocalIndex'
+import { IndexItem } from './types'
 import fs from 'fs/promises'
 import path from 'path'
 
