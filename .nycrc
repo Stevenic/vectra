@@ -1,9 +1,9 @@
 {
   "extension": [
-    ".js"
+    ".ts"
   ],
   "include": [
-    "lib/**/*.js"
+    "src/**/*.ts"
   ],
   "exclude": [
     "**/node_modules/**",
