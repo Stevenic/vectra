@@ -1373,10 +1373,10 @@ gopd@^1.0.1, gopd@^1.2.0:
   resolved "https://registry.yarnpkg.com/gopd/-/gopd-1.2.0.tgz#89f56b8217bdbc8802bd299df6d7f1081d7e51a1"
   integrity sha512-ZUKRh6/kUFoAiTAtTYPZJ3hw9wNxx+BIBOijnlG9PnrJsCcSjs1wyyD6vJpaYtgnzDrKYRSqf3OO6Rfa93xsRg==
 
-gpt-3-encoder@1.1.4:
-  version "1.1.4"
-  resolved "https://registry.npmjs.org/gpt-3-encoder/-/gpt-3-encoder-1.1.4.tgz"
-  integrity sha512-fSQRePV+HUAhCn7+7HL7lNIXNm6eaFWFbNLOOGtmSJ0qJycyQvj60OvRlH7mee8xAMjBDNRdMXlMwjAbMTDjkg==
+gpt-tokenizer@^3.4.0:
+  version "3.4.0"
+  resolved "https://registry.yarnpkg.com/gpt-tokenizer/-/gpt-tokenizer-3.4.0.tgz#4caa73edfdaa649f01dfa84f930e8a320ac0b1b1"
+  integrity sha512-wxFLnhIXTDjYebd9A9pGl3e31ZpSypbpIJSOswbgop5jLte/AsZVDvjlbEuVFlsqZixVKqbcoNmRlFDf6pz/UQ==
 
 graceful-fs@^4.1.15, graceful-fs@^4.1.2:
   version "4.2.11"
