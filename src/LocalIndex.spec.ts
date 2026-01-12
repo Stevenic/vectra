@@ -252,4 +252,72 @@ describe('LocalIndex', () => {
       assert.deepStrictEqual(items, []);
     })
   });
+
+  describe("queryItems", () => {
+    it("returns empty array on empty index search", async () => {
+      const index = new LocalIndex(testIndexDir);
+      await index.createIndex();
+
+      const result = await index.queryItems([1, 2, 3], "", 10);
+      assert.deepStrictEqual(result, []);
+    });
+
+    it("returns bad match when no better match exists", async () => {
+      const index = new LocalIndex(testIndexDir);
+      await index.createIndex();
+      await index.insertItem({ id: "1", vector: [0.9, 0, 0, 0, 0] });
+
+      const result = await index.queryItems([0, 0, 0, 0, 0.1], "", 1);
+      assert.equal(result[0]?.score, 0);
+      assert.equal(result[0]?.item.id, "1");
+    });
+
+    it("returns all vectors when fewer than topK exist", async () => {
+      const index = new LocalIndex(testIndexDir);
+      await index.createIndex();
+      await index.batchInsertItems(basicIndexItems);
+
+      const result = await index.queryItems([0, 0, 1], "", 10);
+      assert.equal(result.length, 3);
+      assert.deepStrictEqual(
+        result.map(({ item }) => item.id),
+        basicIndexItems.map((item) => item.id),
+      );
+    });
+
+    it("filters by metadata when filter provided", async () => {
+      const index = new LocalIndex(testIndexDir);
+      await index.createIndex();
+      await index.batchInsertItems([
+        { id: "1", vector: [1, 0, 0], metadata: { category: "food" } },
+        { id: "2", vector: [0, 0, 1], metadata: { category: "drink" } },
+      ]);
+
+      const bestGeneralMatch = await index.queryItems([1, 0, 0], "", 1);
+      const bestDrinkMatch = await index.queryItems([1, 0, 0], "", 1, {
+        category: { $eq: "drink" },
+      });
+
+      assert.equal(bestGeneralMatch[0].item.id, "1");
+      assert.equal(bestDrinkMatch[0].item.id, "2");
+    });
+
+    it("reads item metadata file when provided", async () => {
+      const index = new LocalIndex(testIndexDir);
+      await index.createIndex({version: 1, metadata_config: {indexed: ['category']}});
+      await index.batchInsertItems([
+        { id: "1", vector: [1, 0, 0] },
+        { id: "2", vector: [0, 0, 1], metadata: {category: 'drink'} },
+      ]);
+
+      sinon
+        .stub(fs, "readFile")
+        .resolves(JSON.stringify({ category: "drink" }));
+
+      const bestDrinkMatch = await index.queryItems([1, 0, 0], "", 2, {category: {'$eq': 'drink'}});
+
+      assert.notEqual(bestDrinkMatch[0].item.metadataFile, undefined);
+      assert.equal(bestDrinkMatch[0].item.id, "2");
+    });
+  });
 });
