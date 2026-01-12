@@ -62,7 +62,16 @@ export interface LocalDocumentIndexConfig {
     chunkingConfig?: Partial<TextSplitterConfig>;
 
     /**
-     * Optional. File storage plugin to use for storing index files.  
+     * Optional. Name of the index file.
+     * @remarks
+     * If not specified, the 'index.json' will be used.
+     */
+    indexName?: string;
+
+    /**
+     * Optional. File storage plugin to use for storing index files.
+     * @remarks
+     * If not specified, the LocalFileStorageClass will be used.  
      */
     storage?: FileStorage;
 }
@@ -82,7 +91,7 @@ export class LocalDocumentIndex extends LocalIndex<DocumentChunkMetadata> {
      * @param config Configuration settings for the document index.
      */
     public constructor(config: LocalDocumentIndexConfig) {
-        super(config.folderPath);
+        super(config.folderPath, config.indexName, config.storage);
         this._embeddings = config.embeddings;
         this._chunkingConfig = Object.assign({
             keepSeparators: true,
