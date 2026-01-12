@@ -275,6 +275,7 @@ export class LocalIndex<TMetadata extends Record<string,MetadataTypes> = Record<
      * This method loads the index into memory and returns the top k items that are most similar.
      * An optional filter can be applied to the metadata of the items.
      * @param vector Vector to query against.
+     * @param query Query text to search for.
      * @param topK Number of items to return.
      * @param filter Optional. Filter to apply.
      * @returns Similar items to the vector that matche the supplied filter.
