@@ -1,4 +1,3 @@
-import * as fs from 'fs/promises';
 import * as path from 'path';
 import { MetadataTypes } from './types';
 import { LocalDocumentIndex } from './LocalDocumentIndex';
@@ -62,16 +61,11 @@ export class LocalDocument {
     }
 
     /**
-     * Determines if the document has additional metadata storred on disk.
+     * Determines if the document has additional metadata stored on disk.
      * @returns True if the document has metadata; otherwise, false.
      */
     public async hasMetadata(): Promise<boolean> {
-        try {
-            await fs.access(path.join(this.folderPath, `${this.id}.json`));
-            return true;
-        } catch (err: unknown) {
-            return false;
-        }
+      return this._index.storage.pathExists(path.join(this.folderPath, `${this.id}.json`));
     }
 
     /**
@@ -82,7 +76,7 @@ export class LocalDocument {
         if (this._metadata == undefined) {
             let json: string;
             try {
-                json = (await fs.readFile(path.join(this.folderPath, `${this.id}.json`))).toString();
+                json = (await this._index.storage.readFile(path.join(this.folderPath, `${this.id}.json`))).toString('utf-8');
             } catch (err: unknown) {
                 throw new Error(`Error reading metadata for document "${this.uri}": ${(err as any).toString()}`);
             }
@@ -104,7 +98,7 @@ export class LocalDocument {
     public async loadText(): Promise<string> {
         if (this._text == undefined) {
             try {
-                this._text = (await fs.readFile(path.join(this.folderPath, `${this.id}.txt`))).toString();
+                this._text = (await this._index.storage.readFile(path.join(this.folderPath, `${this.id}.txt`))).toString('utf-8');
             } catch (err: unknown) {
                 throw new Error(`Error reading text file for document "${this.uri}": ${(err as any).toString()}`);
             }
