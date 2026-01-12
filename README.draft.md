@@ -91,7 +91,7 @@ async function main() {
   await addItem('4', 'blue', 'color');
 
   const queryVec = await getVector('banana');
-  const results = await index.queryItems(queryVec, '', 3); // vector, namespace (unused), topK, [optional filter]
+  const results = await index.queryItems(queryVec, 'banana', 3); // vector, query, topK, [optional filter]
 
   for (const r of results) {
     console.log(`[${r.score.toFixed(3)}] ${r.item.metadata.text}`);
