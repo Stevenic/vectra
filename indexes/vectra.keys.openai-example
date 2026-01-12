@@ -1,8 +1,0 @@
-{
-    "apiKey": "<YOUR API KEY>",
-    "model": "<OPTIONAL MODEL>",
-    "endpoint": "<OPTIONAL API ENDPOINT>",
-    "organization": "<OPTIONAL ORGANIZATION>",
-    "maxTokens": <OPTIONAL MAX TOKENS>",
-    "dimensions": "<OPTIONAL EMBEDDING DIMENSIONS>"
-}
