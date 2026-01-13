@@ -36,7 +36,7 @@ export class LocalFileStorage implements FileStorage {
     }
 
     async deleteFolder(folderPath: string): Promise<void> {
-        await fs.rmdir(this.getFullPath(folderPath), { recursive: true });
+        await fs.rm(this.getFullPath(folderPath), { recursive: true });
     }
 
     async getDetails(fileOrFolderPath: string): Promise<FileDetails> {

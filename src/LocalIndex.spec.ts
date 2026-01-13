@@ -131,7 +131,7 @@ describe('LocalIndex', () => {
     })
 
     it('throws an error if the index could not be saved', async () => {
-      const index = new LocalIndex(testIndexDir, 'index.json');
+      const index = new LocalIndex(testIndexDir);
       await index.createIndex();
       await index.beginUpdate();
 

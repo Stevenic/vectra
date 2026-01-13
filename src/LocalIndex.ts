@@ -24,7 +24,7 @@ export interface CreateIndexConfig {
  */
 export class LocalIndex<TMetadata extends Record<string, MetadataTypes> = Record<string, MetadataTypes>> {
   private readonly _folderPath: string;
-  private readonly _indexName: string;
+  private readonly _indexName: string = "index.json";
   private readonly _storage: FileStorage;
 
   private _data?: IndexData;
@@ -35,12 +35,10 @@ export class LocalIndex<TMetadata extends Record<string, MetadataTypes> = Record
   /**
    * Creates a new instance of LocalIndex.
    * @param folderPath Path to the index folder.
-   * @param indexName Optional name of the index file. Defaults to index.json.
    * @param storage Optional file storage instance. Defaults to LocalFileStorage.
    */
-  public constructor(folderPath: string, indexName?: string, storage?: FileStorage) {
+  public constructor(folderPath: string, storage?: FileStorage) {
     this._folderPath = folderPath;
-    this._indexName = indexName || "index.json";
     this._storage = storage || new LocalFileStorage();
   }
 
@@ -58,6 +56,9 @@ export class LocalIndex<TMetadata extends Record<string, MetadataTypes> = Record
     return this._indexName;
   }
 
+  /**
+   * Storage provider used to store the index.
+   */
   public get storage(): FileStorage {
     return this._storage;
   }
@@ -316,12 +317,12 @@ export class LocalIndex<TMetadata extends Record<string, MetadataTypes> = Record
       }
     }
 
-    //Peform bm25 search only if enabled. Avoid duplicate chunks, which are already selected during semantic search.
+    //Perform bm25 search only if enabled. Avoid duplicate chunks, which are already selected during semantic search.
     if (isBm25) {
       const itemSet = new Set();
       for (const item of top) itemSet.add(item.item.id);
 
-      this.setupbm25();
+      this.setupBm25();
 
       let currDoc;
       let currDocTxt;
@@ -447,7 +448,7 @@ export class LocalIndex<TMetadata extends Record<string, MetadataTypes> = Record
     }
   }
 
-  private async setupbm25(): Promise<any> {
+  private async setupBm25(): Promise<any> {
     this._bm25Engine = bm25();
     const nlp = winkNLP(model);
     const its = nlp.its;
