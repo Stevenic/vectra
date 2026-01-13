@@ -1,4 +1,4 @@
-import * as path from "path";
+import * as path from 'path';
 import { v4 } from 'uuid';
 import { ItemSelector } from './ItemSelector';
 import { IndexItem, IndexStats, MetadataFilter, MetadataTypes, QueryResult } from './types';
@@ -8,6 +8,7 @@ import bm25 from 'wink-bm25-text-search';
 import winkNLP from 'wink-nlp';
 import model from 'wink-eng-lite-web-model';
 import { FileStorage, LocalFileStorage } from './storage';
+
 export interface CreateIndexConfig {
   version: number;
   deleteIfExists?: boolean;
@@ -24,41 +25,50 @@ export interface CreateIndexConfig {
  */
 export class LocalIndex<TMetadata extends Record<string, MetadataTypes> = Record<string, MetadataTypes>> {
   private readonly _folderPath: string;
-  private readonly _indexName: string = "index.json";
+  private readonly _indexName: string = 'index.json';
   private readonly _storage: FileStorage;
-
   private _data?: IndexData;
   private _update?: IndexData;
-  //member fields for BM25
+
+  // member fields for BM25
   private _bm25Engine: any;
+  private readonly _bm25Factory: () => any;
+  private readonly _docReader: (docId: string) => Promise<string>;
 
   /**
    * Creates a new instance of LocalIndex.
    * @param folderPath Path to the index folder.
    * @param storage Optional file storage instance. Defaults to LocalFileStorage.
+   * @param options Optional constructor options for dependency injection.
    */
-  public constructor(folderPath: string, storage?: FileStorage) {
+  public constructor(
+    folderPath: string,
+    storage?: FileStorage,
+    options?: {
+      bm25Factory?: () => any;
+      docReader?: (docId: string) => Promise<string>;
+    }
+  ) {
     this._folderPath = folderPath;
     this._storage = storage || new LocalFileStorage();
+    this._bm25Factory = options?.bm25Factory || (() => bm25());
+    this._docReader = options?.docReader || (async (docId: string) => {
+      const doc = new LocalDocument((this as unknown) as LocalDocumentIndex, docId, '');
+      return await doc.loadText();
+    });
   }
 
-  /**
-   * Path to the index folder.
-   */
+  /** Path to the index folder. */
   public get folderPath(): string {
     return this._folderPath;
   }
 
-  /**
-   * Name of the index file. 
-   */
+  /** Name of the index file. */
   public get indexName(): string {
     return this._indexName;
   }
 
-  /**
-   * Storage provider used to store the index.
-   */
+  /** Storage provider used to store the index. */
   public get storage(): FileStorage {
     return this._storage;
   }
@@ -72,7 +82,6 @@ export class LocalIndex<TMetadata extends Record<string, MetadataTypes> = Record
     if (this._update) {
       throw new Error('Update already in progress');
     }
-
     await this.loadIndexData();
     this._update = structuredClone(this._data);
   }
@@ -112,9 +121,8 @@ export class LocalIndex<TMetadata extends Record<string, MetadataTypes> = Record
         metadata_config: config.metadata_config ?? {},
         items: []
       };
-
       await this.storage.upsertFile(path.join(this._folderPath, this._indexName), JSON.stringify(this._data));
-    } catch (err: unknown) {
+    } catch {
       await this.deleteIndex();
       throw new Error('Error creating index');
     }
@@ -238,9 +246,7 @@ export class LocalIndex<TMetadata extends Record<string, MetadataTypes> = Record
     }
   }
 
-  /**
-   * Returns true if the index exists.
-   */
+  /** Returns true if the index exists. */
   public async isIndexCreated(): Promise<boolean> {
     return await this.storage.pathExists(path.join(this._folderPath, this._indexName));
   }
@@ -275,11 +281,19 @@ export class LocalIndex<TMetadata extends Record<string, MetadataTypes> = Record
    * This method loads the index into memory and returns the top k items that are most similar.
    * An optional filter can be applied to the metadata of the items.
    * @param vector Vector to query against.
+   * @param query Query string (used when isBm25=true).
    * @param topK Number of items to return.
    * @param filter Optional. Filter to apply.
-   * @returns Similar items to the vector that matche the supplied filter.
+   * @param isBm25 Optional. If true, append BM25 keyword results to semantic results.
+   * @returns Similar items to the vector that match the supplied filter.
    */
-  public async queryItems<TItemMetadata extends TMetadata = TMetadata>(vector: number[], query: string, topK: number, filter?: MetadataFilter, isBm25?: boolean): Promise<QueryResult<TItemMetadata>[]> {
+  public async queryItems<TItemMetadata extends TMetadata = TMetadata>(
+    vector: number[],
+    query: string,
+    topK: number,
+    filter?: MetadataFilter,
+    isBm25?: boolean
+  ): Promise<QueryResult<TItemMetadata>[]> {
     await this.loadIndexData();
 
     // Filter items
@@ -290,7 +304,7 @@ export class LocalIndex<TMetadata extends Record<string, MetadataTypes> = Record
 
     // Calculate distances
     const norm = ItemSelector.normalize(vector);
-    const distances: { index: number, distance: number }[] = [];
+    const distances: { index: number; distance: number }[] = [];
     for (let i = 0; i < items.length; i++) {
       const item = items[i];
       const distance = ItemSelector.normalizedCosineSimilarity(vector, norm, item.vector, item.norm);
@@ -312,41 +326,60 @@ export class LocalIndex<TMetadata extends Record<string, MetadataTypes> = Record
     for (const item of top) {
       if (item.item.metadataFile) {
         const metadataPath = path.join(this._folderPath, item.item.metadataFile);
-        const metadata = await this.storage.readFile(metadataPath);
-        item.item.metadata = JSON.parse(metadata.toString('utf-8'));
+        const metadataBuffer = await this.storage.readFile(metadataPath);
+        item.item.metadata = JSON.parse(metadataBuffer.toString('utf-8'));
       }
     }
 
-    //Perform bm25 search only if enabled. Avoid duplicate chunks, which are already selected during semantic search.
+    // Perform bm25 search only if enabled. Avoid duplicate chunks that are already selected during semantic search.
     if (isBm25) {
-      const itemSet = new Set();
-      for (const item of top) itemSet.add(item.item.id);
+      const itemSet = new Set<string>();
+      for (const r of top) itemSet.add(r.item.id);
 
-      this.setupBm25();
+      // Set up BM25 engine
+      await this.setupBm25();
 
-      let currDoc;
-      let currDocTxt;
+      // Add docs if we have necessary metadata; guard everything to avoid crashes
       for (let i = 0; i < items.length; i++) {
         if (!itemSet.has(items[i].id)) {
-          const item = items[i];
-          currDoc = new LocalDocument((this as unknown) as LocalDocumentIndex, item.metadata.documentId.toString(), '');
-          currDocTxt = await currDoc.loadText();
-          const startPos = item.metadata.startPos;
-          const endPos = item.metadata.endPos;
-          const chunkText = currDocTxt.substring(Number(startPos), Number(endPos) + 1);
-          this._bm25Engine.addDoc({ body: chunkText }, i);
+          const item = items[i] as any;
+          const md = item.metadata || {};
+          if (md.documentId != undefined && md.startPos != undefined && md.endPos != undefined) {
+            try {
+              const currDocTxt = await this._docReader(String(md.documentId));
+              const startPos = Number(md.startPos);
+              const endPos = Number(md.endPos);
+              const chunkText = currDocTxt.substring(startPos, endPos + 1);
+              this._bm25Engine.addDoc?.({ body: chunkText }, i);
+            } catch {
+              // Ignore load or engine errors for BM25 doc prep
+            }
+          }
         }
       }
-      this._bm25Engine.consolidate();
-      var results = await this.bm25Search(query, items, topK);
-      results.forEach((res: any) => {
-        top.push({
-          item: Object.assign({}, { ...items[res[0]], metadata: { ...items[res[0]].metadata, isBm25: true } }) as any,
-          score: res[1]
-        });
-      });
 
+      this._bm25Engine.consolidate?.();
+
+      const results: any[] = await this.bm25Search(query, items, topK);
+
+      results.forEach((res: any) => {
+        // Support both [index, score] tuples and { item, score } objects
+        if (Array.isArray(res)) {
+          const idx = res[0];
+          const score = res[1];
+          if (items[idx]) {
+            top.push({
+              item: Object.assign({}, { ...items[idx], metadata: { ...items[idx].metadata, isBm25: true } }) as any,
+              score
+            });
+          }
+        } else if (res && typeof res === 'object' && 'item' in res && 'score' in res) {
+          const objItem = Object.assign({}, { ...(res.item || {}), metadata: { ...(res.item?.metadata || {}), isBm25: true } }) as any;
+          top.push({ item: objItem, score: res.score });
+        }
+      });
     }
+
     return top;
   }
 
@@ -369,14 +402,11 @@ export class LocalIndex<TMetadata extends Record<string, MetadataTypes> = Record
     }
   }
 
-  /**
-   * Ensures that the index has been loaded into memory.
-   */
+  /** Ensures that the index has been loaded into memory. */
   protected async loadIndexData(): Promise<void> {
     if (this._data) {
       return;
     }
-
     if (!await this.isIndexCreated()) {
       throw new Error('Index does not exist');
     }
@@ -403,18 +433,28 @@ export class LocalIndex<TMetadata extends Record<string, MetadataTypes> = Record
     // Check for indexed metadata
     let metadata: Record<string, any> = {};
     let metadataFile: string | undefined;
-    if (this._update!.metadata_config.indexed && this._update!.metadata_config.indexed.length > 0 && item.metadata) {
+    const indexedKeys = this._update!.metadata_config.indexed ?? [];
+    if (indexedKeys.length > 0 && item.metadata) {
       // Copy only indexed metadata
-      for (const key of this._update!.metadata_config.indexed) {
-        if (item.metadata && item.metadata[key]) {
-          metadata[key] = item.metadata[key];
+      const indexedOnly: Record<string, any> = {};
+      for (const key of indexedKeys) {
+        if (Object.prototype.hasOwnProperty.call(item.metadata, key)) {
+          indexedOnly[key] = (item.metadata as any)[key];
         }
       }
 
-      // Save remaining metadata to disk
-      metadataFile = `${v4()}.json`;
-      const metadataPath = path.join(this._folderPath, metadataFile);
-      await this.storage.upsertFile(metadataPath, JSON.stringify(item.metadata));
+      // Determine if there are any non-indexed keys
+      const hasNonIndexed = Object.keys(item.metadata).some(k => !indexedKeys.includes(k));
+
+      // Always store only indexed keys in the index
+      metadata = indexedOnly;
+
+      // Write full metadata externally only if there are non-indexed keys present
+      if (hasNonIndexed) {
+        metadataFile = `${v4()}.json`;
+        const metadataPath = path.join(this._folderPath, metadataFile);
+        await this.storage.upsertFile(metadataPath, JSON.stringify(item.metadata));
+      }
     } else if (item.metadata) {
       metadata = item.metadata;
     }
@@ -449,10 +489,9 @@ export class LocalIndex<TMetadata extends Record<string, MetadataTypes> = Record
   }
 
   private async setupBm25(): Promise<any> {
-    this._bm25Engine = bm25();
+    this._bm25Engine = this._bm25Factory();
     const nlp = winkNLP(model);
     const its = nlp.its;
-
     const prepTask = function (text: string) {
       const tokens: any[] = [];
       nlp.readDoc(text)
@@ -461,23 +500,17 @@ export class LocalIndex<TMetadata extends Record<string, MetadataTypes> = Record
         .filter((t: any) => (t.out(its.type) === 'word' && !t.out(its.stopWordFlag)))
         // Handle negation and extract stem of the word
         .each((t: any) => tokens.push((t.out(its.negationFlag)) ? '!' + t.out(its.stem) : t.out(its.stem)));
-
       return tokens;
     };
-
     this._bm25Engine.defineConfig({ fldWeights: { body: 1 } });
     // Step II: Define PrepTasks pipe.
     this._bm25Engine.definePrepTasks([prepTask]);
   }
 
-  private async bm25Search(searchQuery: string, items: any, topK: number): Promise<any> {
-    var query = searchQuery;
-    // `results` is an array of [ doc-id, score ], sorted by score
-    var results = this._bm25Engine.search(query);
-
+  private async bm25Search(searchQuery: string, _items: any, topK: number): Promise<any> {
+    const results = this._bm25Engine.search(searchQuery);
     return results.slice(0, topK);
   }
-
 }
 
 interface IndexData {

@@ -11,7 +11,8 @@
     "**/coverage/**",
     "**/*.d.ts",
     "**/internals/**",
-    "**/*.spec.ts"
+    "**/*.spec.ts",
+    "**/index.ts"
   ],
   "reporter": [
     "html"
