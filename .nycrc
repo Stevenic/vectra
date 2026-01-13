@@ -9,7 +9,9 @@
     "**/node_modules/**",
     "**/tests/**",
     "**/coverage/**",
-    "**/*.d.ts"
+    "**/*.d.ts",
+    "**/internals/**",
+    "**/*.spec.ts"
   ],
   "reporter": [
     "html"
