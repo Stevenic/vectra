@@ -71,7 +71,9 @@
         "lint": "eslint **/src/**/*.{j,t}s{,x} --fix --no-error-on-unmatched-pattern",
         "test": "npm-run-all build test:mocha",
         "test:mocha": "nyc ts-mocha src/**/*.spec.ts --timeout 10000",
-        "test:compat": "api-extractor run --verbose"
+        "test:compat": "api-extractor run --verbose",
+        "clean:build": "rimraf lib tsconfig.tsbuildinfo",
+        "publish:check": "yarn run clean:build && yarn run build && yarn test && yarn publish --dry-run"
     },
     "files": [
         "_ts3.4",
