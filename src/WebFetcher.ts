@@ -83,7 +83,6 @@ export class WebFetcher implements TextFetcher {
         }
     }
 
-
     private htmlToMarkdown(html: string, baseUrl: string): string {
         // Parse HTML and remove scripts
         const $ = cheerio.load(html, { scriptingEnabled: true });
@@ -93,13 +92,26 @@ export class WebFetcher implements TextFetcher {
         $('a').each((i, elem) => {
             const $el = $(elem);
             const href = $el.attr("href");
-            if (href && !href.startsWith("http")) {
-                // Try converting to an absolute link
-                try {
-                    $el.attr("href", new URL(href, baseUrl).toString());
-                } catch {
-                    // Leave as is
-                }
+            if (!href) return;
+
+            const lower = href.toLowerCase();
+
+            // Leave http/https as-is
+            if (lower.startsWith('http://') || lower.startsWith('https://')) {
+                return;
+            }
+
+            // Leave absolute non-http schemes (mailto:, javascript:, data:, ftp:, etc.)
+            const hasScheme = /^[a-zA-Z][a-zA-Z0-9+.-]*:/.test(href);
+            if (hasScheme) {
+                return;
+            }
+
+            // Rewrite protocol-relative or relative paths
+            try {
+                $el.attr("href", new URL(href, baseUrl).toString());
+            } catch {
+                // Leave as is if parsing fails
             }
         });
 
@@ -112,7 +124,10 @@ export class WebFetcher implements TextFetcher {
         const md = turndownService.turndown(body);
 
         // Remove any overly long header text
-        const contentStart = Math.min(md.indexOf('\n'), md.indexOf(' '));
+        const firstSpace = md.indexOf(' ');
+        const firstNewline = md.indexOf('\n');
+        const candidates = [firstSpace, firstNewline].filter(i => i >= 0);
+        const contentStart = candidates.length ? Math.min(...candidates) : -1;
         if (contentStart > 64) {
             return md.slice(contentStart);
         } else {
@@ -143,40 +158,34 @@ function convertTables(turndownService: TurndownService): void {
                         childNode.getAttribute?.('align') || ''
                     ).toLowerCase()
 
-                    if (align) border = alignMap[align] || border
+                        if (align) border = alignMap[align] || border
 
                     borderCells += cell(border, childNode)
                 }
+                return '\n' + content + (borderCells ? '\n' + borderCells : '')
             }
-            return '\n' + content + (borderCells ? '\n' + borderCells : '')
-        }
-    });
+        });
 
-    turndownService.addRule('table', {
-        filter: ['table'],
-        replacement: function (content, node) {
-            // Ensure there are no blank lines
-            content = content.replace('\n\n', '\n')
-            return '\n\n' + content + '\n\n'
-        }
-    });
+        turndownService.addRule('table', {
+            filter: ['table'],
+            replacement: function (content, node) {
+                // Ensure there are no blank lines
+                content = content.replace('\n\n', '\n')
+                return '\n\n' + content + '\n\n'
+            }
+        });
 
-    turndownService.addRule('tableSection', {
-        filter: ['thead', 'tbody', 'tfoot'],
-        replacement: function (content) {
-            return content
-        }
-    });
-}
+        turndownService.addRule('tableSection', {
+            filter: ['thead', 'tbody', 'tfoot'],
+            replacement: function (content) {
+                return content
+            }
+        });
+    }
 
 const indexOf = Array.prototype.indexOf
 const every = Array.prototype.every
 
-// A tr is a heading row if:
-// - the parent is a THEAD
-// - or if its the first child of the TABLE or the first TBODY (possibly
-//   following a blank THEAD)
-// - and every cell is a TH
 function isHeadingRow(tr: any) {
     var parentNode = tr.parentNode
     return (

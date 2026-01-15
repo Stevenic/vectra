@@ -11,6 +11,7 @@ export class LocalDocument {
     private readonly _uri: string;
     private _metadata: Record<string,MetadataTypes>|undefined;
     private _text: string|undefined;
+    private _length: number|undefined;
 
     /**
      * Creates a new `LocalDocument` instance.
@@ -52,12 +53,19 @@ export class LocalDocument {
      * @returns Length of the document in tokens.
      */
     public async getLength(): Promise<number> {
+        // Return cached length if already computed
+        if (this._length !== undefined) {
+            return this._length;
+        }
+
         const text = await this.loadText();
         if (text.length <= 40000) {
-            return this._index.tokenizer.encode(text).length;
+            this._length = this._index.tokenizer.encode(text).length;
         } else {
-            return Math.ceil(text.length / 4);
+            this._length = Math.ceil(text.length / 4);
         }
+
+        return this._length;
     }
 
     /**

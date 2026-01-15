@@ -1,4 +1,5 @@
-const colorizer = require('json-colorizer');
+const colorizerModule = require('json-colorizer');
+const colorizeFn = colorizerModule?.default ?? colorizerModule;
 
 /**
  * @private
@@ -20,20 +21,23 @@ export class Colorize {
         if (typeof output === 'string') {
             return isBm25 ? `\x1b[34m${quote}${output}${quote}\x1b[0m` : `\x1b[32m${quote}${output}${quote}\x1b[0m`;
         } else if (typeof output === 'object' && output !== null) {
-            return colorizer(output, {
-                pretty: true,
-                colors: {
-                    BRACE: 'white',
-                    BRACKET: 'white',
-                    COLON: 'white',
-                    COMMA: 'white',
-                    STRING_KEY: 'white',
-                    STRING_LITERAL: 'green',
-                    NUMBER_LITERAL: 'blue',
-                    BOOLEAN_LITERAL: 'blue',
-                    NULL_LITERAL: 'blue'
-                }
-            });
+            if (typeof colorizeFn === 'function') {
+                return colorizeFn(output, {
+                    pretty: true,
+                    colors: {
+                        BRACE: 'white',
+                        BRACKET: 'white',
+                        COLON: 'white',
+                        COMMA: 'white',
+                        STRING_KEY: 'white',
+                        STRING_LITERAL: 'green',
+                        NUMBER_LITERAL: 'blue',
+                        BOOLEAN_LITERAL: 'blue',
+                        NULL_LITERAL: 'blue'
+                    }
+                });
+            }
+            return JSON.stringify(output, null, 2);
         } else if (typeof output == 'number') {
             return `\x1b[34m${output}${units}\x1b[0m`;
         } else {
@@ -59,6 +63,5 @@ export class Colorize {
 
     public static warning(warning: string): string {
         return `\x1b[33m${warning}\x1b[0m`;
-
     }
 }
