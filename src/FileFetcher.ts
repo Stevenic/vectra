@@ -1,38 +1,47 @@
 import { TextFetcher } from './types';
 import * as fs from 'fs/promises';
-import * as path from 'path';
+import * as path from 'node:path';
 
 export class FileFetcher implements TextFetcher {
   public async fetch(
     uri: string,
     onDocument: (uri: string, text: string, docType?: string | undefined) => Promise<boolean>
   ): Promise<boolean> {
-    // If the path doesn't exist, resolve true and do not call onDocument
-    let stat: { isDirectory: () => boolean };
+    // Does path exist and is it a directory?
+    let isDirectory: boolean;
     try {
-      stat = await fs.stat(uri);
+      const stat = await fs.stat(uri);
+      isDirectory = stat.isDirectory();
     } catch {
+      // Non-existent path: treat as no-op success
       return true;
     }
 
-    if (stat.isDirectory()) {
-      // Read directory and recurse. If any child returns false, aggregate to false.
-      const entries = await fs.readdir(uri);
+    if (isDirectory) {
+      const files = await fs.readdir(uri);
       let allOk = true;
-      for (const entry of entries) {
-        const childPath = path.join(uri, entry);
-        const ok = await this.fetch(childPath, onDocument);
+      for (const file of files) {
+        const filePath = path.join(uri, file);
+        const ok = await this.fetch(filePath, onDocument);
         if (!ok) {
           allOk = false;
         }
       }
       return allOk;
     } else {
-      // Read file and invoke onDocument
+      // Read file and call onDocument
       const text = await fs.readFile(uri, 'utf8');
+
+      // Determine docType:
+      // - if extension exists, use it (without dot)
+      // - otherwise, use last path segment (basename)
       const ext = path.extname(uri);
-      const docType = ext ? ext.slice(1).toLowerCase() : path.basename(uri).toLowerCase();
-      return onDocument(uri, text, docType);
+      const docType =
+        ext && ext.length > 1
+          ? ext.slice(1).toLowerCase()
+          : path.basename(uri).toLowerCase();
+
+      return await onDocument(uri, text, docType);
     }
   }
-} 
+}

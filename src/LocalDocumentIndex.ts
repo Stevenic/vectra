@@ -1,4 +1,4 @@
-import { pathUtils as path } from './utils/pathUtils';
+import * as path from 'node:path';
 import { v4 } from 'uuid';
 import { GPT3Tokenizer } from "./GPT3Tokenizer";
 import { CreateIndexConfig, LocalIndex } from "./LocalIndex";
@@ -18,19 +18,16 @@ export interface DocumentQueryOptions {
      * Default is 10.
      */
     maxDocuments?: number;
-    
     /**
      * Maximum number of chunks to return per document.
      * @remarks
      * Default is 50.
      */
     maxChunks?: number;
-
     /**
      * Optional. Filter to apply to the document metadata.
      */
     filter?: MetadataFilter;
-
     /**
      * Optional. Turn on bm25 keyword search to perform hybrid search - semantic + keyword
      */
@@ -45,26 +42,22 @@ export interface LocalDocumentIndexConfig {
      * Folder path where the index is stored.
      */
     folderPath: string;
-
     /**
      * Optional. Embeddings model to use for generating document embeddings.
      */
     embeddings?: EmbeddingsModel;
-
     /**
      * Optional. Tokenizer to use for splitting text into tokens.
      */
     tokenizer?: Tokenizer;
-
     /**
      * Optional. Configuration settings for splitting text into chunks.
      */
     chunkingConfig?: Partial<TextSplitterConfig>;
-
     /**
      * Optional. File storage plugin to use for storing index files.
      * @remarks
-     * If not specified, the LocalFileStorageClass will be used.  
+     * If not specified, the LocalFileStorageClass will be used.
      */
     storage?: FileStorage;
 }
@@ -166,17 +159,14 @@ export class LocalDocumentIndex extends LocalIndex<DocumentChunkMetadata> {
         try {
             // Get list of chunks for document
             const chunks = await this.listItemsByMetadata({ documentId });
-
             // Delete chunks
             for (const chunk of chunks) {
                 await this.deleteItem(chunk.id);
             }
-
             // Remove entry from catalog
             delete this._newCatalog!.uriToId[uri];
             delete this._newCatalog!.idToUri[documentId];
             this._newCatalog!.count--;
-
             // Commit changes
             await this.endUpdate();
         } catch (err: unknown) {
@@ -323,7 +313,7 @@ export class LocalDocumentIndex extends LocalIndex<DocumentChunkMetadata> {
         // Return document
         return new LocalDocument(this, documentId, uri);
     }
-    
+
     /**
      * Returns all documents in the index.
      * @remarks
@@ -411,7 +401,6 @@ export class LocalDocumentIndex extends LocalIndex<DocumentChunkMetadata> {
     }
 
     // Overrides
-
     public async beginUpdate(): Promise<void> {
         await super.beginUpdate();
         this._newCatalog = Object.assign({}, this._catalog);
@@ -429,7 +418,6 @@ export class LocalDocumentIndex extends LocalIndex<DocumentChunkMetadata> {
 
     public async endUpdate(): Promise<void> {
         await super.endUpdate();
-
         try {
             // Save catalog
             await this.storage.upsertFile(path.join(this.folderPath, 'catalog.json'), JSON.stringify(this._newCatalog));
@@ -442,7 +430,6 @@ export class LocalDocumentIndex extends LocalIndex<DocumentChunkMetadata> {
 
     protected async loadIndexData(): Promise<void> {
         await super.loadIndexData();
-
         if (this._catalog) {
             return;
         }

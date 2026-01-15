@@ -1,6 +1,5 @@
-// src/storage/VirtualFileStorage.ts
 import { FileDetails, FileStorage, ListFilesFilter } from "./FileStorage";
-import { pathUtils as path } from "../utils/pathUtils";
+import * as path from "node:path";
 import { FileStorageUtilities } from "./FileStorageUtilities";
 
 /**

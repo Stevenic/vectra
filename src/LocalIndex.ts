@@ -1,4 +1,4 @@
-import * as path from 'path';
+import * as path from "node:path";
 import { v4 } from 'uuid';
 import { ItemSelector } from './ItemSelector';
 import { IndexItem, IndexStats, MetadataFilter, MetadataTypes, QueryResult } from './types';
@@ -17,159 +17,126 @@ export interface CreateIndexConfig {
   };
 }
 
-/**
- * Local vector index instance.
- * @remarks
- * This class is used to create, update, and query a local vector index.
- * Each index is a folder on disk containing an index.json file and an optional set of metadata files.
- */
+interface IndexData {
+  version: number;
+  metadata_config: {
+    indexed?: string[];
+  };
+  items: IndexItem[];
+}
+
+type Bm25EngineLike = {
+  defineConfig(config: any): any;
+  definePrepTasks(tasks: Array<(text: string) => any[]>): any;
+  addDoc(doc: any, id: number): any;
+  consolidate(): any;
+  search(q: string): any;
+};
+
+type NlpLike = {
+  its: any;
+  readDoc(text: string): {
+    tokens(): {
+      filter(fn: (t: any) => boolean): any;
+      each(fn: (t: any) => void): any;
+    };
+  };
+};
+
+type LocalIndexDeps = {
+  createBm25Engine?: () => Bm25EngineLike;
+  createNlp?: () => NlpLike;
+  /** injected for testability (ids and metadata filenames) */
+  createId?: () => string;
+};
+
 export class LocalIndex<TMetadata extends Record<string, MetadataTypes> = Record<string, MetadataTypes>> {
   private readonly _folderPath: string;
-  private readonly _indexName: string = 'index.json';
+  private readonly _indexName: string = "index.json";
   private readonly _storage: FileStorage;
   private _data?: IndexData;
   private _update?: IndexData;
 
-  // member fields for BM25
   private _bm25Engine: any;
-  private readonly _bm25Factory: () => any;
-  private readonly _docReader: (docId: string) => Promise<string>;
 
-  /**
-   * Creates a new instance of LocalIndex.
-   * @param folderPath Path to the index folder.
-   * @param storage Optional file storage instance. Defaults to LocalFileStorage.
-   * @param options Optional constructor options for dependency injection.
-   */
-  public constructor(
-    folderPath: string,
-    storage?: FileStorage,
-    options?: {
-      bm25Factory?: () => any;
-      docReader?: (docId: string) => Promise<string>;
-    }
-  ) {
+  private readonly _deps: Required<LocalIndexDeps>;
+
+  public constructor(folderPath: string, storage?: FileStorage, deps?: LocalIndexDeps) {
     this._folderPath = folderPath;
     this._storage = storage || new LocalFileStorage();
-    this._bm25Factory = options?.bm25Factory || (() => bm25());
-    this._docReader = options?.docReader || (async (docId: string) => {
-      const doc = new LocalDocument((this as unknown) as LocalDocumentIndex, docId, '');
-      return await doc.loadText();
-    });
+
+    this._deps = {
+      createBm25Engine: deps?.createBm25Engine ?? (() => bm25() as any),
+      createNlp: deps?.createNlp ?? (() => (winkNLP(model) as any)),
+      createId: deps?.createId ?? (() => v4()),
+    };
   }
 
-  /** Path to the index folder. */
   public get folderPath(): string {
     return this._folderPath;
   }
 
-  /** Name of the index file. */
   public get indexName(): string {
     return this._indexName;
   }
 
-  /** Storage provider used to store the index. */
   public get storage(): FileStorage {
     return this._storage;
   }
 
-  /**
-   * Begins an update to the index.
-   * @remarks
-   * This method loads the index into memory and prepares it for updates.
-   */
   public async beginUpdate(): Promise<void> {
-    if (this._update) {
-      throw new Error('Update already in progress');
-    }
+    if (this._update) throw new Error('Update already in progress');
     await this.loadIndexData();
     this._update = structuredClone(this._data);
   }
 
-  /**
-   * Cancels an update to the index.
-   * @remarks
-   * This method discards any changes made to the index since the update began.
-   */
   public cancelUpdate(): void {
     this._update = undefined;
   }
 
-  /**
-   * Creates a new index.
-   * @remarks
-   * This method creates a new folder on disk containing an index.json file.
-   * @param config Index configuration.
-   */
   public async createIndex(config: CreateIndexConfig = { version: 1 }): Promise<void> {
-    // Delete if exists
     if (await this.isIndexCreated()) {
-      if (config.deleteIfExists) {
-        await this.deleteIndex();
-      } else {
-        throw new Error('Index already exists');
-      }
+      if (config.deleteIfExists) await this.deleteIndex();
+      else throw new Error('Index already exists');
     }
 
     try {
-      // Create folder for index
       await this.storage.createFolder(this._folderPath);
 
-      // Initialize index.json file
       this._data = {
         version: config.version,
         metadata_config: config.metadata_config ?? {},
         items: []
       };
+
       await this.storage.upsertFile(path.join(this._folderPath, this._indexName), JSON.stringify(this._data));
-    } catch {
+    } catch (_err: unknown) {
       await this.deleteIndex();
       throw new Error('Error creating index');
     }
   }
 
-  /**
-   * Deletes the index.
-   * @remarks
-   * This method deletes the index folder from disk.
-   */
   public async deleteIndex(): Promise<void> {
     this._data = undefined;
     return await this.storage.deleteFolder(this._folderPath);
   }
 
-  /**
-   * Deletes an item from the index.
-   * @param id ID of item to delete.
-   */
   public async deleteItem(id: string): Promise<void> {
     if (this._update) {
       const index = this._update.items.findIndex(i => i.id === id);
-      if (index >= 0) {
-        this._update.items.splice(index, 1);
-      }
+      if (index >= 0) this._update.items.splice(index, 1);
     } else {
       await this.beginUpdate();
       const index = this._update!.items.findIndex(i => i.id === id);
-      if (index >= 0) {
-        this._update!.items.splice(index, 1);
-      }
+      if (index >= 0) this._update!.items.splice(index, 1);
       await this.endUpdate();
     }
   }
 
-  /**
-   * Ends an update to the index.
-   * @remarks
-   * This method saves the index to disk.
-   */
   public async endUpdate(): Promise<void> {
-    if (!this._update) {
-      throw new Error('No update in progress');
-    }
+    if (!this._update) throw new Error('No update in progress');
 
     try {
-      // Save index
       await this.storage.upsertFile(path.join(this._folderPath, this._indexName), JSON.stringify(this._update));
       this._data = this._update;
       this._update = undefined;
@@ -178,10 +145,6 @@ export class LocalIndex<TMetadata extends Record<string, MetadataTypes> = Record
     }
   }
 
-  /**
-   * Loads an index from disk and returns its stats.
-   * @returns Index stats.
-   */
   public async getIndexStats(): Promise<IndexStats> {
     await this.loadIndexData();
     return {
@@ -191,24 +154,11 @@ export class LocalIndex<TMetadata extends Record<string, MetadataTypes> = Record
     };
   }
 
-  /**
-   * Returns an item from the index given its ID.
-   * @param id ID of the item to retrieve.
-   * @returns Item or undefined if not found.
-   */
   public async getItem<TItemMetadata extends TMetadata = TMetadata>(id: string): Promise<IndexItem<TItemMetadata> | undefined> {
     await this.loadIndexData();
     return this._data!.items.find(i => i.id === id) as any | undefined;
   }
 
-  /**
-   * Adds an item to the index.
-   * @remarks
-   * A new update is started if one is not already in progress. If an item with the same ID
-   * already exists, an error will be thrown.
-   * @param item Item to insert.
-   * @returns Inserted item.
-   */
   public async insertItem<TItemMetadata extends TMetadata = TMetadata>(item: Partial<IndexItem<TItemMetadata>>): Promise<IndexItem<TItemMetadata>> {
     if (this._update) {
       return await this.addItemToUpdate(item, true) as any;
@@ -220,15 +170,6 @@ export class LocalIndex<TMetadata extends Record<string, MetadataTypes> = Record
     }
   }
 
-  /**
-   * Adds a batch of items to the index.
-   * @remarks
-   * Batch update requires no update to be in progress. This is necessary so that if any one
-   * insert operation fails, the entire update can be safely cancelled. This prevents partial
-   * updates from being applied to the local index.
-   * @param items Items to insert.
-   * @returns Inserted items.
-   */
   public async batchInsertItems<TItemMetadata extends TMetadata = TMetadata>(items: Partial<IndexItem<TItemMetadata>>[]): Promise<IndexItem[]> {
     await this.beginUpdate();
     try {
@@ -240,53 +181,25 @@ export class LocalIndex<TMetadata extends Record<string, MetadataTypes> = Record
       await this.endUpdate();
       return newItems;
     } catch (e) {
-      // cancels this update to prevent partial batch updates. allows error to bubble up.
       await this.cancelUpdate();
       throw e;
     }
   }
 
-  /** Returns true if the index exists. */
   public async isIndexCreated(): Promise<boolean> {
     return await this.storage.pathExists(path.join(this._folderPath, this._indexName));
   }
 
-  /**
-   * Returns all items in the index.
-   * @remarks
-   * This method loads the index into memory and returns all its items. A copy of the items
-   * array is returned so no modifications should be made to the array.
-   * @returns Array of all items in the index.
-   */
   public async listItems<TItemMetadata extends TMetadata = TMetadata>(): Promise<IndexItem<TItemMetadata>[]> {
     await this.loadIndexData();
     return this._data!.items.slice() as any;
   }
 
-  /**
-   * Returns all items in the index matching the filter.
-   * @remarks
-   * This method loads the index into memory and returns all its items matching the filter.
-   * @param filter Filter to apply.
-   * @returns Array of items matching the filter.
-   */
   public async listItemsByMetadata<TItemMetadata extends TMetadata = TMetadata>(filter: MetadataFilter): Promise<IndexItem<TItemMetadata>[]> {
     await this.loadIndexData();
     return this._data!.items.filter(i => ItemSelector.select(i.metadata, filter)) as any;
   }
 
-  /**
-   * Finds the top k items in the index that are most similar to the vector.
-   * @remarks
-   * This method loads the index into memory and returns the top k items that are most similar.
-   * An optional filter can be applied to the metadata of the items.
-   * @param vector Vector to query against.
-   * @param query Query string (used when isBm25=true).
-   * @param topK Number of items to return.
-   * @param filter Optional. Filter to apply.
-   * @param isBm25 Optional. If true, append BM25 keyword results to semantic results.
-   * @returns Similar items to the vector that match the supplied filter.
-   */
   public async queryItems<TItemMetadata extends TMetadata = TMetadata>(
     vector: number[],
     query: string,
@@ -296,102 +209,66 @@ export class LocalIndex<TMetadata extends Record<string, MetadataTypes> = Record
   ): Promise<QueryResult<TItemMetadata>[]> {
     await this.loadIndexData();
 
-    // Filter items
     let items = this._data!.items;
-    if (filter) {
-      items = items.filter(i => ItemSelector.select(i.metadata, filter));
-    }
+    if (filter) items = items.filter(i => ItemSelector.select(i.metadata, filter));
 
-    // Calculate distances
     const norm = ItemSelector.normalize(vector);
-    const distances: { index: number; distance: number }[] = [];
+    const distances: { index: number, distance: number }[] = [];
     for (let i = 0; i < items.length; i++) {
       const item = items[i];
       const distance = ItemSelector.normalizedCosineSimilarity(vector, norm, item.vector, item.norm);
-      distances.push({ index: i, distance: distance });
+      distances.push({ index: i, distance });
     }
 
-    // Sort by distance DESCENDING
     distances.sort((a, b) => b.distance - a.distance);
 
-    // Find top k
-    const top: QueryResult<TItemMetadata>[] = distances.slice(0, topK).map(d => {
-      return {
-        item: Object.assign({}, items[d.index]) as any,
-        score: d.distance
-      };
-    });
+    const top: QueryResult<TItemMetadata>[] = distances.slice(0, topK).map(d => ({
+      item: Object.assign({}, items[d.index]) as any,
+      score: d.distance
+    }));
 
-    // Load external metadata
     for (const item of top) {
       if (item.item.metadataFile) {
         const metadataPath = path.join(this._folderPath, item.item.metadataFile);
-        const metadataBuffer = await this.storage.readFile(metadataPath);
-        item.item.metadata = JSON.parse(metadataBuffer.toString('utf-8'));
+        const metadata = await this.storage.readFile(metadataPath);
+        item.item.metadata = JSON.parse(metadata.toString('utf-8'));
       }
     }
 
-    // Perform bm25 search only if enabled. Avoid duplicate chunks that are already selected during semantic search.
     if (isBm25) {
-      const itemSet = new Set<string>();
-      for (const r of top) itemSet.add(r.item.id);
+      const itemSet = new Set();
+      for (const item of top) itemSet.add(item.item.id);
 
-      // Set up BM25 engine
       await this.setupBm25();
 
-      // Add docs if we have necessary metadata; guard everything to avoid crashes
+      let currDoc;
+      let currDocTxt;
       for (let i = 0; i < items.length; i++) {
         if (!itemSet.has(items[i].id)) {
-          const item = items[i] as any;
-          const md = item.metadata || {};
-          if (md.documentId != undefined && md.startPos != undefined && md.endPos != undefined) {
-            try {
-              const currDocTxt = await this._docReader(String(md.documentId));
-              const startPos = Number(md.startPos);
-              const endPos = Number(md.endPos);
-              const chunkText = currDocTxt.substring(startPos, endPos + 1);
-              this._bm25Engine.addDoc?.({ body: chunkText }, i);
-            } catch {
-              // Ignore load or engine errors for BM25 doc prep
-            }
-          }
+          const item = items[i];
+          currDoc = new LocalDocument((this as unknown) as LocalDocumentIndex, item.metadata.documentId.toString(), '');
+          currDocTxt = await currDoc.loadText();
+          const startPos = item.metadata.startPos;
+          const endPos = item.metadata.endPos;
+          const chunkText = currDocTxt.substring(Number(startPos), Number(endPos) + 1);
+          this._bm25Engine.addDoc({ body: chunkText }, i);
         }
       }
 
-      this._bm25Engine.consolidate?.();
-
-      const results: any[] = await this.bm25Search(query, items, topK);
-
+      this._bm25Engine.consolidate();
+      const results = await this.bm25Search(query, items, topK);
       results.forEach((res: any) => {
-        // Support both [index, score] tuples and { item, score } objects
-        if (Array.isArray(res)) {
-          const idx = res[0];
-          const score = res[1];
-          if (items[idx]) {
-            top.push({
-              item: Object.assign({}, { ...items[idx], metadata: { ...items[idx].metadata, isBm25: true } }) as any,
-              score
-            });
-          }
-        } else if (res && typeof res === 'object' && 'item' in res && 'score' in res) {
-          const objItem = Object.assign({}, { ...(res.item || {}), metadata: { ...(res.item?.metadata || {}), isBm25: true } }) as any;
-          top.push({ item: objItem, score: res.score });
-        }
+        top.push({
+          item: Object.assign({}, { ...items[res[0]], metadata: { ...items[res[0]].metadata, isBm25: true } }) as any,
+          score: res[1]
+        });
       });
     }
 
     return top;
   }
 
-  /**
-   * Adds or replaces an item in the index.
-   * @remarks
-   * A new update is started if one is not already in progress. If an item with the same ID
-   * already exists, it will be replaced.
-   * @param item Item to insert or replace.
-   * @returns Upserted item.
-   */
-  public async upsertItem<TItemMetadata extends TMetadata = TMetadata>(item: Partial<IndexItem<TItemMetadata>>): Promise<IndexItem<TItemMetadata>> {
+  public async upsertItem<TItemMetadata extends TMetadata = TMetadata>(item: Partial<IndexItem<TItemMetadata>>): Promise<IndexItem> {
     if (this._update) {
       return await this.addItemToUpdate(item, false) as any;
     } else {
@@ -402,75 +279,49 @@ export class LocalIndex<TMetadata extends Record<string, MetadataTypes> = Record
     }
   }
 
-  /** Ensures that the index has been loaded into memory. */
   protected async loadIndexData(): Promise<void> {
-    if (this._data) {
-      return;
-    }
-    if (!await this.isIndexCreated()) {
-      throw new Error('Index does not exist');
-    }
+    if (this._data) return;
+
+    if (!await this.isIndexCreated()) throw new Error('Index does not exist');
 
     const data = await this.storage.readFile(path.join(this._folderPath, this.indexName));
     this._data = JSON.parse(data.toString('utf-8'));
   }
 
   private async addItemToUpdate(item: Partial<IndexItem<any>>, unique: boolean): Promise<IndexItem> {
-    // Ensure vector is provided
-    if (!item.vector) {
-      throw new Error('Vector is required');
-    }
+    if (!item.vector) throw new Error('Vector is required');
 
-    // Ensure unique
-    const id = item.id ?? v4();
+    const id = item.id ?? this._deps.createId();
+
     if (unique) {
       const existing = this._update!.items.find(i => i.id === id);
-      if (existing) {
-        throw new Error(`Item with id ${id} already exists`);
-      }
+      if (existing) throw new Error(`Item with id ${id} already exists`);
     }
 
-    // Check for indexed metadata
     let metadata: Record<string, any> = {};
     let metadataFile: string | undefined;
-    const indexedKeys = this._update!.metadata_config.indexed ?? [];
-    if (indexedKeys.length > 0 && item.metadata) {
-      // Copy only indexed metadata
-      const indexedOnly: Record<string, any> = {};
-      for (const key of indexedKeys) {
-        if (Object.prototype.hasOwnProperty.call(item.metadata, key)) {
-          indexedOnly[key] = (item.metadata as any)[key];
-        }
+
+    if (this._update!.metadata_config.indexed && this._update!.metadata_config.indexed.length > 0 && item.metadata) {
+      for (const key of this._update!.metadata_config.indexed) {
+        if (item.metadata && item.metadata[key]) metadata[key] = item.metadata[key];
       }
 
-      // Determine if there are any non-indexed keys
-      const hasNonIndexed = Object.keys(item.metadata).some(k => !indexedKeys.includes(k));
-
-      // Always store only indexed keys in the index
-      metadata = indexedOnly;
-
-      // Write full metadata externally only if there are non-indexed keys present
-      if (hasNonIndexed) {
-        metadataFile = `${v4()}.json`;
-        const metadataPath = path.join(this._folderPath, metadataFile);
-        await this.storage.upsertFile(metadataPath, JSON.stringify(item.metadata));
-      }
+      metadataFile = `${this._deps.createId()}.json`;
+      const metadataPath = path.join(this._folderPath, metadataFile);
+      await this.storage.upsertFile(metadataPath, JSON.stringify(item.metadata));
     } else if (item.metadata) {
       metadata = item.metadata;
     }
 
-    // Create new item
     const newItem: IndexItem = {
-      id: id,
-      metadata: metadata,
+      id,
+      metadata,
       vector: item.vector,
       norm: ItemSelector.normalize(item.vector)
     };
-    if (metadataFile) {
-      newItem.metadataFile = metadataFile;
-    }
 
-    // Add item to index
+    if (metadataFile) newItem.metadataFile = metadataFile;
+
     if (!unique) {
       const existing = this._update!.items.find(i => i.id === id);
       if (existing) {
@@ -489,21 +340,21 @@ export class LocalIndex<TMetadata extends Record<string, MetadataTypes> = Record
   }
 
   private async setupBm25(): Promise<any> {
-    this._bm25Engine = this._bm25Factory();
-    const nlp = winkNLP(model);
+    this._bm25Engine = this._deps.createBm25Engine();
+
+    const nlp = this._deps.createNlp();
     const its = nlp.its;
+
     const prepTask = function (text: string) {
       const tokens: any[] = [];
       nlp.readDoc(text)
         .tokens()
-        // Use only words ignoring punctuations etc and from them remove stop words
         .filter((t: any) => (t.out(its.type) === 'word' && !t.out(its.stopWordFlag)))
-        // Handle negation and extract stem of the word
         .each((t: any) => tokens.push((t.out(its.negationFlag)) ? '!' + t.out(its.stem) : t.out(its.stem)));
       return tokens;
     };
+
     this._bm25Engine.defineConfig({ fldWeights: { body: 1 } });
-    // Step II: Define PrepTasks pipe.
     this._bm25Engine.definePrepTasks([prepTask]);
   }
 
@@ -511,12 +362,4 @@ export class LocalIndex<TMetadata extends Record<string, MetadataTypes> = Record
     const results = this._bm25Engine.search(searchQuery);
     return results.slice(0, topK);
   }
-}
-
-interface IndexData {
-  version: number;
-  metadata_config: {
-    indexed?: string[];
-  };
-  items: IndexItem[];
 }
