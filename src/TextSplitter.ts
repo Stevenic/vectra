@@ -1,8 +1,6 @@
 import { GPT3Tokenizer } from "./GPT3Tokenizer";
 import { TextChunk, Tokenizer } from "./types";
 
-const ALPHANUMERIC_CHARS = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-
 export interface TextSplitterConfig {
   separators: string[];
   keepSeparators: boolean;
@@ -22,17 +20,14 @@ export class TextSplitter {
       chunkOverlap: 40,
     } as TextSplitterConfig, config);
 
-    // Create a default tokenizer if none is provided
     if (!this._config.tokenizer) {
       this._config.tokenizer = new GPT3Tokenizer();
     }
 
-    // Use default separators if none are provided
     if (!this._config.separators || this._config.separators.length === 0) {
       this._config.separators = this.getSeparators(this._config.docType);
     }
 
-    // Validate the config settings
     if (this._config.chunkSize < 1) {
       throw new Error("chunkSize must be >= 1");
     } else if (this._config.chunkOverlap < 0) {
@@ -43,30 +38,19 @@ export class TextSplitter {
   }
 
   public split(text: string): TextChunk[] {
-    // Get basic chunks
     const chunks = this.recursiveSplit(text, this._config.separators, 0);
 
-    const that = this;
-    function getOverlapTokens(tokens?: number[]): number[] {
-      if (tokens != undefined) {
-        const len = tokens.length > that._config.chunkOverlap ? that._config.chunkOverlap : tokens.length;
-        return tokens.slice(0, len);
-      } else {
-        return [];
-      }
-    }
-
-    // Add overlap tokens and text to the start and end of each chunk
     if (this._config.chunkOverlap > 0) {
-      for (let i = 1; i < chunks.length; i++) {
-        const previousChunk = chunks[i - 1];
-        const chunk = chunks[i];
-        const nextChunk = i < chunks.length - 1 ? chunks[i + 1] : undefined;
+      for (let i = 0; i < chunks.length - 1; i++) {
+        const current = chunks[i];
+        const next = chunks[i + 1];
 
-        // Use copies to avoid reversing in place (preserve token order in previous chunks)
-        const prevTokensCopy = previousChunk.tokens.slice();
-        chunk.startOverlap = getOverlapTokens(prevTokensCopy.reverse()).reverse();
-        chunk.endOverlap = getOverlapTokens(nextChunk?.tokens);
+        const currTokensCopy = current.tokens.slice();
+        const trailing = currTokensCopy.reverse().slice(0, this._config.chunkOverlap).reverse();
+        next.startOverlap = trailing;
+
+        const leadLen = Math.min(this._config.chunkOverlap, next.tokens.length);
+        current.endOverlap = next.tokens.slice(0, leadLen);
       }
     }
 
@@ -74,132 +58,205 @@ export class TextSplitter {
   }
 
   private recursiveSplit(text: string, separators: string[], startPos: number): TextChunk[] {
-    const chunks: TextChunk[] = [];
+    if (text.length === 0) return [];
 
-    if (text.length > 0) {
-      // Split text into parts
-      let parts: string[];
-      let separator = '';
+    if (separators.length > 0) {
+      const sep = separators[0];
       const nextSeparators = separators.length > 1 ? separators.slice(1) : [];
 
-      if (separators.length > 0) {
-        // Split by separator
-        separator = separators[0];
-        parts = separator == ' ' ? this.splitBySpaces(text) : text.split(separator);
-      } else {
-        // Cut text in half
-        const half = Math.floor(text.length / 2);
-        parts = [text.substring(0, half), text.substring(half)];
-      }
+      const parts = sep === ' ' ? this.splitBySpaces(text) : text.split(sep);
+      const out: TextChunk[] = [];
 
-      // Iterate over parts
+      let pos = startPos;
       for (let i = 0; i < parts.length; i++) {
-        const lastChunk = (i === parts.length - 1);
+        const lastPart = (i === parts.length - 1);
+        let piece = parts[i];
 
-        // Get chunk text and endPos
-        let chunk = parts[i];
-        const endPos = (startPos + (chunk.length - 1)) + (lastChunk ? 0 : separator.length);
-
-        if (this._config.keepSeparators && !lastChunk) {
-          chunk += separator;
+        if (this._config.keepSeparators && !lastPart) {
+          piece += sep;
         }
 
-        // Keep chunks that contain any non-whitespace; drop whitespace-only
-        if (!/\S/.test(chunk)) {
-          // drop whitespace-only chunks
-          startPos = endPos + 1;
+        if (!/\S/.test(piece)) {
+          const consumed = parts[i].length + (lastPart ? 0 : sep.length);
+          pos += consumed;
           continue;
         }
 
-        // Optimization to avoid encoding really large chunks
-        if (chunk.length / 6 > this._config.chunkSize) {
-          // Break the text into smaller chunks
-          const subChunks = this.recursiveSplit(chunk, nextSeparators, startPos);
-          chunks.push(...subChunks);
+        const sub = this.recursiveSplit(piece, nextSeparators, pos);
+        if (sub.length > 0) {
+          out.push(...sub);
         } else {
-          // Encode chunk text
-          const tokens = this._config.tokenizer.encode(chunk);
-          if (tokens.length > this._config.chunkSize) {
-            // Break the text into smaller chunks
-            const subChunks = this.recursiveSplit(chunk, nextSeparators, startPos);
-            chunks.push(...subChunks);
-          } else {
-            // Append chunk to output
-            chunks.push({
-              text: chunk,
-              tokens: tokens,
-              startPos: startPos,
-              endPos: endPos,
-              startOverlap: [],
-              endOverlap: [],
-            });
-          }
+          out.push(...this.finalizeToChunks(piece, pos));
         }
 
-        // Update startPos
-        startPos = endPos + 1;
+        const consumed = parts[i].length + (lastPart ? 0 : sep.length);
+        pos += consumed;
+      }
+
+      const joiner =
+        this._config.keepSeparators
+          ? ''
+          : (sep !== ' ' && (sep.includes('\n') || sep.includes('\t')) ? ' ' : '');
+
+      return this.combineChunks(out, joiner);
+    }
+
+    return this.combineChunks(this.finalizeToChunks(text, startPos), '');
+  }
+
+  // Strip inline punctuation-only runs when keepSeparators=false.
+  // Only removes runs that touch non-whitespace on at least one side (inline),
+  // preserving standalone lines like '---' or '***' that are separated by whitespace/newlines.
+  private stripInlineSeparators(s: string): string {
+    if (this._config.keepSeparators || s.length === 0) return s;
+    const re = /(-{3,}|\*{3,}|={3,}|_{3,})/g;
+    let out = '';
+    let lastIndex = 0;
+    let m: RegExpExecArray | null;
+    while ((m = re.exec(s)) !== null) {
+      const start = m.index;
+      const end = start + m[0].length;
+      const left = start > 0 ? s[start - 1] : undefined;
+      const right = end < s.length ? s[end] : undefined;
+      const leftNonWS = left !== undefined && !/\s/.test(left);
+      const rightNonWS = right !== undefined && !/\s/.test(right);
+      // Inline if touching non-whitespace on at least one side
+      if (leftNonWS || rightNonWS) {
+        out += s.slice(lastIndex, start);
+        lastIndex = end; // drop the run
+      }
+    }
+    out += s.slice(lastIndex);
+    return out;
+  }
+
+  // Produce one or more chunks under budget.
+  private finalizeToChunks(text: string, startPos: number): TextChunk[] {
+    const chunks: TextChunk[] = [];
+    const tokens = this._config.tokenizer.encode(text);
+
+    // Token-budget splitting
+    if (tokens.length > this._config.chunkSize) {
+      let remaining = tokens.slice();
+      let pos = startPos;
+
+      while (remaining.length > 0) {
+        const span = remaining.splice(0, this._config.chunkSize);
+        const original = this._config.tokenizer.decode(span);
+
+        const leadingWSMatch = original.match(/^\s+/);
+        const leadingWSLen = leadingWSMatch ? leadingWSMatch[0].length : 0;
+
+        let sliceText = leadingWSLen > 0 ? original.slice(leadingWSLen) : original;
+        if (sliceText.length === 0) {
+          pos += original.length;
+          continue;
+        }
+
+        // Drop inline punctuation-only runs if configured
+        const stripped = this.stripInlineSeparators(sliceText);
+
+        const sliceStart = pos + leadingWSLen;
+        const sliceEnd = sliceStart + stripped.length - 1;
+
+        const spanTokens = this._config.tokenizer.encode(stripped);
+
+        chunks.push({
+          text: stripped,
+          tokens: spanTokens,
+          startPos: sliceStart,
+          endPos: sliceEnd,
+          startOverlap: [],
+          endOverlap: [],
+        });
+
+        pos += original.length;
+      }
+      return chunks;
+    }
+
+    // If text fits but is a very long unbroken string with no configured separators, fall back to char windows
+    if (text.length > this._config.chunkSize) {
+      const hasWhitespace = /\s/.test(text);
+      const hasAnyConfiguredSep = (this._config.separators || []).some(s => s && text.includes(s));
+
+      if (!hasWhitespace && !hasAnyConfiguredSep) {
+        let pos = startPos;
+        for (let off = 0; off < text.length; off += this._config.chunkSize) {
+          const slice = text.slice(off, off + this._config.chunkSize);
+          const stripped = this.stripInlineSeparators(slice);
+          const sliceTokens = this._config.tokenizer.encode(stripped);
+          const sliceStart = pos;
+          const sliceEnd = sliceStart + stripped.length - 1;
+          chunks.push({
+            text: stripped,
+            tokens: sliceTokens,
+            startPos: sliceStart,
+            endPos: sliceEnd,
+            startOverlap: [],
+            endOverlap: [],
+          });
+          pos = sliceEnd + 1;
+        }
+        return chunks;
       }
     }
 
-    return this.combineChunks(chunks);
+    const stripped = this.stripInlineSeparators(text);
+    const outTokens = this._config.tokenizer.encode(stripped);
+
+    chunks.push({
+      text: stripped,
+      tokens: outTokens,
+      startPos,
+      endPos: startPos + stripped.length - 1,
+      startOverlap: [],
+      endOverlap: [],
+    });
+    return chunks;
   }
 
-  private combineChunks(chunks: TextChunk[]): TextChunk[] {
-    const combinedChunks: TextChunk[] = [];
-    let currentChunk: TextChunk | undefined;
-    let currentLength = 0;
-
-    // When not keeping separators, we previously inserted a space between merged chunks.
-    // We will still use a space for normal merges, but we will prevent merging punctuation-only
-    // separator chunks (e.g., '---', '***', '====') to preserve them as standalone.
-    const separator = this._config.keepSeparators ? '' : ' ';
+  private combineChunks(chunks: TextChunk[], joiner: string): TextChunk[] {
+    const combined: TextChunk[] = [];
+    let current: TextChunk | undefined;
 
     const isWhitespaceOnly = (t: string) => !/\S/.test(t);
     const isPunctuationOnly = (t: string) => /\S/.test(t) && !/[a-zA-Z0-9]/.test(t);
 
     for (let i = 0; i < chunks.length; i++) {
-      const chunk = chunks[i];
-
-      if (!currentChunk) {
-        currentChunk = chunk;
-        currentLength = chunk.tokens.length;
+      const next = chunks[i];
+      if (!current) {
+        current = next;
         continue;
       }
 
-      // If either the current or next chunk is punctuation-only (non-whitespace, no alphanumeric),
-      // do not merge; keep them as separate chunks to preserve separators like '---'.
-      if (isPunctuationOnly(currentChunk.text) || isPunctuationOnly(chunk.text)) {
-        combinedChunks.push(currentChunk);
-        currentChunk = chunk;
-        currentLength = chunk.tokens.length;
+      // Keep punctuation-only chunks standalone
+      if (isPunctuationOnly(current.text) || isPunctuationOnly(next.text)) {
+        combined.push(current);
+        current = next;
         continue;
       }
 
-      // Normal merge path constrained by token budget
-      const length = currentChunk.tokens.length + chunk.tokens.length;
-      if (length > this._config.chunkSize) {
-        combinedChunks.push(currentChunk);
-        currentChunk = chunk;
-        currentLength = chunk.tokens.length;
+      const tokenLength = current.tokens.length + next.tokens.length;
+      const textLength = current.text.length + (joiner ? joiner.length : 0) + next.text.length;
+
+      if (tokenLength > this._config.chunkSize || textLength > this._config.chunkSize) {
+        combined.push(current);
+        current = next;
       } else {
-        // Only insert separator if neither chunk is whitespace-only (defensive)
-        const joiner = (!this._config.keepSeparators && !isWhitespaceOnly(currentChunk.text) && !isWhitespaceOnly(chunk.text)) ? separator : '';
-        currentChunk.text += joiner + chunk.text;
-        currentChunk.endPos = chunk.endPos;
-        currentChunk.tokens.push(...chunk.tokens);
-        currentLength += chunk.tokens.length;
+        const sep = (!this._config.keepSeparators && !isWhitespaceOnly(current.text) && !isWhitespaceOnly(next.text)) ? joiner : '';
+        current.text += sep + next.text;
+        current.endPos = next.endPos;
+        current.tokens.push(...next.tokens);
       }
     }
 
-    if (currentChunk) {
-      combinedChunks.push(currentChunk);
-    }
-
-    return combinedChunks;
+    if (current) combined.push(current);
+    return combined;
   }
 
+  // Token-window splitting utility used for the ' ' logical separator
   private splitBySpaces(text: string): string[] {
-    // Split text by tokens and return parts
     const parts: string[] = [];
     let tokens = this._config.tokenizer.encode(text);
 
