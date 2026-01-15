@@ -1,4 +1,4 @@
-import * as path from 'path';
+import { pathUtils as path } from './utils/pathUtils';
 import { v4 } from 'uuid';
 import { GPT3Tokenizer } from "./GPT3Tokenizer";
 import { CreateIndexConfig, LocalIndex } from "./LocalIndex";

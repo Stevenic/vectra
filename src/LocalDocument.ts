@@ -1,4 +1,4 @@
-import * as path from 'path';
+import { pathUtils as path } from './utils/pathUtils';
 import { MetadataTypes } from './types';
 import { LocalDocumentIndex } from './LocalDocumentIndex';
 

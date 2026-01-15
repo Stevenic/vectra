@@ -1,11 +1,25 @@
 {
     "name": "vectra",
     "author": "Steven Ickman",
-    "description": "A vector database that uses the local file system for storage.",
+    "description": "A lightweight, file-backed vector database for Node.js and browsers with Pinecone-compatible filtering and hybrid BM25 search.",
     "version": "0.12.3",
     "license": "MIT",
     "keywords": [
-        "gpt"
+        "vector-database",
+        "embeddings",
+        "semantic-search",
+        "rag",
+        "retrieval-augmented-generation",
+        "openai",
+        "azure-openai",
+        "cosine-similarity",
+        "bm25",
+        "hybrid-search",
+        "local-database",
+        "llm",
+        "ai",
+        "browser",
+        "electron"
     ],
     "bugs": {
         "url": "https://github.com/Stevenic/vectra/issues"
@@ -14,8 +28,34 @@
         "type": "git",
         "url": "https://github.com/Stevenic/vectra.git"
     },
+    "homepage": "https://github.com/Stevenic/vectra#readme",
     "main": "./lib/index.js",
+    "module": "./lib/index.js",
+    "browser": "./lib/browser.js",
     "types": "./lib/index.d.ts",
+    "exports": {
+        ".": {
+            "node": {
+                "types": "./lib/index.d.ts",
+                "import": "./lib/index.js",
+                "require": "./lib/index.js"
+            },
+            "browser": {
+                "types": "./lib/browser.d.ts",
+                "default": "./lib/browser.js"
+            },
+            "default": "./lib/index.js"
+        },
+        "./browser": {
+            "types": "./lib/browser.d.ts",
+            "default": "./lib/browser.js"
+        },
+        "./node": {
+            "types": "./lib/index.d.ts",
+            "import": "./lib/index.js",
+            "require": "./lib/index.js"
+        }
+    },
     "bin": {
         "vectra": "./bin/vectra.js"
     },
@@ -31,6 +71,7 @@
     },
     "dependencies": {
         "axios": "^1.9.0",
+        "buffer": "^6.0.3",
         "cheerio": "^1.0.0",
         "dotenv": "^16.5.0",
         "gpt-tokenizer": "^3.4.0",
@@ -42,7 +83,6 @@
         "wink-nlp": "^2.3.2",
         "yargs": "^17.7.2"
     },
-    "resolutions": {},
     "devDependencies": {
         "@types/assert": "^1.5.11",
         "@types/mocha": "^10.0.10",
@@ -59,26 +99,25 @@
         "sinon": "^21.0.1",
         "ts-mocha": "11.1.0",
         "ts-node": "^10.9.1",
-        "typescript": "^5.8.3",
-        "wink-bm25-text-search": "^3.1.2"
+        "typescript": "^5.8.3"
     },
     "scripts": {
         "build": "tsc -b",
-        "build-docs": "typedoc --theme markdown --entryPoint botbuilder-m365 --excludePrivate --includeDeclarations --ignoreCompilerErrors --module amd --out ..\\..\\doc\\botbuilder-ai .\\lib\\index.d.ts --hideGenerator --name \"Bot Builder SDK - AI\" --readme none",
-        "build:rollup": "yarn clean && yarn build && api-extractor run --verbose --local",
-        "clean": "rimraf _ts3.4 lib tsconfig.tsbuildinfo node_modules",
-        "depcheck": "depcheck --config ../../.depcheckrc",
+        "build:watch": "tsc -b --watch",
+        "clean": "rimraf lib tsconfig.tsbuildinfo",
+        "clean:all": "rimraf _ts3.4 lib tsconfig.tsbuildinfo node_modules",
         "lint": "eslint **/src/**/*.{j,t}s{,x} --fix --no-error-on-unmatched-pattern",
         "test": "npm-run-all build test:mocha",
         "test:mocha": "nyc ts-mocha src/**/*.spec.ts --timeout 10000",
-        "test:compat": "api-extractor run --verbose",
-        "clean:build": "rimraf lib tsconfig.tsbuildinfo",
-        "publish:check": "yarn run clean:build && yarn run build && yarn test && yarn publish --dry-run"
+        "test:watch": "ts-mocha src/**/*.spec.ts --timeout 10000 --watch",
+        "test:coverage": "nyc --reporter=html --reporter=text ts-mocha src/**/*.spec.ts --timeout 10000",
+        "prepublishOnly": "yarn run clean && yarn run build && yarn test",
+        "publish:check": "yarn run clean && yarn run build && yarn test && yarn publish --dry-run"
     },
     "files": [
         "_ts3.4",
         "lib",
-        "src"
+        "bin"
     ],
     "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e"
 }

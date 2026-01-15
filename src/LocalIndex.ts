@@ -1,4 +1,4 @@
-import * as path from "path";
+import { pathUtils as path } from "./utils/pathUtils";
 import { v4 } from 'uuid';
 import { ItemSelector } from './ItemSelector';
 import { IndexItem, IndexStats, MetadataFilter, MetadataTypes, QueryResult } from './types';

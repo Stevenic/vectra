@@ -9,7 +9,7 @@
         "strict": true,
         "target": "es6",
         "esModuleInterop": true,
-        "lib": ["ES2021"],
+        "lib": ["ES2021", "DOM"],
         "outDir": "./lib",
         "rootDir": "./src",
         "skipLibCheck": true

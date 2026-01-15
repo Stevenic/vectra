@@ -1,6 +1,6 @@
 import { FileStorage } from "./FileStorage";
 import { FileExt, FileType, ContentTypeMap } from "./FileType";
-import * as path from "path";
+import { pathUtils as path } from "../utils/pathUtils";
 
 /**
  * Utility functions for working with FileStorage abstractions.

@@ -138,13 +138,14 @@ function convertTables(turndownService: TurndownService): void {
             if (isHeadingRow(node)) {
                 for (var i = 0; i < node.childNodes.length; i++) {
                     var border = '---'
+                    const childNode = node.childNodes[i] as Element;
                     var align: string = (
-                        node.childNodes[i].getAttribute('align') || ''
+                        childNode.getAttribute?.('align') || ''
                     ).toLowerCase()
 
                     if (align) border = alignMap[align] || border
 
-                    borderCells += cell(border, node.childNodes[i])
+                    borderCells += cell(border, childNode)
                 }
             }
             return '\n' + content + (borderCells ? '\n' + borderCells : '')
