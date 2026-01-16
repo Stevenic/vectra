@@ -101,15 +101,20 @@
         "rimraf": "^5.0.1",
         "shx": "^0.4.0",
         "sinon": "^21.0.1",
+        "ts-loader": "^9.5.4",
         "ts-mocha": "11.1.0",
         "ts-node": "^10.9.1",
-        "typescript": "^5.8.3"
+        "typescript": "^5.8.3",
+        "webpack": "^5.104.1",
+        "webpack-cli": "^6.0.1"
     },
     "scripts": {
         "build": "tsc -b",
+        "build:browser": "webpack --config webpack.browser.js",
+        "build:all": "yarn build && yarn build:browser",
         "build:watch": "tsc -b --watch",
-        "clean": "rimraf lib tsconfig.tsbuildinfo",
-        "clean:all": "rimraf _ts3.4 lib tsconfig.tsbuildinfo node_modules",
+        "clean": "rimraf lib dist tsconfig.tsbuildinfo",
+        "clean:all": "rimraf _ts3.4 lib dist tsconfig.tsbuildinfo node_modules",
         "lint": "eslint **/src/**/*.{j,t}s{,x} --fix --no-error-on-unmatched-pattern",
         "test": "npm-run-all build test:mocha",
         "test:mocha": "nyc ts-mocha src/**/*.spec.ts --timeout 10000",
@@ -121,6 +126,7 @@
     "files": [
         "_ts3.4",
         "lib",
+        "dist",
         "bin"
     ],
     "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e"
