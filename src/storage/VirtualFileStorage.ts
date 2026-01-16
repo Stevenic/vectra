@@ -1,5 +1,5 @@
 import { FileDetails, FileStorage, ListFilesFilter } from "./FileStorage";
-import * as path from "node:path";
+import { pathUtils as path } from '../utils/pathUtils';
 import { FileStorageUtilities } from "./FileStorageUtilities";
 
 /**

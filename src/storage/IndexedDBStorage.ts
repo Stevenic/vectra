@@ -1,3 +1,4 @@
+import { Buffer } from 'buffer';
 import { FileDetails, FileStorage, ListFilesFilter } from "./FileStorage";
 import { FileStorageUtilities } from "./FileStorageUtilities";
 import { pathUtils } from "../utils/pathUtils";
@@ -87,7 +88,7 @@ export class IndexedDBStorage implements FileStorage {
         if (typeof content === 'string') {
             arrayBuffer = new TextEncoder().encode(content).buffer;
         } else {
-            arrayBuffer = content.buffer.slice(content.byteOffset, content.byteOffset + content.byteLength);
+            arrayBuffer = content.buffer.slice(content.byteOffset, content.byteOffset + content.byteLength) as ArrayBuffer;
         }
 
         return new Promise((resolve, reject) => {
@@ -318,7 +319,7 @@ export class IndexedDBStorage implements FileStorage {
         if (typeof content === 'string') {
             arrayBuffer = new TextEncoder().encode(content).buffer;
         } else {
-            arrayBuffer = content.buffer.slice(content.byteOffset, content.byteOffset + content.byteLength);
+            arrayBuffer = content.buffer.slice(content.byteOffset, content.byteOffset + content.byteLength) as ArrayBuffer;
         }
 
         return new Promise((resolve, reject) => {

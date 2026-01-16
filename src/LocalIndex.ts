@@ -1,5 +1,4 @@
-import * as path from "node:path";
-import { v4 } from 'uuid';
+import { pathUtils as path } from './utils/pathUtils'; import { v4 } from 'uuid';
 import { ItemSelector } from './ItemSelector';
 import { IndexItem, IndexStats, MetadataFilter, MetadataTypes, QueryResult } from './types';
 import { LocalDocument } from './LocalDocument';
