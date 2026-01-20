@@ -1,4 +1,4 @@
-import * as path from 'node:path';
+import { pathUtils as path } from './utils/pathUtils';
 import { v4 } from 'uuid';
 import { GPT3Tokenizer } from "./GPT3Tokenizer";
 import { CreateIndexConfig, LocalIndex } from "./LocalIndex";
@@ -106,7 +106,7 @@ export class LocalDocumentIndex extends LocalIndex<DocumentChunkMetadata> {
      * Returns true if the document catalog exists.
      */
     public async isCatalogCreated(): Promise<boolean> {
-      return this.storage.pathExists(path.join(this.folderPath, 'catalog.json'));
+        return this.storage.pathExists(path.join(this.folderPath, 'catalog.json'));
     }
 
     /**
@@ -379,7 +379,7 @@ export class LocalDocumentIndex extends LocalIndex<DocumentChunkMetadata> {
 
         // Group chunks by document
         const documentChunks: { [documentId: string]: QueryResult<DocumentChunkMetadata>[]; } = {};
-        for (const result  of results) {
+        for (const result of results) {
             const metadata = result.item.metadata;
             if (documentChunks[metadata.documentId] == undefined) {
                 documentChunks[metadata.documentId] = [];
@@ -423,7 +423,7 @@ export class LocalDocumentIndex extends LocalIndex<DocumentChunkMetadata> {
             await this.storage.upsertFile(path.join(this.folderPath, 'catalog.json'), JSON.stringify(this._newCatalog));
             this._catalog = this._newCatalog;
             this._newCatalog = undefined;
-        } catch(err: unknown) {
+        } catch (err: unknown) {
             throw new Error(`Error saving document catalog: ${(err as any).toString()}`);
         }
     }
@@ -449,7 +449,7 @@ export class LocalDocumentIndex extends LocalIndex<DocumentChunkMetadata> {
                     idToUri: {},
                 };
                 await this.storage.upsertFile(catalogPath, JSON.stringify(this._catalog));
-            } catch(err: unknown) {
+            } catch (err: unknown) {
                 throw new Error(`Error creating document catalog: ${(err as any).toString()}`);
             }
         }
