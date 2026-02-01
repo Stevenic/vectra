@@ -137,7 +137,7 @@ export class TransformersEmbeddings implements EmbeddingsModel {
             );
         }
 
-        const { pipeline, AutoTokenizer } = transformers;
+        const { pipeline } = transformers;
 
         // Apply defaults
         const opts = {
@@ -168,7 +168,7 @@ export class TransformersEmbeddings implements EmbeddingsModel {
         );
 
         // Load the tokenizer separately for use with TextSplitter
-        const tokenizer = extractor.tokenizer; //await AutoTokenizer.from_pretrained(opts.model);
+        const tokenizer = extractor.tokenizer;
 
         return new TransformersEmbeddings(extractor, tokenizer, opts);
     }
