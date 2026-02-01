@@ -12,6 +12,8 @@
         "retrieval-augmented-generation",
         "openai",
         "azure-openai",
+        "transformers",
+        "local-embeddings",
         "cosine-similarity",
         "bm25",
         "hybrid-search",
@@ -84,6 +86,7 @@
         "yargs": "^17.7.2"
     },
     "devDependencies": {
+        "@huggingface/transformers": "^3.8.1",
         "@types/assert": "^1.5.11",
         "@types/mocha": "^10.0.10",
         "@types/node": "^22.15.11",
@@ -107,6 +110,14 @@
         "typescript": "^5.8.3",
         "webpack": "^5.104.1",
         "webpack-cli": "^6.0.1"
+    },
+    "peerDependencies": {
+        "@huggingface/transformers": "^3.8.1"
+    },
+    "peerDependenciesMeta": {
+        "@huggingface/transformers": {
+            "optional": true
+        }
     },
     "scripts": {
         "build": "tsc -b",
