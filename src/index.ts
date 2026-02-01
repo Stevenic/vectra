@@ -13,6 +13,8 @@ export * from './TextSplitter';
 
 // Embeddings
 export * from './OpenAIEmbeddings';
+export * from './TransformersEmbeddings';
+export * from './TransformersTokenizer';
 
 // Query utilities
 export * from './ItemSelector';

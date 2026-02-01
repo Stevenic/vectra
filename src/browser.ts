@@ -30,6 +30,8 @@ export {
     OSSEmbeddingsOptions,
     BaseOpenAIEmbeddingsOptions
 } from './OpenAIEmbeddings';
+export { TransformersEmbeddings, TransformersEmbeddingsOptions } from './TransformersEmbeddings';
+export { TransformersTokenizer } from './TransformersTokenizer';
 
 // Query utilities
 export { ItemSelector } from './ItemSelector';
