@@ -40,20 +40,19 @@ module.exports = {
             },
         ],
     },
-    // Provide Buffer globally
     plugins: [
         new webpack.ProvidePlugin({
             Buffer: ['buffer', 'Buffer'],
         }),
     ],
-    // Generate source maps for debugging
     devtool: 'source-map',
-    // Optimize for production
     optimization: {
         minimize: true,
     },
-    // Ignore Node.js specific warnings
     ignoreWarnings: [
         /Critical dependency/,
     ],
+    externals: {
+        '@huggingface/transformers': '@huggingface/transformers'
+    }
 };
