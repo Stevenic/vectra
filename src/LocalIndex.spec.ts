@@ -4,8 +4,7 @@ import { LocalIndex } from './LocalIndex';
 import { LocalDocument } from './LocalDocument';
 import { IndexItem } from './types';
 import fs from 'fs/promises';
-import path from 'path';
-import * as uuid from 'uuid';
+import path from "./utils/pathUtils";
 
 describe('LocalIndex', () => {
   const testIndexDir = path.join(__dirname, 'test_index');

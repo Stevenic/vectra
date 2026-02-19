@@ -1,4 +1,4 @@
-import * as path from 'path';
+import path from "./utils/pathUtils";
 import { strict as assert } from 'node:assert';
 import { describe, it, beforeEach } from 'mocha';
 import { LocalDocumentIndex, LocalDocumentIndexConfig } from './LocalDocumentIndex';
@@ -237,7 +237,7 @@ describe('LocalDocumentIndex', () => {
       storage.files.set(path.join(folderPath, `${documentId}.txt`), 'hello');
       storage.files.set(path.join(folderPath, `${documentId}.json`), '{"k":"v"}');
       (index as any).listItemsByMetadata = async () => [{ id: 'chunk-1', metadata: { documentId } }];
-      (index as any).deleteItem = async () => {};
+      (index as any).deleteItem = async () => { };
       await index.deleteDocument(uri);
       assert(!storage.files.has(path.join(folderPath, `${documentId}.txt`)));
       assert(!storage.files.has(path.join(folderPath, `${documentId}.json`)));
@@ -260,7 +260,7 @@ describe('LocalDocumentIndex', () => {
       const documentId = 'id-text-err';
       (index as any)._catalog = { version: 1, count: 1, uriToId: { [uri]: documentId }, idToUri: { [documentId]: uri } };
       (index as any).listItemsByMetadata = async () => [];
-      (index as any).deleteItem = async () => {};
+      (index as any).deleteItem = async () => { };
       const originalDelete = storage.deleteFile.bind(storage);
       storage.deleteFile = async (filePath: string) => {
         if (filePath.endsWith('.txt')) throw new Error('delete text error');
@@ -292,7 +292,7 @@ describe('LocalDocumentIndex', () => {
       (index as any)._catalog = { version: 1, count: 1, uriToId: { [uri]: existingId }, idToUri: { [existingId]: uri } };
       let deleteCalled = false;
       (index as any).deleteDocument = async () => { deleteCalled = true; };
-      (index as any).insertItem = async () => {};
+      (index as any).insertItem = async () => { };
       embeddings.createEmbeddingsResponses.push({ status: 'success', output: [[0.01, 0.02]] });
       const doc = await index.upsertDocument(uri, 'hello world');
       assert(deleteCalled);
@@ -300,7 +300,7 @@ describe('LocalDocumentIndex', () => {
     });
 
     it('infers docType from uri when not provided and writes files, updates catalog', async () => {
-      (index as any).insertItem = async () => {};
+      (index as any).insertItem = async () => { };
       embeddings.createEmbeddingsResponses.push({ status: 'success', output: [[0.1, 0.2]] });
       const metadata = { author: 'test' };
       const doc = await index.upsertDocument('file.md', 'content here', undefined, metadata);
@@ -321,7 +321,7 @@ describe('LocalDocumentIndex', () => {
         const arr = Array.isArray(inputs) ? inputs : [inputs];
         return { status: 'success', output: arr.map(() => [0.1, 0.2]) };
       };
-      (index as any).insertItem = async () => {};
+      (index as any).insertItem = async () => { };
       await index.upsertDocument('file.txt', longText);
       assert(calls.length > 1);
     });
@@ -461,11 +461,11 @@ describe('LocalDocumentIndex', () => {
       storage.files.set(path.join(folderPath, `${docId}.txt`), 'text');
       storage.files.set(path.join(folderPath, `${docId}.json`), '{}');
       (index as any).listItemsByMetadata = async () => [];
-      (index as any).deleteItem = async () => {};
+      (index as any).deleteItem = async () => { };
       await index.deleteDocument(uri);
       assert(storage.deleteFileCalls.includes(path.join(folderPath, `${docId}.txt`)));
       assert(storage.deleteFileCalls.includes(path.join(folderPath, `${docId}.json`)));
-      (index as any).insertItem = async () => {};
+      (index as any).insertItem = async () => { };
       embeddings.createEmbeddingsResponses.push({ status: 'success', output: [[0.1, 0.2]] });
       const newDoc = await index.upsertDocument(uri, 'text', 'txt', { key: 'value' });
       const metaPath = path.join(folderPath, `${newDoc.id}.json`);
