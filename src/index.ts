@@ -3,6 +3,7 @@ export * from './storage';
 export * from './FileFetcher';
 export * from './GPT3Tokenizer';
 export * from './ItemSelector';
+export * from './LocalEmbeddings';
 export * from './LocalIndex';
 export * from './LocalDocument';
 export * from './LocalDocumentIndex';
