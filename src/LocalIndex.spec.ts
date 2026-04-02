@@ -482,7 +482,7 @@ describe('LocalIndex', () => {
         search: (_q: string) => []
       }
 
-      const index = new LocalIndex(testIndexDir, undefined, { bm25Factory: () => fakeEngine /* no docReader injected */ })
+      const index = new LocalIndex(testIndexDir, undefined, undefined, { bm25Factory: () => fakeEngine /* no docReader injected */ })
       await index.createIndex()
       await index.batchInsertItems([
         { id: 'a', vector: [1, 0, 0], metadata: { documentId: 'docA', startPos: 0, endPos: 4 } },
@@ -503,7 +503,7 @@ describe('LocalIndex', () => {
         consolidate: sinon.stub(),
         search: (_q: string) => []
       }
-      const index = new LocalIndex(testIndexDir, undefined, { bm25Factory: () => fakeEngine, docReader: async () => 'text' })
+      const index = new LocalIndex(testIndexDir, undefined, undefined, { bm25Factory: () => fakeEngine, docReader: async () => 'text' })
       await index.createIndex()
       // trigger setupBm25 via a BM25 query
       await index.batchInsertItems([{ id: 'x', vector: [1], metadata: { documentId: 'd', startPos: 0, endPos: 0 } }])
@@ -554,7 +554,7 @@ describe('LocalIndex', () => {
         search: (_q: string) => []
       }
 
-      const index = new LocalIndex(testIndexDir, undefined, { bm25Factory: () => fakeEngine })
+      const index = new LocalIndex(testIndexDir, undefined, undefined, { bm25Factory: () => fakeEngine })
       await index.createIndex()
       await index.batchInsertItems([
         { id: 'a', vector: [1, 0, 0], metadata: { documentId: 'docA', startPos: 0, endPos: 4 } },
@@ -577,7 +577,7 @@ describe('LocalIndex', () => {
         search: (_q: string) => []
       }
 
-      const index = new LocalIndex(testIndexDir, undefined, { bm25Factory: () => fakeEngine, docReader: async () => 'text' })
+      const index = new LocalIndex(testIndexDir, undefined, undefined, { bm25Factory: () => fakeEngine, docReader: async () => 'text' })
       await index.createIndex()
       await index.batchInsertItems([{ id: 'x', vector: [1], metadata: { documentId: 'd', startPos: 0, endPos: 0 } }])
       await index.queryItems([1], 'q', 1, undefined, true)
@@ -684,6 +684,7 @@ describe('LocalIndex', () => {
       const index = new LocalIndex(
         testIndexDir,
         undefined,
+        undefined,
         {
           bm25Factory: () => fakeEngine,
           docReader: async (_docId: string) => 'SAMPLETEXT'
@@ -727,7 +728,7 @@ describe('LocalIndex', () => {
         return ''
       }
 
-      const index = new LocalIndex(testIndexDir, undefined, { bm25Factory: () => fakeEngine, docReader })
+      const index = new LocalIndex(testIndexDir, undefined, undefined, { bm25Factory: () => fakeEngine, docReader })
       await index.createIndex()
 
       await index.batchInsertItems([
@@ -753,6 +754,7 @@ describe('LocalIndex', () => {
       const index = new LocalIndex(
         testIndexDir,
         undefined,
+        undefined,
         { bm25Factory: () => fakeEngine, docReader: async () => 'YY' }
       )
       await index.createIndex()
@@ -774,6 +776,7 @@ describe('LocalIndex', () => {
       const index = new LocalIndex(
         testIndexDir,
         undefined,
+        undefined,
         { bm25Factory: () => fakeEngine, docReader: async () => 'YY' }
       )
       await index.createIndex()
@@ -792,7 +795,7 @@ describe('LocalIndex', () => {
   describe('VirtualFileStorage (in-memory)', () => {
     it('works end-to-end in-memory without touching disk', async () => {
       const storage = new VirtualFileStorage()
-      const index = new LocalIndex('mem://idx', storage)
+      const index = new LocalIndex('mem://idx', undefined, storage)
       await index.createIndex({ version: 3, metadata_config: { indexed: ['t'] } })
       await index.insertItem({ vector: [1], metadata: { t: 'x', other: 'y' } })
       const stats = await index.getIndexStats()

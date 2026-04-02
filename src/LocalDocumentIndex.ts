@@ -47,6 +47,11 @@ export interface LocalDocumentIndexConfig {
     folderPath: string;
 
     /**
+     * Optional. Name of the index file. Defaults to 'index.json'.
+     */
+    indexName?: string;
+
+    /**
      * Optional. Embeddings model to use for generating document embeddings.
      */
     embeddings?: EmbeddingsModel;
@@ -84,7 +89,7 @@ export class LocalDocumentIndex extends LocalIndex<DocumentChunkMetadata> {
      * @param config Configuration settings for the document index.
      */
     public constructor(config: LocalDocumentIndexConfig) {
-        super(config.folderPath, config.storage);
+        super(config.folderPath, config.indexName, config.storage);
         this._embeddings = config.embeddings;
         this._chunkingConfig = Object.assign({
             keepSeparators: true,

@@ -1,4 +1,3 @@
-import axios, { AxiosRequestConfig } from "axios";
 import { TextFetcher } from './types';
 import * as cheerio from 'cheerio';
 import TurndownService  from 'turndown';
@@ -28,7 +27,7 @@ const DEFAULT_HEADERS = {
 
 export interface WebFetcherConfig {
     headers?: Record<string,string>;
-    requestConfig?: AxiosRequestConfig;
+    requestConfig?: RequestInit;
     htmlToMarkdown: boolean;
     summarizeHtml: boolean;
 }
@@ -44,12 +43,8 @@ export class WebFetcher implements TextFetcher {
     }
 
     public async fetch(uri: string, onDocument: (uri: string, text: string, docType?: string) => Promise<boolean>): Promise<boolean> {
-        const httpClient = axios.create({
-            validateStatus: () => true,
-        });
-
         // Clone headers to avoid mutating the original
-        const headers = Object.assign({}, DEFAULT_HEADERS, this._config.headers)
+        const headers: Record<string, string> = Object.assign({}, DEFAULT_HEADERS, this._config.headers);
 
         // get hostname from url
         const host = new URL(uri).hostname;
@@ -57,16 +52,17 @@ export class WebFetcher implements TextFetcher {
         headers['Alt-Used'] = host;
 
         // Fetch page and check for errors
-        const response = await httpClient.get(uri, {
-            headers,
+        const response = await fetch(uri, {
             ...this._config.requestConfig,
+            method: 'GET',
+            headers,
         });
         if (response.status >= 400) {
             throw new Error(`Site returned an HTTP status of ${response.status}`);
         }
 
         // Check for valid content type
-        const contentType = response.headers['content-type'];
+        const contentType = response.headers.get('content-type') ?? '';
         const contentTypeArray = contentType.split(';');
         if (!contentTypeArray[0] || !ALLOWED_CONTENT_TYPES.includes(contentTypeArray[0])) {
             throw new Error(`Site returned an invalid content type of ${contentType}`);
@@ -75,10 +71,11 @@ export class WebFetcher implements TextFetcher {
         // Convert content type to doc type
         const docType = contentTypeArray[0] != 'text/plain' ? contentTypeArray[0].split('/')[1] : undefined;
         if (docType == 'html' && this._config.htmlToMarkdown) {
-            const text = this.htmlToMarkdown(response.data, uri);
+            const data = await response.text();
+            const text = this.htmlToMarkdown(data, uri);
             return await onDocument(uri, text, 'md');
         } else {
-            const text = response.data;
+            const text = await response.text();
             return await onDocument(uri, text, docType);
         }
     }
@@ -151,15 +148,16 @@ function convertTables(turndownService: TurndownService): void {
             var alignMap: any = { left: ':--', right: '--:', center: ':-:' }
 
             if (isHeadingRow(node)) {
-                for (var i = 0; i < node.childNodes.length; i++) {
+                const children = (node as any).childNodes;
+                for (var i = 0; i < children.length; i++) {
                     var border = '---'
                     var align: string = (
-                        node.childNodes[i].getAttribute('align') || ''
+                        children[i].getAttribute('align') || ''
                     ).toLowerCase()
 
                         if (align) border = alignMap[align] || border
 
-                        borderCells += cell(border, node.childNodes[i])
+                        borderCells += cell(border, children[i])
                     }
                 }
                 return '\n' + content + (borderCells ? '\n' + borderCells : '')

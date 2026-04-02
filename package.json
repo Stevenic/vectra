@@ -2,7 +2,7 @@
     "name": "vectra",
     "author": "Steven Ickman",
     "description": "A vector database that uses the local file system for storage.",
-    "version": "0.12.3",
+    "version": "0.14.0",
     "license": "MIT",
     "keywords": [
         "gpt"
@@ -30,7 +30,6 @@
         }
     },
     "dependencies": {
-        "axios": "^1.9.0",
         "cheerio": "^1.0.0",
         "dotenv": "^16.5.0",
         "gpt-tokenizer": "^3.4.0",

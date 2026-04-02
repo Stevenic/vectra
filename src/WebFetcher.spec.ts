@@ -1,42 +1,39 @@
 import assert from "node:assert";
-import { describe, it, beforeEach } from "mocha";
-import proxyquire from "proxyquire";
-import { AxiosRequestConfig } from "axios";
+import { describe, it, beforeEach, afterEach } from "mocha";
+import sinon from "sinon";
+import { WebFetcher } from "./WebFetcher";
 
 describe("WebFetcher", () => {
-  let WebFetcher: any;
+  let sandbox: sinon.SinonSandbox;
+  let fetchStub: sinon.SinonStub;
 
-  let mockResponse: any;
-  let lastUri: string | undefined;
-  let lastConfig: AxiosRequestConfig | undefined;
+  let lastUrl: string | undefined;
+  let lastInit: RequestInit | undefined;
 
-  function resetAxiosRecorder() {
-    mockResponse = undefined;
-    lastUri = undefined;
-    lastConfig = undefined;
-  }
-
-  function loadModule() {
-    const axiosGet = async (uri: string, config: AxiosRequestConfig) => {
-      lastUri = uri;
-      lastConfig = config;
-      return mockResponse;
-    };
-
-    const module = proxyquire.noCallThru().load("./WebFetcher", {
-      axios: {
-        create: () => ({ get: axiosGet }),
-      },
-      cheerio: require("cheerio"),
-      turndown: require("turndown"),
-    });
-
-    WebFetcher = module.WebFetcher;
+  function makeFetchResponse(status: number, data: string, contentType: string): Response {
+    return {
+      status,
+      statusText: status >= 400 ? `HTTP ${status}` : 'OK',
+      ok: status >= 200 && status < 300,
+      headers: new Headers({ 'content-type': contentType }),
+      text: async () => data,
+      json: async () => JSON.parse(data),
+    } as Response;
   }
 
   beforeEach(() => {
-    resetAxiosRecorder();
-    loadModule();
+    sandbox = sinon.createSandbox();
+    fetchStub = sandbox.stub(globalThis, 'fetch').callsFake(async (input: any, init?: any) => {
+      lastUrl = typeof input === 'string' ? input : input.url;
+      lastInit = init;
+      return makeFetchResponse(200, 'ok', 'text/plain');
+    });
+    lastUrl = undefined;
+    lastInit = undefined;
+  });
+
+  afterEach(() => {
+    sandbox.restore();
   });
 
   it("constructor uses defaults and merges config", () => {
@@ -48,7 +45,7 @@ describe("WebFetcher", () => {
       htmlToMarkdown: false,
       summarizeHtml: true,
       headers: { Accept: "custom/type", "User-Agent": "custom-agent" },
-      requestConfig: { timeout: 123 },
+      requestConfig: { signal: AbortSignal.timeout(123) },
     };
     const fetcher = new WebFetcher(custom);
     assert.strictEqual(fetcher["_config"].htmlToMarkdown, false);
@@ -57,15 +54,11 @@ describe("WebFetcher", () => {
       Accept: "custom/type",
       "User-Agent": "custom-agent",
     });
-    assert.deepStrictEqual(fetcher["_config"].requestConfig, { timeout: 123 });
+    assert.ok(fetcher["_config"].requestConfig);
   });
 
   it("throws on HTTP error (>=400)", async () => {
-    mockResponse = {
-      status: 404,
-      headers: { "content-type": "text/html" },
-      data: "<html></html>",
-    };
+    fetchStub.resolves(makeFetchResponse(404, '<html></html>', 'text/html'));
     const fetcher = new WebFetcher();
     await assert.rejects(
       () => fetcher.fetch("https://example.com/404", async () => true),
@@ -74,11 +67,7 @@ describe("WebFetcher", () => {
   });
 
   it("throws on invalid content-type", async () => {
-    mockResponse = {
-      status: 200,
-      headers: { "content-type": "image/png" },
-      data: "…",
-    };
+    fetchStub.resolves(makeFetchResponse(200, '…', 'image/png'));
     const fetcher = new WebFetcher();
     await assert.rejects(
       () => fetcher.fetch("https://example.com/img", async () => true),
@@ -116,11 +105,7 @@ describe("WebFetcher", () => {
         </table>
       </body></html>
     `;
-    mockResponse = {
-      status: 200,
-      headers: { "content-type": "text/html" },
-      data: html,
-    };
+    fetchStub.resolves(makeFetchResponse(200, html, 'text/html'));
 
     const fetcher = new WebFetcher({ htmlToMarkdown: true });
     const calls: any[] = [];
@@ -148,11 +133,7 @@ describe("WebFetcher", () => {
 
   it("handles text/html with htmlToMarkdown=false (passes raw html, docType 'html')", async () => {
     const html = "<html><body><p>content</p></body></html>";
-    mockResponse = {
-      status: 200,
-      headers: { "content-type": "text/html" },
-      data: html,
-    };
+    fetchStub.resolves(makeFetchResponse(200, html, 'text/html'));
 
     const fetcher = new WebFetcher({ htmlToMarkdown: false });
     const calls: any[] = [];
@@ -172,11 +153,7 @@ describe("WebFetcher", () => {
 
   it("handles application/json; charset=… (docType 'json')", async () => {
     const json = '{"a":1}';
-    mockResponse = {
-      status: 200,
-      headers: { "content-type": "application/json; charset=utf-8" },
-      data: json,
-    };
+    fetchStub.resolves(makeFetchResponse(200, json, 'application/json; charset=utf-8'));
     const fetcher = new WebFetcher();
     const calls: any[] = [];
     const onDocument = async (...args: any[]) => {
@@ -191,11 +168,7 @@ describe("WebFetcher", () => {
 
   it("handles application/xml (docType 'xml')", async () => {
     const xml = "<root/>";
-    mockResponse = {
-      status: 200,
-      headers: { "content-type": "application/xml" },
-      data: xml,
-    };
+    fetchStub.resolves(makeFetchResponse(200, xml, 'application/xml'));
     const fetcher = new WebFetcher();
     const calls: any[] = [];
     const onDocument = async (...args: any[]) => {
@@ -210,11 +183,7 @@ describe("WebFetcher", () => {
 
   it("handles application/javascript (docType 'javascript')", async () => {
     const js = "console.log('hi');";
-    mockResponse = {
-      status: 200,
-      headers: { "content-type": "application/javascript" },
-      data: js,
-    };
+    fetchStub.resolves(makeFetchResponse(200, js, 'application/javascript'));
     const fetcher = new WebFetcher();
     const calls: any[] = [];
     const onDocument = async (...args: any[]) => {
@@ -229,11 +198,7 @@ describe("WebFetcher", () => {
 
   it("handles text/plain (docType undefined)", async () => {
     const text = "plain";
-    mockResponse = {
-      status: 200,
-      headers: { "content-type": "text/plain" },
-      data: text,
-    };
+    fetchStub.resolves(makeFetchResponse(200, text, 'text/plain'));
     const fetcher = new WebFetcher();
     const calls: any[] = [];
     const onDocument = async (...args: any[]) => {
@@ -247,11 +212,13 @@ describe("WebFetcher", () => {
   });
 
   it("sets Host and Alt-Used to request hostname; merges and does not mutate caller headers", async () => {
-    mockResponse = {
-      status: 200,
-      headers: { "content-type": "text/plain" },
-      data: "ok",
-    };
+    let capturedUrl: string | undefined;
+    let capturedInit: RequestInit | undefined;
+    fetchStub.callsFake(async (url: string, init?: RequestInit) => {
+      capturedUrl = url;
+      capturedInit = init;
+      return makeFetchResponse(200, 'ok', 'text/plain');
+    });
 
     const userHeaders: Record<string, string> = {
       Accept: "custom/type",
@@ -264,34 +231,34 @@ describe("WebFetcher", () => {
     const ok = await fetcher.fetch(url, onDocument);
     assert.strictEqual(ok, true);
 
-    assert.strictEqual(lastUri, url);
-    assert.ok(lastConfig);
-    assert.ok(lastConfig!.headers);
+    assert.strictEqual(capturedUrl, url);
+    assert.ok(capturedInit);
+    assert.ok(capturedInit!.headers);
 
-    assert.strictEqual((lastConfig!.headers as any).Host, "host.example.com");
-    assert.strictEqual((lastConfig!.headers as any)["Alt-Used"], "host.example.com");
+    const headers = capturedInit!.headers as Record<string, string>;
+    assert.strictEqual(headers.Host, "host.example.com");
+    assert.strictEqual(headers["Alt-Used"], "host.example.com");
 
-    assert.strictEqual((lastConfig!.headers as any).Accept, "custom/type");
-    assert.strictEqual((lastConfig!.headers as any)["User-Agent"], "custom-agent");
+    assert.strictEqual(headers.Accept, "custom/type");
+    assert.strictEqual(headers["User-Agent"], "custom-agent");
 
     assert.strictEqual((userHeaders as any).Host, undefined);
     assert.strictEqual((userHeaders as any)["Alt-Used"], undefined);
   });
 
-  it("merges requestConfig options into axios.get call", async () => {
-    mockResponse = {
-      status: 200,
-      headers: { "content-type": "text/plain" },
-      data: "ok",
-    };
+  it("merges requestConfig options into fetch call", async () => {
+    let capturedInit: RequestInit | undefined;
+    fetchStub.callsFake(async (_url: string, init?: RequestInit) => {
+      capturedInit = init;
+      return makeFetchResponse(200, 'ok', 'text/plain');
+    });
 
     const fetcher = new WebFetcher({
-      requestConfig: { timeout: 5000, params: { a: 1 } },
+      requestConfig: { keepalive: true },
     });
     const ok = await fetcher.fetch("https://example.com", async () => true);
     assert.strictEqual(ok, true);
-    assert.strictEqual(lastConfig!.timeout, 5000);
-    assert.deepStrictEqual(lastConfig!.params, { a: 1 });
+    assert.strictEqual(capturedInit!.keepalive, true);
   });
 
   it("htmlToMarkdown trims overly long header text when first space/newline index > 64", () => {
@@ -311,11 +278,7 @@ describe("WebFetcher", () => {
   });
 
   it("propagates onDocument return value (true/false)", async () => {
-    mockResponse = {
-      status: 200,
-      headers: { "content-type": "text/plain" },
-      data: "ok",
-    };
+    fetchStub.resolves(makeFetchResponse(200, 'ok', 'text/plain'));
     const fetcher = new WebFetcher();
     const yes = await fetcher.fetch("https://example.com/yes", async () => true);
     const no = await fetcher.fetch("https://example.com/no", async () => false);

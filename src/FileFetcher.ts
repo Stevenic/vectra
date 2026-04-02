@@ -1,5 +1,5 @@
 import { TextFetcher } from './types';
-import * as fs from 'fs/promises';
+import fs from 'node:fs';
 import * as path from 'path';
 
 export class FileFetcher implements TextFetcher {
@@ -10,14 +10,14 @@ export class FileFetcher implements TextFetcher {
     // If the path doesn't exist, resolve true and do not call onDocument
     let stat: { isDirectory: () => boolean };
     try {
-      stat = await fs.stat(uri);
+      stat = await fs.promises.stat(uri);
     } catch {
       return true;
     }
 
     if (stat.isDirectory()) {
       // Read directory and recurse. If any child returns false, aggregate to false.
-      const entries = await fs.readdir(uri);
+      const entries = await fs.promises.readdir(uri);
       let allOk = true;
       for (const entry of entries) {
         const childPath = path.join(uri, entry);
@@ -29,7 +29,7 @@ export class FileFetcher implements TextFetcher {
       return allOk;
     } else {
       // Read file and invoke onDocument
-      const text = await fs.readFile(uri, 'utf8');
+      const text = await fs.promises.readFile(uri, 'utf8');
       const ext = path.extname(uri);
       const docType = ext ? ext.slice(1).toLowerCase() : path.basename(uri).toLowerCase();
       return onDocument(uri, text, docType);

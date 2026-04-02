@@ -43,6 +43,7 @@ export class LocalIndex<TMetadata extends Record<string, MetadataTypes> = Record
    */
   public constructor(
     folderPath: string,
+    indexName?: string,
     storage?: FileStorage,
     options?: {
       bm25Factory?: () => any;
@@ -50,6 +51,9 @@ export class LocalIndex<TMetadata extends Record<string, MetadataTypes> = Record
     }
   ) {
     this._folderPath = folderPath;
+    if (indexName) {
+      this._indexName = indexName;
+    }
     this._storage = storage || new LocalFileStorage();
     this._bm25Factory = options?.bm25Factory || (() => bm25());
     this._docReader = options?.docReader || (async (docId: string) => {
