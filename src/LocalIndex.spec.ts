@@ -482,7 +482,7 @@ describe('LocalIndex', () => {
         search: (_q: string) => []
       }
 
-      const index = new LocalIndex(testIndexDir, undefined, undefined, { bm25Factory: () => fakeEngine /* no docReader injected */ })
+      const index = new LocalIndex(testIndexDir, undefined, undefined, undefined, { bm25Factory: () => fakeEngine /* no docReader injected */ })
       await index.createIndex()
       await index.batchInsertItems([
         { id: 'a', vector: [1, 0, 0], metadata: { documentId: 'docA', startPos: 0, endPos: 4 } },
@@ -503,7 +503,7 @@ describe('LocalIndex', () => {
         consolidate: sinon.stub(),
         search: (_q: string) => []
       }
-      const index = new LocalIndex(testIndexDir, undefined, undefined, { bm25Factory: () => fakeEngine, docReader: async () => 'text' })
+      const index = new LocalIndex(testIndexDir, undefined, undefined, undefined, { bm25Factory: () => fakeEngine, docReader: async () => 'text' })
       await index.createIndex()
       // trigger setupBm25 via a BM25 query
       await index.batchInsertItems([{ id: 'x', vector: [1], metadata: { documentId: 'd', startPos: 0, endPos: 0 } }])
@@ -554,7 +554,7 @@ describe('LocalIndex', () => {
         search: (_q: string) => []
       }
 
-      const index = new LocalIndex(testIndexDir, undefined, undefined, { bm25Factory: () => fakeEngine })
+      const index = new LocalIndex(testIndexDir, undefined, undefined, undefined, { bm25Factory: () => fakeEngine })
       await index.createIndex()
       await index.batchInsertItems([
         { id: 'a', vector: [1, 0, 0], metadata: { documentId: 'docA', startPos: 0, endPos: 4 } },
@@ -577,7 +577,7 @@ describe('LocalIndex', () => {
         search: (_q: string) => []
       }
 
-      const index = new LocalIndex(testIndexDir, undefined, undefined, { bm25Factory: () => fakeEngine, docReader: async () => 'text' })
+      const index = new LocalIndex(testIndexDir, undefined, undefined, undefined, { bm25Factory: () => fakeEngine, docReader: async () => 'text' })
       await index.createIndex()
       await index.batchInsertItems([{ id: 'x', vector: [1], metadata: { documentId: 'd', startPos: 0, endPos: 0 } }])
       await index.queryItems([1], 'q', 1, undefined, true)
@@ -685,6 +685,7 @@ describe('LocalIndex', () => {
         testIndexDir,
         undefined,
         undefined,
+        undefined,
         {
           bm25Factory: () => fakeEngine,
           docReader: async (_docId: string) => 'SAMPLETEXT'
@@ -728,7 +729,7 @@ describe('LocalIndex', () => {
         return ''
       }
 
-      const index = new LocalIndex(testIndexDir, undefined, undefined, { bm25Factory: () => fakeEngine, docReader })
+      const index = new LocalIndex(testIndexDir, undefined, undefined, undefined, { bm25Factory: () => fakeEngine, docReader })
       await index.createIndex()
 
       await index.batchInsertItems([
@@ -755,6 +756,7 @@ describe('LocalIndex', () => {
         testIndexDir,
         undefined,
         undefined,
+        undefined,
         { bm25Factory: () => fakeEngine, docReader: async () => 'YY' }
       )
       await index.createIndex()
@@ -775,6 +777,7 @@ describe('LocalIndex', () => {
       }
       const index = new LocalIndex(
         testIndexDir,
+        undefined,
         undefined,
         undefined,
         { bm25Factory: () => fakeEngine, docReader: async () => 'YY' }

@@ -8,6 +8,7 @@ import { Colorize } from './internals';
 import { FileFetcher } from './FileFetcher';
 import { LocalFileStorage } from './storage/LocalFileStorage';
 import { VirtualFileStorage } from './storage/VirtualFileStorage';
+import { IndexCodec, JsonCodec, ProtobufCodec, detectCodec, migrateIndex, FormatName } from './codecs';
 
 function getStorage(args: any) {
   if (args.storage === 'virtual') {
@@ -15,6 +16,12 @@ function getStorage(args: any) {
   } else {
     return new LocalFileStorage(args.storageRoot);
   }
+}
+
+function getCodecFromFormat(format?: string): IndexCodec | undefined {
+  if (format === 'protobuf') return new ProtobufCodec();
+  if (format === 'json') return new JsonCodec();
+  return undefined; // default
 }
 
 export async function run() {
@@ -30,18 +37,27 @@ export async function run() {
       describe: 'root folder for local storage (only applies if storage=local)',
       type: 'string'
     })
-    .command('create <index>', `create a new local index`, {}, async (args) => {
+    .command('create <index>', `create a new local index`, (yargs) => {
+      return yargs.option('format', {
+        describe: 'serialization format for the index',
+        choices: ['json', 'protobuf'] as const,
+        default: 'json' as const
+      });
+    }, async (args) => {
       const folderPath = args.index as string;
       const storage = getStorage(args);
-      const index = new LocalDocumentIndex({ folderPath, storage });
-      console.log(Colorize.output(`creating index at ${folderPath}`));
+      const codec = getCodecFromFormat(args.format);
+      const index = new LocalDocumentIndex({ folderPath, storage, codec });
+      const formatLabel = args.format === 'protobuf' ? 'protobuf' : 'json';
+      console.log(Colorize.output(`creating ${formatLabel} index at ${folderPath}`));
       await index.createIndex({ version: 1, deleteIfExists: true });
     })
     .command('delete <index>', `delete an existing local index`, {}, async (args) => {
       const folderPath = args.index as string;
       console.log(Colorize.output(`deleting index at ${folderPath}`));
       const storage = getStorage(args);
-      const index = new LocalDocumentIndex({ folderPath, storage });
+      const codec = await detectCodec(folderPath, storage).catch(() => undefined);
+      const index = new LocalDocumentIndex({ folderPath, storage, codec });
       await index.deleteIndex();
     })
     .command('add <index>', `adds one or more web pages to an index`, (yargs) => {
@@ -96,13 +112,15 @@ export async function run() {
       // Initialize index
       const folderPath = args.index as string;
       const storage = getStorage(args);
+      const codec = await detectCodec(folderPath, storage).catch(() => undefined);
       const index = new LocalDocumentIndex({
         folderPath,
         embeddings,
         chunkingConfig: {
           chunkSize: args.chunkSize
         },
-        storage
+        storage,
+        codec
       });
       // Get list of url's
       const uris = await getItemList(args.uri as string[], args.list as string, 'web page');
@@ -150,7 +168,8 @@ export async function run() {
       // Initialize index
       const folderPath = args.index as string;
       const storage = getStorage(args);
-      const index = new LocalDocumentIndex({ folderPath, storage });
+      const codec = await detectCodec(folderPath, storage).catch(() => undefined);
+      const index = new LocalDocumentIndex({ folderPath, storage, codec });
       // Get list of uri's
       const uris = await getItemList(args.uri as string[], args.list as string, 'document');
       // Remove documents
@@ -159,13 +178,31 @@ export async function run() {
         await index.deleteDocument(uri);
       }
     })
-    .command('stats <index>', `prints the stats for a local index`, {}, async (args) => {
+    .command('stats <index>', `prints the stats for a local index`, (yargs) => {
+      return yargs;
+    }, async (args) => {
       const folderPath = args.index as string;
       const storage = getStorage(args);
-      const index = new LocalDocumentIndex({ folderPath, storage });
+      // Auto-detect format from files on disk
+      const codec = await detectCodec(folderPath, storage);
+      const index = new LocalDocumentIndex({ folderPath, storage, codec });
       const stats = await index.getCatalogStats();
       console.log(Colorize.title('Index Stats'));
       console.log(Colorize.output(stats));
+    })
+    .command('migrate <index>', `migrate an index between serialization formats`, (yargs) => {
+      return yargs.option('to', {
+        describe: 'target format',
+        choices: ['json', 'protobuf'] as const,
+        demandOption: true
+      });
+    }, async (args) => {
+      const folderPath = args.index as string;
+      const storage = getStorage(args);
+      const to = args.to as FormatName;
+      console.log(Colorize.output(`migrating index at ${folderPath} to ${to} format`));
+      await migrateIndex(folderPath, { to, storage });
+      console.log(Colorize.output(`migration complete`));
     })
     .command('query <index> <query>', `queries a local index`, (yargs) => {
       return yargs
@@ -229,10 +266,12 @@ export async function run() {
       // Initialize index
       const folderPath = args.index as string;
       const storage = getStorage(args);
+      const codec = await detectCodec(folderPath, storage).catch(() => undefined);
       const index = new LocalDocumentIndex({
         folderPath,
         embeddings,
-        storage
+        storage,
+        codec
       });
       // Query index
       const query = args.query as string;

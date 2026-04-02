@@ -8,6 +8,7 @@ import bm25 from 'wink-bm25-text-search';
 import winkNLP from 'wink-nlp';
 import model from 'wink-eng-lite-web-model';
 import { FileStorage, LocalFileStorage } from './storage';
+import { IndexCodec, JsonCodec } from './codecs';
 
 export interface CreateIndexConfig {
   version: number;
@@ -27,6 +28,7 @@ export class LocalIndex<TMetadata extends Record<string, MetadataTypes> = Record
   private readonly _folderPath: string;
   private readonly _indexName: string = 'index.json';
   private readonly _storage: FileStorage;
+  private readonly _codec: IndexCodec;
   private _data?: IndexData;
   private _update?: IndexData;
 
@@ -38,21 +40,27 @@ export class LocalIndex<TMetadata extends Record<string, MetadataTypes> = Record
   /**
    * Creates a new instance of LocalIndex.
    * @param folderPath Path to the index folder.
+   * @param indexName Optional index file name. Defaults to 'index' + codec.extension.
    * @param storage Optional file storage instance. Defaults to LocalFileStorage.
+   * @param codec Optional codec for serialization. Defaults to JsonCodec.
    * @param options Optional constructor options for dependency injection.
    */
   public constructor(
     folderPath: string,
     indexName?: string,
     storage?: FileStorage,
+    codec?: IndexCodec,
     options?: {
       bm25Factory?: () => any;
       docReader?: (docId: string) => Promise<string>;
     }
   ) {
     this._folderPath = folderPath;
+    this._codec = codec || new JsonCodec();
     if (indexName) {
       this._indexName = indexName;
+    } else {
+      this._indexName = `index${this._codec.extension}`;
     }
     this._storage = storage || new LocalFileStorage();
     this._bm25Factory = options?.bm25Factory || (() => bm25());
@@ -75,6 +83,11 @@ export class LocalIndex<TMetadata extends Record<string, MetadataTypes> = Record
   /** Storage provider used to store the index. */
   public get storage(): FileStorage {
     return this._storage;
+  }
+
+  /** Codec used for serialization. */
+  public get codec(): IndexCodec {
+    return this._codec;
   }
 
   /**
@@ -125,7 +138,7 @@ export class LocalIndex<TMetadata extends Record<string, MetadataTypes> = Record
         metadata_config: config.metadata_config ?? {},
         items: []
       };
-      await this.storage.upsertFile(path.join(this._folderPath, this._indexName), JSON.stringify(this._data));
+      await this.storage.upsertFile(path.join(this._folderPath, this._indexName), this._codec.serializeIndex(this._data));
     } catch {
       await this.deleteIndex();
       throw new Error('Error creating index');
@@ -174,7 +187,7 @@ export class LocalIndex<TMetadata extends Record<string, MetadataTypes> = Record
 
     try {
       // Save index
-      await this.storage.upsertFile(path.join(this._folderPath, this._indexName), JSON.stringify(this._update));
+      await this.storage.upsertFile(path.join(this._folderPath, this._indexName), this._codec.serializeIndex(this._update));
       this._data = this._update;
       this._update = undefined;
     } catch (err: unknown) {
@@ -331,7 +344,7 @@ export class LocalIndex<TMetadata extends Record<string, MetadataTypes> = Record
       if (item.item.metadataFile) {
         const metadataPath = path.join(this._folderPath, item.item.metadataFile);
         const metadataBuffer = await this.storage.readFile(metadataPath);
-        item.item.metadata = JSON.parse(metadataBuffer.toString('utf-8'));
+        item.item.metadata = this._codec.deserializeMetadata(metadataBuffer) as any;
       }
     }
 
@@ -416,7 +429,7 @@ export class LocalIndex<TMetadata extends Record<string, MetadataTypes> = Record
     }
 
     const data = await this.storage.readFile(path.join(this._folderPath, this.indexName));
-    this._data = JSON.parse(data.toString('utf-8'));
+    this._data = this._codec.deserializeIndex(data);
   }
 
   private async addItemToUpdate(item: Partial<IndexItem<any>>, unique: boolean): Promise<IndexItem> {
@@ -455,9 +468,9 @@ export class LocalIndex<TMetadata extends Record<string, MetadataTypes> = Record
 
       // Write full metadata externally only if there are non-indexed keys present
       if (hasNonIndexed) {
-        metadataFile = `${v4()}.json`;
+        metadataFile = `${v4()}${this._codec.extension}`;
         const metadataPath = path.join(this._folderPath, metadataFile);
-        await this.storage.upsertFile(metadataPath, JSON.stringify(item.metadata));
+        await this.storage.upsertFile(metadataPath, this._codec.serializeMetadata(item.metadata as Record<string, MetadataTypes>));
       }
     } else if (item.metadata) {
       metadata = item.metadata;

@@ -7,6 +7,7 @@ import { MetadataFilter, EmbeddingsModel, Tokenizer, MetadataTypes, EmbeddingsRe
 import { LocalDocumentResult } from './LocalDocumentResult';
 import { LocalDocument } from './LocalDocument';
 import { FileStorage } from './storage';
+import { DocumentCatalog, IndexCodec, JsonCodec } from './codecs';
 
 /**
  * Options for querying documents in the index.
@@ -69,9 +70,16 @@ export interface LocalDocumentIndexConfig {
     /**
      * Optional. File storage plugin to use for storing index files.
      * @remarks
-     * If not specified, the LocalFileStorageClass will be used.  
+     * If not specified, the LocalFileStorageClass will be used.
      */
     storage?: FileStorage;
+
+    /**
+     * Optional. Codec for serialization format.
+     * @remarks
+     * If not specified, the JsonCodec will be used (backward-compatible).
+     */
+    codec?: IndexCodec;
 }
 
 /**
@@ -89,7 +97,7 @@ export class LocalDocumentIndex extends LocalIndex<DocumentChunkMetadata> {
      * @param config Configuration settings for the document index.
      */
     public constructor(config: LocalDocumentIndexConfig) {
-        super(config.folderPath, config.indexName, config.storage);
+        super(config.folderPath, config.indexName, config.storage, config.codec);
         this._embeddings = config.embeddings;
         this._chunkingConfig = Object.assign({
             keepSeparators: true,
@@ -117,8 +125,13 @@ export class LocalDocumentIndex extends LocalIndex<DocumentChunkMetadata> {
     /**
      * Returns true if the document catalog exists.
      */
+    /** Name of the catalog file (derived from codec extension). */
+    private get _catalogName(): string {
+        return `catalog${this.codec.extension}`;
+    }
+
     public async isCatalogCreated(): Promise<boolean> {
-      return this.storage.pathExists(path.join(this.folderPath, 'catalog.json'));
+      return this.storage.pathExists(path.join(this.folderPath, this._catalogName));
     }
 
     /**
@@ -199,7 +212,7 @@ export class LocalDocumentIndex extends LocalIndex<DocumentChunkMetadata> {
 
         // Delete metadata file from disk
         try {
-            await this.storage.deleteFile(path.join(this.folderPath, `${documentId}.json`));
+            await this.storage.deleteFile(path.join(this.folderPath, `${documentId}${this.codec.extension}`));
         } catch (err: unknown) {
             // Ignore error
         }
@@ -306,7 +319,7 @@ export class LocalDocumentIndex extends LocalIndex<DocumentChunkMetadata> {
 
             // Save metadata file to disk
             if (metadata != undefined) {
-                await this.storage.upsertFile(path.join(this.folderPath, `${documentId}.json`), JSON.stringify(metadata));
+                await this.storage.upsertFile(path.join(this.folderPath, `${documentId}${this.codec.extension}`), this.codec.serializeMetadata(metadata));
             }
 
             // Save text file to disk
@@ -437,7 +450,7 @@ export class LocalDocumentIndex extends LocalIndex<DocumentChunkMetadata> {
 
         try {
             // Save catalog
-            await this.storage.upsertFile(path.join(this.folderPath, 'catalog.json'), JSON.stringify(this._newCatalog));
+            await this.storage.upsertFile(path.join(this.folderPath, this._catalogName), this.codec.serializeCatalog(this._newCatalog!));
             this._catalog = this._newCatalog;
             this._newCatalog = undefined;
         } catch(err: unknown) {
@@ -452,11 +465,11 @@ export class LocalDocumentIndex extends LocalIndex<DocumentChunkMetadata> {
             return;
         }
 
-        const catalogPath = path.join(this.folderPath, 'catalog.json');
+        const catalogPath = path.join(this.folderPath, this._catalogName);
         if (await this.isCatalogCreated()) {
             // Load catalog
             const buffer = await this.storage.readFile(catalogPath);
-            this._catalog = JSON.parse(buffer.toString('utf-8'));
+            this._catalog = this.codec.deserializeCatalog(buffer);
         } else {
             try {
                 // Initialize catalog
@@ -466,7 +479,7 @@ export class LocalDocumentIndex extends LocalIndex<DocumentChunkMetadata> {
                     uriToId: {},
                     idToUri: {},
                 };
-                await this.storage.upsertFile(catalogPath, JSON.stringify(this._catalog));
+                await this.storage.upsertFile(catalogPath, this.codec.serializeCatalog(this._catalog));
             } catch(err: unknown) {
                 throw new Error(`Error creating document catalog: ${(err as any).toString()}`);
             }
@@ -474,9 +487,3 @@ export class LocalDocumentIndex extends LocalIndex<DocumentChunkMetadata> {
     }
 }
 
-interface DocumentCatalog {
-    version: number;
-    count: number;
-    uriToId: { [uri: string]: string; };
-    idToUri: { [id: string]: string; };
-}
