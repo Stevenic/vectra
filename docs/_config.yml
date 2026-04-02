@@ -1,0 +1,20 @@
+title: Vectra
+description: A local, file-backed vector database for Node.js
+remote_theme: just-the-docs/just-the-docs@v0.10.1
+
+url: https://stevenic.github.io
+baseurl: /vectra
+
+aux_links:
+  "GitHub":
+    - "https://github.com/Stevenic/vectra"
+
+nav_sort: case_insensitive
+search_enabled: true
+
+footer_content: >-
+  Vectra is distributed under the
+  <a href="https://github.com/Stevenic/vectra/blob/main/LICENSE">MIT License</a>.
+
+back_to_top: true
+back_to_top_text: "Back to top"
