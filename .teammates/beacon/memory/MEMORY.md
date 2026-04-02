@@ -1,0 +1,2 @@
+- [Daily 2026-04-02](2026-04-02.md) — Clean build fix, WebFetcher type error, test import fix
+- [Project: ESM compat issue](project_esm_compat.md) — proxyquire tests fail under ESM auto-detect
