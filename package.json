@@ -62,7 +62,7 @@
         "vectra": "./bin/vectra.js"
     },
     "engines": {
-        "node": ">=20.x"
+        "node": ">=22.x"
     },
     "typesVersions": {
         "<3.9": {

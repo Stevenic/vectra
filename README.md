@@ -24,6 +24,16 @@ Vectra is a local, file-backed, in-memory vector database with an optional gRPC 
 
 Typical use cases: prompt augmentation, infinite few-shot example libraries, single/small-document Q&A, local dev workflows, and cross-language access via gRPC.
 
+## Breaking Changes in v0.14.x
+
+### fetch() replaces axios
+
+All HTTP requests now use the built-in `fetch()` API instead of [axios](https://github.com/axios/axios). This removes axios as a dependency and reduces the attack surface — `fetch()` is built into Node.js and browsers with no third-party code in the request path. If your project was relying on axios interceptors or custom axios configuration passed through Vectra, you will need to update your integration.
+
+### Node.js 22.x minimum
+
+The minimum Node.js version is now **22.x** (up from 20.x). This is driven by the `undici@8.0.0` transitive dependency which requires `node >=22.19.0`. Node.js 20.x reached end-of-life on March 26, 2026, so most projects should already be on 22.x LTS.
+
 ## Install
 
 ```sh

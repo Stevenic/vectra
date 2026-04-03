@@ -21,7 +21,7 @@ Install Vectra and run your first queries in minutes.
 
 ## Requirements
 
-- **Node.js 20.x** or newer (for the TypeScript library and CLI)
+- **Node.js 22.x** or newer (for the TypeScript library and CLI)
 - A package manager (**npm** or **yarn**)
 - An embeddings provider for similarity search (pick one):
   - OpenAI (API key + model, e.g., `text-embedding-3-large`)
