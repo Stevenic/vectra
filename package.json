@@ -87,7 +87,7 @@
         "yargs": "^18.0.0"
     },
     "optionalDependencies": {
-        "protobufjs": "^7.4.0"
+        "protobufjs": "^8.0.0"
     },
     "resolutions": {
         "undici": ">=6.24.0",
