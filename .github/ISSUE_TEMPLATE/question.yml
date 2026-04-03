@@ -1,0 +1,36 @@
+name: Question
+description: Ask a question about using Vectra
+title: "[Question]: "
+labels: ["question"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Before opening a question, please check:
+        - [Documentation](https://stevenic.github.io/vectra/)
+        - [Existing issues](https://github.com/Stevenic/vectra/issues?q=is%3Aissue)
+        - [llms.txt](https://github.com/Stevenic/vectra/blob/main/llms.txt) (for AI agents)
+
+  - type: textarea
+    id: question
+    attributes:
+      label: Your question
+      description: What would you like to know?
+    validations:
+      required: true
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Context
+      description: What are you trying to accomplish? Include relevant code snippets if applicable.
+    validations:
+      required: false
+
+  - type: input
+    id: version
+    attributes:
+      label: Vectra version (if applicable)
+      placeholder: "0.14.0"
+    validations:
+      required: false

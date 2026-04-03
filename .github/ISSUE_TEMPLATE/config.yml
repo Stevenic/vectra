@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Documentation
+    url: https://stevenic.github.io/vectra/
+    about: Check the docs before opening an issue — your answer might already be there.
+  - name: Agent Ready (llms.txt)
+    url: https://github.com/Stevenic/vectra/blob/main/llms.txt
+    about: Point your AI coding agent at llms.txt for API guidance.

@@ -1,0 +1,92 @@
+name: Bug Report
+description: Report a bug or unexpected behavior in Vectra
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report a bug! Please fill out the sections below to help us reproduce and fix the issue.
+
+  - type: input
+    id: version
+    attributes:
+      label: Vectra version
+      description: "Run `npm list vectra` or check your package.json"
+      placeholder: "0.14.0"
+    validations:
+      required: true
+
+  - type: input
+    id: node-version
+    attributes:
+      label: Node.js version
+      description: "Run `node --version`"
+      placeholder: "v22.0.0"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: environment
+    attributes:
+      label: Environment
+      description: Where are you running Vectra?
+      options:
+        - Node.js
+        - Browser
+        - Electron
+        - Other
+    validations:
+      required: true
+
+  - type: input
+    id: os
+    attributes:
+      label: Operating system
+      placeholder: "Windows 11 / macOS 15 / Ubuntu 24.04"
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Describe the bug
+      description: A clear and concise description of what the bug is.
+    validations:
+      required: true
+
+  - type: textarea
+    id: repro
+    attributes:
+      label: Steps to reproduce
+      description: Minimal steps to reproduce the behavior.
+      value: |
+        1.
+        2.
+        3.
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+      description: What you expected to happen.
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+      description: What actually happened. Include error messages or stack traces if applicable.
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional context
+      description: Any additional context, screenshots, or code snippets.
+    validations:
+      required: false

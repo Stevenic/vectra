@@ -1,0 +1,57 @@
+name: Feature Request
+description: Suggest a new feature or enhancement for Vectra
+title: "[Feature]: "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for suggesting an improvement! Please describe the feature you'd like to see.
+
+  - type: textarea
+    id: use-case
+    attributes:
+      label: Use case
+      description: What problem are you trying to solve? Describe the scenario where this feature would be useful.
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      description: Describe how you'd like this to work. Include API examples or pseudocode if possible.
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: What other approaches have you tried or considered?
+    validations:
+      required: false
+
+  - type: dropdown
+    id: scope
+    attributes:
+      label: Scope
+      description: What area of Vectra does this affect?
+      options:
+        - Core (indexing, querying, filtering)
+        - Storage backends
+        - Embeddings
+        - CLI
+        - Browser / Electron support
+        - Documentation
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional context
+      description: Any additional context, examples from other libraries, or screenshots.
+    validations:
+      required: false
