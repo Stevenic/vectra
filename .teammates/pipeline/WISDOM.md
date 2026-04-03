@@ -36,5 +36,5 @@ Browser-based `gh auth login` is usually simpler and safer than managing long-li
 **Daily logs are part of the prompt budget.**
 Verbose teammate logs crowd out the actual task in future sessions. Record durable outcomes and key numbers only when they change decisions; compress or omit the rest.
 
-**This project currently has no CI/CD.**
-No `.github/` directory exists yet. Setting up GitHub Actions workflows for build, test, lint, and publish is the primary infrastructure gap.
+**CI/CD has core CI, still missing npm publish.**
+Docs deploy workflow and CI workflow (build, test, coverage on Node 18+20) exist. Binding publish workflows were rolled back — bindings are generated via `vectra generate` CLI. Still missing: an npm publish workflow for the main `vectra` package.
