@@ -21,13 +21,17 @@ Install Vectra and run your first queries in minutes.
 
 ## Requirements
 
-- **Node.js 20.x** or newer (for the TypeScript library and CLI)
+- **Node.js 22.x** or newer (for the TypeScript library and CLI)
 - A package manager (**npm** or **yarn**)
-- An embeddings provider for similarity search:
+- An embeddings provider for similarity search (pick one):
   - OpenAI (API key + model, e.g., `text-embedding-3-large`)
   - Azure OpenAI (endpoint, deployment name, API key)
   - OpenAI-compatible OSS endpoint (model name + base URL)
+  - Local embeddings — no API key needed (install optional `@huggingface/transformers` package)
 - Sufficient RAM to hold your index in memory during queries (see [Performance and limits](/vectra/best-practices#performance-and-limits))
+
+{: .note }
+Vectra also runs in the browser using `IndexedDBStorage` for persistence. See the [Storage](/vectra/storage#running-in-the-browser) guide for browser setup.
 
 ## Install
 
@@ -37,6 +41,16 @@ npm install vectra
 
 # yarn
 yarn add vectra
+```
+
+Optional dependencies:
+
+```sh
+# For local embeddings (no API key needed)
+npm install @huggingface/transformers
+
+# For Protocol Buffer storage format
+npm install protobufjs
 ```
 
 For CLI usage without a global install:
@@ -169,6 +183,8 @@ Set `isBm25: true` in `queryDocuments` options to enable [hybrid retrieval](/vec
 ## Next steps
 
 - [Core Concepts](/vectra/core-concepts) — understand index types, metadata filtering, and on-disk layout
+- [Storage](/vectra/storage) — pluggable storage backends, custom implementations, and browser support
 - [CLI Reference](/vectra/cli) — manage indexes from the command line
 - [API Reference](/vectra/api-reference) — full API documentation
+- [gRPC Server](/vectra/grpc) — cross-language access via gRPC
 - [Best Practices](/vectra/best-practices) — performance tuning and troubleshooting

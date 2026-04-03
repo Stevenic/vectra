@@ -28,6 +28,15 @@ npx vectra <command> [options]
 vectra <command> [options]
 ```
 
+## Global options
+
+All commands accept these options:
+
+| Flag | Default | Description |
+|------|---------|-------------|
+| `--storage <local\|virtual>` | `local` | Storage backend to use |
+| `--storage-root <path>` | -- | Root folder for local storage |
+
 ## Commands
 
 ### create
@@ -36,6 +45,15 @@ Create a new index folder.
 
 ```sh
 npx vectra create ./my-doc-index
+npx vectra create ./my-doc-index --format protobuf   # use Protocol Buffer format
+```
+
+### delete
+
+Delete an existing index and all its data.
+
+```sh
+npx vectra delete ./my-doc-index
 ```
 
 ### add
@@ -156,6 +174,59 @@ npx vectra watch ./my-doc-index --keys ./keys.json --uri ./docs \
 
 {: .note }
 The `FolderWatcher` class is also exported from the library for programmatic use. See the [API Reference](/vectra/api-reference) for details.
+
+### migrate
+
+Migrate an index between serialization formats.
+
+```sh
+npx vectra migrate ./my-doc-index --to protobuf
+npx vectra migrate ./my-doc-index --to json
+```
+
+### serve
+
+Start the gRPC server to expose index operations over the network. See the [gRPC Server](/vectra/grpc) guide for full details.
+
+```sh
+# Serve a single index
+npx vectra serve ./my-doc-index --keys ./keys.json
+
+# Serve all indexes under a root directory
+npx vectra serve --root ./indexes --keys ./keys.json --port 50051
+
+# Run as a background daemon
+npx vectra serve ./my-doc-index --keys ./keys.json --daemon --pid-file ./vectra.pid
+```
+
+**Options:**
+
+| Flag | Default | Description |
+|------|---------|-------------|
+| `--root <dir>` | -- | Directory containing multiple index subdirectories |
+| `--port` | 50051 | Port to bind the gRPC server on |
+| `--keys` | -- | Path to keys.json for server-side embeddings |
+| `--daemon` | false | Fork to background as a daemon process |
+| `--pid-file` | auto | Path to PID file (daemon mode) |
+
+### stop
+
+Stop a running Vectra daemon.
+
+```sh
+npx vectra stop --pid-file ./vectra.pid
+```
+
+### generate
+
+Generate language bindings for the gRPC service. See [Language Bindings](/vectra/grpc#language-bindings) for details on each language.
+
+```sh
+npx vectra generate --language python --output ./bindings/python
+npx vectra generate --language csharp --output ./bindings/csharp
+```
+
+Supported languages: `python`, `csharp`, `rust`, `go`, `java`, `typescript`.
 
 ### help
 

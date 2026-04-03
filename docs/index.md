@@ -29,5 +29,7 @@ Vectra works like a local [Pinecone](https://www.pinecone.io/) or [Qdrant](https
 - [Getting Started](/vectra/getting-started) — install, quick start with both index types
 - [Core Concepts](/vectra/core-concepts) — index types, metadata filtering, hybrid retrieval, on-disk layout
 - [CLI Reference](/vectra/cli) — command-line usage and embeddings config
-- [API Reference](/vectra/api-reference) — LocalIndex, LocalDocumentIndex, and utilities
+- [API Reference](/vectra/api-reference) — LocalIndex, LocalDocumentIndex, embeddings, and utilities
 - [Best Practices](/vectra/best-practices) — performance, limits, and troubleshooting
+- [Storage](/vectra/storage) — pluggable backends, custom storage, browser/IndexedDB support
+- [gRPC Server](/vectra/grpc) — cross-language access, service API, and language bindings

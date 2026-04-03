@@ -1,11 +1,27 @@
 {
     "name": "vectra",
     "author": "Steven Ickman",
-    "description": "A vector database that uses the local file system for storage.",
+    "description": "A lightweight, file-backed vector database for Node.js and browsers with Pinecone-compatible filtering and hybrid BM25 search.",
     "version": "0.14.0",
     "license": "MIT",
     "keywords": [
-        "gpt"
+        "vector-database",
+        "embeddings",
+        "semantic-search",
+        "rag",
+        "retrieval-augmented-generation",
+        "openai",
+        "azure-openai",
+        "transformers",
+        "local-embeddings",
+        "cosine-similarity",
+        "bm25",
+        "hybrid-search",
+        "local-database",
+        "llm",
+        "ai",
+        "browser",
+        "electron"
     ],
     "bugs": {
         "url": "https://github.com/Stevenic/vectra/issues"
@@ -14,13 +30,39 @@
         "type": "git",
         "url": "https://github.com/Stevenic/vectra.git"
     },
+    "homepage": "https://github.com/Stevenic/vectra#readme",
     "main": "./lib/index.js",
+    "module": "./lib/index.js",
+    "browser": "./lib/browser.js",
     "types": "./lib/index.d.ts",
+    "exports": {
+        ".": {
+            "node": {
+                "types": "./lib/index.d.ts",
+                "import": "./lib/index.js",
+                "require": "./lib/index.js"
+            },
+            "browser": {
+                "types": "./lib/browser.d.ts",
+                "default": "./lib/browser.js"
+            },
+            "default": "./lib/index.js"
+        },
+        "./browser": {
+            "types": "./lib/browser.d.ts",
+            "default": "./lib/browser.js"
+        },
+        "./node": {
+            "types": "./lib/index.d.ts",
+            "import": "./lib/index.js",
+            "require": "./lib/index.js"
+        }
+    },
     "bin": {
         "vectra": "./bin/vectra.js"
     },
     "engines": {
-        "node": ">=20.x"
+        "node": ">=22.x"
     },
     "typesVersions": {
         "<3.9": {
@@ -32,6 +74,7 @@
     "dependencies": {
         "@grpc/grpc-js": "^1.14.3",
         "@grpc/proto-loader": "^0.8.0",
+        "buffer": "^6.0.3",
         "cheerio": "^1.0.0",
         "dotenv": "^16.5.0",
         "gpt-tokenizer": "^3.4.0",
@@ -52,6 +95,8 @@
         "form-data": ">=4.0.4"
     },
     "devDependencies": {
+        "@eslint/js": "^10.0.1",
+        "@huggingface/transformers": "^3.8.1",
         "@types/assert": "^1.5.11",
         "@types/mocha": "^10.0.10",
         "@types/node": "^22.15.11",
@@ -59,33 +104,52 @@
         "@types/turndown": "^5.0.5",
         "@types/uuid": "10.0.0",
         "@types/yargs": "17.0.33",
+        "@typescript-eslint/eslint-plugin": "^8.58.0",
+        "@typescript-eslint/parser": "^8.58.0",
+        "eslint": "^10.1.0",
         "mocha": "11.2.2",
         "npm-run-all": "^4.1.5",
         "nyc": "^17.1.0",
         "rimraf": "^5.0.1",
         "shx": "^0.4.0",
         "sinon": "^21.0.1",
+        "ts-loader": "^9.5.4",
         "ts-mocha": "11.1.0",
         "ts-node": "^10.9.1",
         "typescript": "^5.8.3",
+        "webpack": "^5.104.1",
+        "webpack-cli": "^6.0.1",
         "wink-bm25-text-search": "^3.1.2"
+    },
+    "peerDependencies": {
+        "@huggingface/transformers": "^3.8.1"
+    },
+    "peerDependenciesMeta": {
+        "@huggingface/transformers": {
+            "optional": true
+        }
     },
     "scripts": {
         "build": "tsc -b && shx mkdir -p lib/codecs/schemas && shx cp src/codecs/schemas/*.proto lib/codecs/schemas/ && shx cp -r src/templates lib/templates",
-        "build-docs": "typedoc --theme markdown --entryPoint botbuilder-m365 --excludePrivate --includeDeclarations --ignoreCompilerErrors --module amd --out ..\\..\\doc\\botbuilder-ai .\\lib\\index.d.ts --hideGenerator --name \"Bot Builder SDK - AI\" --readme none",
-        "build:rollup": "yarn clean && yarn build && api-extractor run --verbose --local",
-        "clean": "rimraf _ts3.4 lib tsconfig.tsbuildinfo node_modules",
-        "depcheck": "depcheck --config ../../.depcheckrc",
-        "lint": "eslint **/src/**/*.{j,t}s{,x} --fix --no-error-on-unmatched-pattern",
+        "build:browser": "webpack --config webpack.browser.js",
+        "build:all": "yarn build && yarn build:browser",
+        "build:watch": "tsc -b --watch",
+        "clean": "rimraf lib dist tsconfig.tsbuildinfo",
+        "clean:all": "rimraf _ts3.4 lib dist tsconfig.tsbuildinfo node_modules",
+        "clean:build": "rimraf lib tsconfig.tsbuildinfo",
+        "lint": "eslint src/",
         "test": "npm-run-all build test:mocha",
         "test:mocha": "nyc ts-mocha src/**/*.spec.ts --timeout 10000",
-        "test:compat": "api-extractor run --verbose",
-        "clean:build": "rimraf lib tsconfig.tsbuildinfo",
+        "test:watch": "ts-mocha src/**/*.spec.ts --timeout 10000 --watch",
+        "test:coverage": "nyc --reporter=html --reporter=text ts-mocha src/**/*.spec.ts --timeout 10000",
+        "prepublishOnly": "yarn run clean && yarn run build && yarn test",
         "publish:check": "yarn run clean:build && yarn run build && yarn test && yarn publish --dry-run"
     },
     "files": [
         "_ts3.4",
         "lib",
+        "dist",
+        "bin",
         "proto",
         "src"
     ],

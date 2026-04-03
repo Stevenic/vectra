@@ -279,15 +279,169 @@ Generate embeddings for an array of text strings. Handles batching automatically
 
 ---
 
+## LocalEmbeddings
+
+Run embeddings locally using HuggingFace transformer models. No API key or network calls required. Requires the optional `@huggingface/transformers` package.
+
+### Constructor
+
+```ts
+import { LocalEmbeddings } from 'vectra';
+
+// Default model: Xenova/all-MiniLM-L6-v2 (384 dimensions, 256 max tokens)
+const embeddings = new LocalEmbeddings();
+
+// Custom model
+const embeddings = new LocalEmbeddings({
+  model: 'Xenova/all-MiniLM-L12-v2',
+  maxTokens: 512,
+});
+```
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `model` | `string?` | `'Xenova/all-MiniLM-L6-v2'` | HuggingFace model ID (must support `feature-extraction` pipeline) |
+| `maxTokens` | `number?` | `256` | Maximum tokens per input |
+
+### Properties
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `model` | `string` | The model ID in use |
+| `maxTokens` | `number` | Maximum tokens per input |
+
+### Methods
+
+#### createEmbeddings(inputs)
+
+Generate embeddings for one or more text strings. The pipeline is lazily initialized on first call — models are downloaded and cached locally.
+
+```ts
+const response = await embeddings.createEmbeddings(['hello', 'world']);
+// response.status: 'success' | 'error'
+// response.output: number[][] (one vector per input)
+```
+
+---
+
+## FolderWatcher
+
+Watch folders for file changes and automatically sync them into a `LocalDocumentIndex`. Performs an initial full sync on start, then monitors for real-time adds, updates, and deletes.
+
+{: .note }
+Node.js only — uses `fs.watch()` for filesystem monitoring.
+
+### Constructor
+
+```ts
+import { FolderWatcher } from 'vectra';
+
+const watcher = new FolderWatcher({
+  index: myDocumentIndex,           // LocalDocumentIndex instance
+  paths: ['./docs', './notes'],     // folders or files to watch
+  extensions: ['.txt', '.md'],      // optional: filter by extension
+  debounceMs: 500,                  // optional: debounce interval (default: 500)
+});
+```
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `index` | `LocalDocumentIndex` | -- | The index to sync files into |
+| `paths` | `string[]` | -- | Folders or files to watch |
+| `extensions` | `string[]?` | all files | File extensions to include (e.g., `['.txt', '.md']`) |
+| `debounceMs` | `number?` | `500` | Debounce interval in milliseconds |
+
+### Properties
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `isRunning` | `boolean` | Whether the watcher is actively monitoring |
+| `trackedFileCount` | `number` | Number of files currently tracked |
+
+### Methods
+
+#### start()
+
+Begin watching. Performs an initial full sync, then emits events for changes.
+
+```ts
+await watcher.start();
+```
+
+#### stop()
+
+Stop watching and clean up file watchers.
+
+```ts
+await watcher.stop();
+```
+
+#### sync()
+
+Manually trigger a full sync. Returns the number of files synced.
+
+```ts
+const count = await watcher.sync();
+```
+
+### Events
+
+| Event | Payload | Description |
+|-------|---------|-------------|
+| `sync` | `(uri: string, action: 'added' \| 'updated' \| 'deleted')` | Fired for each file synced |
+| `error` | `(error: Error, uri: string)` | Fired when a sync operation fails |
+| `ready` | -- | Fired after the initial sync completes |
+
+```ts
+watcher.on('sync', (uri, action) => console.log(`${action}: ${uri}`));
+watcher.on('error', (err, uri) => console.error(`Error syncing ${uri}:`, err));
+watcher.on('ready', () => console.log('Initial sync complete'));
+```
+
+---
+
+## Storage classes
+
+For full documentation on the `FileStorage` interface, built-in implementations, custom storage, and browser support, see the [Storage](/vectra/storage) guide.
+
+| Class | Environment | Description |
+|-------|-------------|-------------|
+| `LocalFileStorage` | Node.js | File-system-backed storage (default) |
+| `VirtualFileStorage` | Any | In-memory storage for testing |
+| `IndexedDBStorage` | Browser, Electron | IndexedDB-backed persistent storage |
+
+---
+
+## Codecs
+
+Vectra supports pluggable serialization via the `IndexCodec` interface.
+
+| Class | Description |
+|-------|-------------|
+| `JsonCodec` | JSON serialization (default, human-readable) |
+| `ProtobufCodec` | Protocol Buffer serialization (40-50% smaller, requires `protobufjs`) |
+
+```ts
+import { LocalIndex, ProtobufCodec } from 'vectra';
+
+const index = new LocalIndex('./my-index', { codec: new ProtobufCodec() });
+```
+
+See [Storage Formats](/vectra/storage#storage-formats) for details and migration instructions.
+
+---
+
 ## Utilities
 
 | Class | Description |
 |-------|-------------|
 | `TextSplitter` | Split text into chunks by token count with configurable overlap |
-| `FileFetcher` | Read local files for document ingestion |
-| `WebFetcher` | Fetch web pages for document ingestion |
-| `LocalFileStorage` | File-system-backed storage (default) |
-| `VirtualFileStorage` | In-memory storage for testing |
+| `GPT3Tokenizer` | Token counting |
+| `ItemSelector` | Item selection utilities |
+| `FileFetcher` | Read local files for document ingestion (Node.js only) |
+| `WebFetcher` | Fetch web pages for document ingestion (Node.js only) |
+| `pathUtils` | Cross-platform path utilities (works in Node.js and browsers) |
+| `migrateIndex` | Migrate an index between serialization formats |
 
 ---
 

@@ -22,7 +22,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [18, 20]
+        node-version: [22]
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -36,6 +36,9 @@ jobs:
       - name: Install dependencies
         run: yarn --frozen-lockfile
 
+      - name: Lint
+        run: yarn lint
+
       - name: Build
         run: npm run build
 
@@ -43,7 +46,8 @@ jobs:
         run: npm run test:mocha
 
       - name: Upload coverage to Coveralls
-        if: matrix.node-version == 20
+        if: matrix.node-version == 22
         uses: coverallsapp/github-action@v2
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
+          file: coverage/lcov.info

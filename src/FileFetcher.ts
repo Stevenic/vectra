@@ -1,17 +1,18 @@
 import { TextFetcher } from './types';
 import fs from 'node:fs';
-import * as path from 'path';
+import * as path from 'node:path';
 
 export class FileFetcher implements TextFetcher {
   public async fetch(
     uri: string,
     onDocument: (uri: string, text: string, docType?: string | undefined) => Promise<boolean>
   ): Promise<boolean> {
-    // If the path doesn't exist, resolve true and do not call onDocument
-    let stat: { isDirectory: () => boolean };
+    // Does path exist and is it a directory?
+    let stat;
     try {
       stat = await fs.promises.stat(uri);
     } catch {
+      // Non-existent path: treat as no-op success
       return true;
     }
 
@@ -19,9 +20,9 @@ export class FileFetcher implements TextFetcher {
       // Read directory and recurse. If any child returns false, aggregate to false.
       const entries = await fs.promises.readdir(uri);
       let allOk = true;
-      for (const entry of entries) {
-        const childPath = path.join(uri, entry);
-        const ok = await this.fetch(childPath, onDocument);
+      for (const file of entries) {
+        const filePath = path.join(uri, file);
+        const ok = await this.fetch(filePath, onDocument);
         if (!ok) {
           allOk = false;
         }
@@ -31,8 +32,12 @@ export class FileFetcher implements TextFetcher {
       // Read file and invoke onDocument
       const text = await fs.promises.readFile(uri, 'utf8');
       const ext = path.extname(uri);
-      const docType = ext ? ext.slice(1).toLowerCase() : path.basename(uri).toLowerCase();
-      return onDocument(uri, text, docType);
+      const docType =
+        ext && ext.length > 1
+          ? ext.slice(1).toLowerCase()
+          : path.basename(uri).toLowerCase();
+
+      return await onDocument(uri, text, docType);
     }
   }
-} 
+}

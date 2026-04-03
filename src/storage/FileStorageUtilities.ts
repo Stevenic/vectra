@@ -1,7 +1,6 @@
 import { FileStorage } from "./FileStorage";
 import { FileExt, FileType, ContentTypeMap } from "./FileType";
-import * as path from "path";
-
+import { pathUtils as path } from '../utils/pathUtils';
 /**
  * Utility functions for working with FileStorage abstractions.
  */
@@ -20,12 +19,12 @@ export class FileStorageUtilities {
     /**
      * Returns the file type of a file based on its extension.
      * @remarks
-     * The file type is determined by the file extension. Only extensions found in the 
+     * The file type is determined by the file extension. Only extensions found in the
      * `FileExt[]` array are returned.
      * @param filePath Path to file to get type for.
      * @returns The file type, or undefined if the file type is unknown.
      */
-    public static getFileType(filePath: string): FileType|undefined {
+    public static getFileType(filePath: string): FileType | undefined {
         // Get extension from file
         const ext = path.extname(filePath).toLowerCase();
         if (ext.length > 1) {
@@ -44,8 +43,8 @@ export class FileStorageUtilities {
      * @param contentType Content type to map.
      * @returns File type, or undefined if the content type is unknown.
      */
-    public static getFileTypeFromContentType(contentType: string): FileType|undefined {
-        if (ContentTypeMap.hasOwnProperty(contentType)) {
+    public static getFileTypeFromContentType(contentType: string): FileType | undefined {
+        if (Object.prototype.hasOwnProperty.call(ContentTypeMap, contentType)) {
             return ContentTypeMap[contentType];
         } else {
             // Try to find a matching file type
@@ -67,7 +66,7 @@ export class FileStorageUtilities {
      * @param filePath Path to the file to delete.
      * @returns An Error if the file could not be deleted, otherwise undefined.
      */
-    public static async tryDeleteFile(storage: FileStorage, filePath: string): Promise<Error|undefined> {
+    public static async tryDeleteFile(storage: FileStorage, filePath: string): Promise<Error | undefined> {
         try {
             await storage.deleteFile(filePath);
             return undefined;

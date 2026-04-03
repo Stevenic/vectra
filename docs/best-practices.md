@@ -57,6 +57,21 @@ If you manage updates manually, call `beginUpdate` → multiple insert/delete �
 - For exact phrases or code terms, enable **hybrid retrieval** (`isBm25: true`) to add keyword matches alongside semantic results.
 - Render sections with a realistic token budget for your target LLM — **1000–2000 tokens** per section is common.
 
+## Storage format
+
+- **JSON** (default) is human-readable and easy to debug — great for development and small indexes.
+- **Protocol Buffers** reduce index file sizes by 40-50% — use for larger indexes or when disk/bandwidth matters.
+- Create new indexes with `--format protobuf` or migrate existing ones with `vectra migrate --to protobuf`.
+- See the [Storage Formats](/vectra/storage#storage-formats) guide for setup details.
+
+## Browser usage
+
+- Use `IndexedDBStorage` for persistent browser storage, or `VirtualFileStorage` for ephemeral use.
+- `LocalEmbeddings` runs entirely in the browser using `@huggingface/transformers` — no API key needed.
+- `OpenAIEmbeddings` also works in browsers (makes fetch requests to the API).
+- `LocalFileStorage`, `FileFetcher`, `WebFetcher`, and `FolderWatcher` are Node.js only.
+- See the [Running in the Browser](/vectra/storage#running-in-the-browser) guide for a full setup example.
+
 ## Memory management
 
 - The entire index is loaded into RAM. Estimate vector + metadata size and stay within budget.
@@ -146,6 +161,18 @@ If you manage updates manually, call `beginUpdate` → multiple insert/delete �
 **Symptom:** JSON parse errors reading `index.json` or metadata files.
 
 **Fix:** Recreate the index (`deleteIfExists: true`) and re-ingest, or restore from a clean backup.
+
+### protobufjs not found
+
+**Symptom:** "The protobufjs package is required" error when using protobuf format.
+
+**Fix:** Install the optional dependency: `npm install protobufjs`.
+
+### @huggingface/transformers not found
+
+**Symptom:** "The @huggingface/transformers package is required for local embeddings" error.
+
+**Fix:** Install the optional dependency: `npm install @huggingface/transformers`.
 
 ### Web fetching problems (CLI)
 

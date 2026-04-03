@@ -1,4 +1,4 @@
-import * as path from 'path';
+import { pathUtils as path } from '../utils/pathUtils';
 import { FileStorage, LocalFileStorage } from '../storage';
 import { IndexCodec } from './IndexCodec';
 import { JsonCodec } from './JsonCodec';

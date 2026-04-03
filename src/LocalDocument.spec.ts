@@ -1,5 +1,5 @@
 import { strict as assert } from "node:assert";
-import * as path from "path";
+import path from "./utils/pathUtils";
 import { describe, it, beforeEach } from "mocha";
 import * as LocalDocumentModule from "../src/LocalDocument";
 

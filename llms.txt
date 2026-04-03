@@ -10,7 +10,15 @@ The built-in gRPC server (`vectra serve`) exposes 19 RPCs so any language can us
 
 Install: `npm install vectra`
 
-Key exports: `LocalIndex`, `LocalDocumentIndex`, `OpenAIEmbeddings`, `LocalEmbeddings`, `JsonCodec`, `ProtobufCodec`, `migrateIndex`, `VectraServer`, `IndexManager`, `FolderWatcher`, `TextSplitter`, `GPT3Tokenizer`, `ItemSelector`, `FileFetcher`, `WebFetcher`, `LocalFileStorage`, `VirtualFileStorage`.
+Key exports: `LocalIndex`, `LocalDocumentIndex`, `OpenAIEmbeddings`, `LocalEmbeddings`, `JsonCodec`, `ProtobufCodec`, `migrateIndex`, `VectraServer`, `IndexManager`, `FolderWatcher`, `TextSplitter`, `GPT3Tokenizer`, `ItemSelector`, `FileFetcher`, `WebFetcher`, `LocalFileStorage`, `VirtualFileStorage`, `IndexedDBStorage`.
+
+Storage backends:
+- `LocalFileStorage` — filesystem (Node.js, default)
+- `IndexedDBStorage` — IndexedDB (browsers, Electron)
+- `VirtualFileStorage` — in-memory (any environment, ephemeral)
+- Custom implementations via the `FileStorage` interface
+
+Vectra runs in browsers using `IndexedDBStorage` for persistence and `LocalEmbeddings` for offline vector generation.
 
 Embeddings providers:
 - `OpenAIEmbeddings` — OpenAI, Azure OpenAI, or any OpenAI-compatible endpoint

@@ -1,7 +1,7 @@
 import { FileDetails, FileStorage, ListFilesFilter } from "./FileStorage";
 import { FileStorageUtilities } from "./FileStorageUtilities";
 import fs from "fs/promises";
-import * as path from "path";
+import * as path from "node:path";
 
 /**
  * A `FileStorage` implementation that uses the local file system.
@@ -16,7 +16,7 @@ export class LocalFileStorage implements FileStorage {
     constructor(rootFolder?: string) {
         this._rootFolder = rootFolder;
     }
-    
+
     async createFile(filePath: string, content: Buffer|string): Promise<void> {
         // Convert content to buffer if it's a string
         if (typeof content == 'string') {
@@ -49,7 +49,7 @@ export class LocalFileStorage implements FileStorage {
         };
     }
 
-    async listFiles(folderPath: string, filter?: ListFilesFilter | undefined): Promise<FileDetails[]> {
+    async listFiles(folderPath: string, _filter?: ListFilesFilter | undefined): Promise<FileDetails[]> {
         const folder = this.getFullPath(folderPath);
         const list = await fs.readdir(folder, { withFileTypes: true });
         return list.map((entry) => {
@@ -59,7 +59,7 @@ export class LocalFileStorage implements FileStorage {
                 isFolder: entry.isDirectory(),
                 fileType: entry.isFile() ? FileStorageUtilities.getFileType(entry.name) : undefined
             };
-        }); 
+        });
     }
 
     async pathExists(fileOrFolderPath: string): Promise<boolean> {

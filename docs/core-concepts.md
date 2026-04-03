@@ -122,6 +122,33 @@ my-doc-index/
 
 **`catalog.json`** maps URIs to document IDs and tracks counts. It's portable and easy to inspect or version.
 
+### Protocol Buffer format
+
+Indexes can optionally use Protocol Buffer serialization (40-50% smaller files). The layout is identical but with `.pb` extensions:
+
+```
+my-index/
+├── index.pb            # binary proto format
+├── <itemId-1>.pb
+├── catalog.pb          # (document indexes)
+├── <docId>.txt         # document bodies unchanged
+└── ...
+```
+
+See [Storage](/vectra/storage#storage-formats) for setup and migration details.
+
+## Storage backends
+
+Vectra separates index logic from file I/O through the `FileStorage` interface. This allows the same index code to run against the local filesystem, IndexedDB (browsers), or in-memory storage.
+
+| Backend | Environment | Persistence |
+|---------|-------------|-------------|
+| `LocalFileStorage` | Node.js | Disk |
+| `IndexedDBStorage` | Browser, Electron | IndexedDB |
+| `VirtualFileStorage` | Any | In-memory |
+
+You can also implement `FileStorage` to store data anywhere (S3, SQLite, etc.). See the [Storage](/vectra/storage) guide for the full interface, browser setup, and custom implementation examples.
+
 ## File-backed vs. in-memory usage
 
 ### Persistent usage

@@ -6,7 +6,6 @@ import {
   OSSEmbeddingsOptions,
   OpenAIEmbeddingsOptions
 } from './OpenAIEmbeddings';
-import { Colorize } from './internals';
 
 describe('OpenAIEmbeddings', () => {
   let sandbox: sinon.SinonSandbox;

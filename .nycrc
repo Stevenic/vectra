@@ -15,7 +15,9 @@
     "**/index.ts"
   ],
   "reporter": [
-    "html"
+    "html",
+    "lcov",
+    "text"
   ],
   "all": true,
   "cache": true
