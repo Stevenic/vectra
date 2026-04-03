@@ -4,7 +4,7 @@
 [![Build](https://github.com/Stevenic/vectra/actions/workflows/ci.yml/badge.svg)](https://github.com/Stevenic/vectra/actions/workflows/ci.yml)
 [![Coverage Status](https://coveralls.io/repos/github/Stevenic/vectra/badge.svg?branch=main)](https://coveralls.io/github/Stevenic/vectra?branch=main)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![LLM Ready](https://img.shields.io/badge/LLM-Ready-blue.svg)](https://github.com/Stevenic/vectra/blob/main/llms.txt)
+[![Agent Ready](https://img.shields.io/badge/Agent-Ready-blue.svg)](#agent-ready)
 
 Vectra is a local, file-backed, in-memory vector database with an optional gRPC server for cross-language access. Each index is a folder on disk — queries use MongoDB-style metadata filtering and cosine similarity ranking, with sub-millisecond latency for small indexes.
 
@@ -69,6 +69,18 @@ Full docs at **[stevenic.github.io/vectra](https://stevenic.github.io/vectra/)**
 | [gRPC Server](https://stevenic.github.io/vectra/grpc) | Cross-language access and language bindings |
 | [Changelog](https://stevenic.github.io/vectra/changelog) | Breaking changes and migration guides |
 | [Tutorials](https://stevenic.github.io/vectra/tutorials/) | RAG pipeline, browser app, gRPC, custom storage, folder sync |
+
+## Agent Ready
+
+Vectra ships an [`llms.txt`](https://github.com/Stevenic/vectra/blob/main/llms.txt) file that gives coding agents everything they need to integrate Vectra into your project. Point your agent at it and let it do the work:
+
+```
+Read the llms.txt file at https://raw.githubusercontent.com/Stevenic/vectra/main/llms.txt
+and then add Vectra support to this project. Use LocalDocumentIndex for document
+storage and retrieval.
+```
+
+The `llms.txt` file covers all exports, index types, CLI commands, gRPC bindings, and on-disk format — enough for any coding agent to scaffold a working integration without browsing docs.
 
 ## License
 
