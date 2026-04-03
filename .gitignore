@@ -113,3 +113,11 @@ dist
 catalog/
 history/
 bug.txt
+
+# gRPC generated stubs
+_generated/
+generated/
+*_pb.js
+*_pb.d.ts
+*_grpc_pb.js
+*_grpc_pb.d.ts
