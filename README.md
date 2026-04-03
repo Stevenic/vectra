@@ -4,6 +4,7 @@
 [![Build](https://github.com/Stevenic/vectra/actions/workflows/ci.yml/badge.svg)](https://github.com/Stevenic/vectra/actions/workflows/ci.yml)
 [![Coverage Status](https://coveralls.io/repos/github/Stevenic/vectra/badge.svg?branch=main)](https://coveralls.io/github/Stevenic/vectra?branch=main)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![LLM Ready](https://img.shields.io/badge/LLM-Ready-blue.svg)](https://github.com/Stevenic/vectra/blob/main/llms.txt)
 
 ## Overview
 
