@@ -1,26 +1,41 @@
 # Vectra Samples
-There are two flavors of samples in this folder. Samples that show how to build Vectra indexes using the CLI, like the [wikipedia sample](./wikipedia/README.md), and samples that show how to consume a Vectra index programatically, like the [chat sample](./chat/README.md).
 
-All samples will require an OpenAI key which can be generated in the [API keys](https://platform.openai.com/api-keys) section of the OpenAI Developer Portal. This key will need to be stored in a `vectra.keys` file at the root of each sample. **DO NOT CHECK IN ANY FILES WITH KEYS** OpenAI uses a key scanner and will automatically revoke any checked in keys. The `.gitignore` file in each sample has a rule to prevent checking the `vectra.keys` file in.
+Runnable examples covering the main Vectra features. Each sample has its own README with setup instructions.
 
-## Index Building Samples
-These samples show how to use the `vectra` CLI command to manually build a Vectra document index. Vectra includes a crawler capable of indexing both local and web documents. The crawler uses Vectras [WebFetcher](../src/WebFetcher.ts) class, for indexing web documents, and [FileFetcher](../src/FileFetcher.ts) class, for indexing local documents.  The current crawler has the following capabilities and limitations:
+## Samples
 
-- Only text based file formats are currently supported. PDF and Office file formats are planned but not implemented yet.
-- HTML documents will be automatically converted to Markdown. This makes them smaller indexing wise and also token wise when rendering to an LLM.  Special table handling logic is included that converts HTML based tables to Markdown tables.
-- The [WebFetcher](../src/WebFetcher.ts) class does not do link traversal so you have to provide the crawler with an explicit list of url's you'd like it to index.
-- The [FileFetcher](../src/FileFetcher.ts) class does support folders. If you give it a folder path it will attempt to index every document in that folder and any child folders.
+| Sample | Description | API Key Required |
+|--------|-------------|:----------------:|
+| [quickstart](./quickstart/) | Minimal LocalIndex and LocalDocumentIndex examples | Yes (OpenAI) |
+| [rag](./rag/) | End-to-end RAG pipeline: ingest → query → render → LLM | Yes (OpenAI) |
+| [browser](./browser/) | Browser-based semantic search with IndexedDB + TransformersEmbeddings | No |
+| [custom-storage](./custom-storage/) | Implement the FileStorage interface with SQLite | Yes (OpenAI) |
+| [grpc-python](./grpc-python/) | Python gRPC client for cross-language access | Yes (OpenAI) |
+| [folder-watcher](./folder-watcher/) | Auto-sync a folder to an index (CLI and library) | Yes (OpenAI)* |
+| [wikipedia](./wikipedia/) | Build a document index from Wikipedia using the CLI | Yes (OpenAI) |
 
-Here's the list of index building samples:
+\* The folder-watcher sample includes an offline variant using `LocalEmbeddings` that requires no API key.
 
-| Name | Description |
-| ---- | ----------- |
-| [wikipedia](./wikipedia/README.md) | Builds a Vectra index of the Top 25 Wikipedia Articles for 2023 |
+## Getting an API Key
 
-## Index Consumption Samples
-These samples show how to consume a Vectra document index programatically. Here's the list of index consumption samples:
+Samples that require an OpenAI key need the `OPENAI_API_KEY` environment variable set:
 
-| Name | Description |
-| ---- | ----------- |
-| [chat](./chat/README.md) | A simple CLI based chat experience for performing Retrieval Augmented Generation (RAG) using Vectra and an LLM |
+```bash
+export OPENAI_API_KEY=sk-...
+```
 
+Generate a key in the [OpenAI Developer Portal](https://platform.openai.com/api-keys).
+
+## Running TypeScript Samples
+
+All TypeScript samples use top-level `await` and can be run with [tsx](https://github.com/privatenumber/tsx):
+
+```bash
+npx tsx <script>.ts
+```
+
+## Learn More
+
+- [Getting Started guide](https://stevenic.github.io/vectra/getting-started)
+- [Tutorials](https://stevenic.github.io/vectra/tutorials/)
+- [Full documentation](https://stevenic.github.io/vectra/)

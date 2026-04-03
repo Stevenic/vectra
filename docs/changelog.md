@@ -7,7 +7,7 @@ nav_order: 11
 # Changelog
 {: .no_toc }
 
-Breaking changes, migration guides, and version compatibility.
+Release history, breaking changes, and migration guides.
 {: .fs-6 .fw-300 }
 
 <details open markdown="block">
@@ -61,9 +61,72 @@ The minimum Node.js version is now **22.x** (up from 20.x). This is driven by th
 - **`vectra migrate`** — migrate between JSON and protobuf formats
 - **TransformersTokenizer** — tokenizer matching TransformersEmbeddings model for chunk alignment
 
+### Security fixes
+
+- **Removed axios dependency** — eliminated supply chain risk by switching to built-in `fetch()`
+- **Fixed dependency vulnerabilities** — resolved additional security issues in transitive dependencies
+
+### Infrastructure
+
+- CI/CD pipeline with GitHub Actions (build, test, lint, coverage)
+- ESLint configuration added
+- Developer documentation site launched
+
+---
+
+## v0.12.2 (2026-01-11)
+
+### Features
+
+- **Unit test coverage** — expanded test suite covering `LocalIndex` simple functions and `queryItem` cases (#78, #79)
+
+### Community
+
+- **Code of Conduct** — added Contributor Covenant (#82)
+- **Contributing guide** — added `CONTRIBUTING.md` (#83)
+- **License update** — updated copyright year (#84)
+- **README overhaul** — new readme with updated table of contents (#85, #91)
+
+### Infrastructure
+
+- Added `publish:check` script — clean build + test + dry-run publish (#92)
+
+---
+
+## v0.12.0 (2026-01-08)
+
+### Features
+
+- **Batch insert** — `beginBatchUpdate()` for efficient bulk operations on `LocalIndex` (#73)
+
+### Bug fixes
+
+- **Webpack bundling fix** — replaced `gpt-3-encoder` with `gpt-tokenizer` to resolve `fs.readFileSync` errors when bundling with Webpack (#75)
+- **Build break fix** — fixed build breaks from batch import PR
+
+---
+
+## v0.11.1 (2025-05-12)
+
+### Bug fixes
+
+- **Missing dependency** — added missing dependency to `package.json` (#71)
+
+---
+
+## v0.11.0 (2025-05-07)
+
+### Changes
+
+- **Dependency upgrades** — upgraded all dependencies (#68)
+- **Node.js engine constraint** — added `engines` field to `package.json` requiring `>=20.x`
+
+---
+
 ## Version compatibility
 
 | Vectra version | Node.js | Optional dependencies |
 |---------------|---------|----------------------|
 | 0.14.x | 22.x+ | `@huggingface/transformers` (local embeddings), `protobufjs` (protobuf format) |
-| 0.13.x and earlier | 20.x+ | -- |
+| 0.12.x | 20.x+ | -- |
+| 0.11.x | 20.x+ | -- |

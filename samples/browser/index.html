@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head><title>Vectra Browser Search</title></head>
+<body>
+  <h1>Vectra Browser Search</h1>
+  <input id="query" placeholder="Search..." />
+  <button id="search">Search</button>
+  <div id="results">Loading model...</div>
+
+  <script type="module">
+    import {
+      LocalDocumentIndex,
+      TransformersEmbeddings,
+      IndexedDBStorage,
+    } from 'vectra/browser';
+
+    const storage = new IndexedDBStorage('search-demo');
+    const embeddings = await TransformersEmbeddings.create({
+      device: 'auto',
+      dtype: 'q8',
+      progressCallback: (p) => {
+        document.getElementById('results').textContent =
+          `Loading model: ${p.status} ${Math.round(p.progress || 0)}%`;
+      },
+    });
+
+    const index = new LocalDocumentIndex({
+      folderPath: 'demo-index',
+      embeddings,
+      storage,
+    });
+
+    if (!(await index.isIndexCreated())) {
+      await index.createIndex({ version: 1 });
+
+      // Seed with sample data
+      await index.upsertDocument(
+        'doc://vectra',
+        'Vectra is a local vector database with sub-millisecond query latency.',
+        'txt'
+      );
+      await index.upsertDocument(
+        'doc://features',
+        'Vectra supports metadata filtering, hybrid BM25 retrieval, and multiple storage backends.',
+        'txt'
+      );
+      await index.upsertDocument(
+        'doc://browser',
+        'Vectra runs in browsers using IndexedDB for storage and TransformersEmbeddings for local inference.',
+        'txt'
+      );
+    }
+
+    document.getElementById('results').textContent = 'Ready — try a search.';
+
+    document.getElementById('search').addEventListener('click', async () => {
+      const query = document.getElementById('query').value;
+      if (!query) return;
+
+      const results = await index.queryDocuments(query, { maxDocuments: 5 });
+      const el = document.getElementById('results');
+      el.innerHTML = '';
+
+      for (const result of results) {
+        const sections = await result.renderSections(500, 1, true);
+        const div = document.createElement('div');
+        div.innerHTML = `<strong>${result.uri}</strong> (${result.score.toFixed(4)})<br>${sections.map((s) => s.text).join('<br>')}`;
+        el.appendChild(div);
+      }
+
+      if (results.length === 0) {
+        el.textContent = 'No results found.';
+      }
+    });
+  </script>
+</body>
+</html>

@@ -69,6 +69,7 @@ Full docs at **[stevenic.github.io/vectra](https://stevenic.github.io/vectra/)**
 | [gRPC Server](https://stevenic.github.io/vectra/grpc) | Cross-language access and language bindings |
 | [Changelog](https://stevenic.github.io/vectra/changelog) | Breaking changes and migration guides |
 | [Tutorials](https://stevenic.github.io/vectra/tutorials/) | RAG pipeline, browser app, gRPC, custom storage, folder sync |
+| [Samples](./samples/) | Runnable examples: quickstart, RAG, browser, SQLite storage, gRPC, folder watcher |
 
 ## Agent Ready
 
