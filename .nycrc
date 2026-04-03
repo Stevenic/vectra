@@ -12,7 +12,11 @@
     "**/*.d.ts",
     "**/internals/**",
     "**/*.spec.ts",
-    "**/index.ts"
+    "**/index.ts",
+    "**/templates/**",
+    "**/*.browser.ts",
+    "**/BrowserWebFetcher.ts",
+    "**/IndexedDBStorage.ts"
   ],
   "reporter": [
     "html",
