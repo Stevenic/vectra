@@ -137,9 +137,9 @@
         "clean:build": "rimraf lib tsconfig.tsbuildinfo",
         "lint": "eslint src/",
         "test": "yarn build && yarn test:mocha",
-        "test:mocha": "nyc ts-mocha src/**/*.spec.ts --timeout 10000",
-        "test:watch": "ts-mocha src/**/*.spec.ts --timeout 10000 --watch",
-        "test:coverage": "nyc --reporter=html --reporter=text ts-mocha src/**/*.spec.ts --timeout 10000",
+        "test:mocha": "nyc ts-mocha \"src/**/*.spec.ts\" --timeout 10000",
+        "test:watch": "ts-mocha \"src/**/*.spec.ts\" --timeout 10000 --watch",
+        "test:coverage": "nyc --reporter=html --reporter=text ts-mocha \"src/**/*.spec.ts\" --timeout 10000",
         "prepublishOnly": "yarn run clean && yarn run build && yarn test",
         "publish:check": "yarn run clean:build && yarn run build && yarn test && yarn publish --dry-run"
     },
