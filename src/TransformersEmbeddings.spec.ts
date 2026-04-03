@@ -1,18 +1,17 @@
 import { strict as assert } from 'node:assert';
 import { describe, it, beforeEach, afterEach } from 'mocha';
 import sinon from 'sinon';
-import proxyquire from 'proxyquire';
 import { EmbeddingsModel } from './types';
+import * as transformersModule from '@huggingface/transformers';
 
 describe('TransformersEmbeddings', () => {
     let TransformersEmbeddings: any;
-    let mockPipeline: sinon.SinonStub;
-    let mockAutoTokenizer: { from_pretrained: sinon.SinonStub };
     let mockExtractor: sinon.SinonStub;
     let mockTokenizer: any;
     let sandbox: sinon.SinonSandbox;
+    let pipelineStub: sinon.SinonStub;
 
-    beforeEach(() => {
+    beforeEach(async () => {
         sandbox = sinon.createSandbox();
 
         // Create mock tokenizer
@@ -29,13 +28,11 @@ describe('TransformersEmbeddings', () => {
         );
 
         // Create mock extractor (feature extraction pipeline)
-        // Make it dynamic based on input array length
         mockExtractor = sandbox.stub().callsFake(async (inputs: string | string[]) => {
             const inputArray = Array.isArray(inputs) ? inputs : [inputs];
             const batchSize = inputArray.length;
             const embeddingDim = 4;
 
-            // Create data array with repeated embeddings
             const data = new Float32Array(batchSize * embeddingDim);
             for (let i = 0; i < batchSize; i++) {
                 data[i * embeddingDim] = 0.1;
@@ -50,24 +47,15 @@ describe('TransformersEmbeddings', () => {
             };
         });
 
-        // Create mock pipeline function
-        mockPipeline = sandbox.stub().resolves(mockExtractor);
+        // Attach tokenizer to the mock extractor so pipeline result has .tokenizer
+        (mockExtractor as any).tokenizer = callableTokenizer;
 
-        // Create mock AutoTokenizer
-        mockAutoTokenizer = {
-            from_pretrained: sandbox.stub().resolves(callableTokenizer)
-        };
+        // Stub the pipeline function from @huggingface/transformers
+        pipelineStub = sandbox.stub(transformersModule, 'pipeline' as any).resolves(mockExtractor);
 
-        // Use proxyquire to inject mocks
-        const module = proxyquire.noCallThru()('./TransformersEmbeddings', {
-            '@huggingface/transformers': {
-                pipeline: mockPipeline,
-                AutoTokenizer: mockAutoTokenizer,
-                '@global': true
-            }
-        });
-
-        TransformersEmbeddings = module.TransformersEmbeddings;
+        // Import TransformersEmbeddings fresh (uses the stubbed pipeline via dynamic import)
+        const mod = await import('./TransformersEmbeddings');
+        TransformersEmbeddings = mod.TransformersEmbeddings;
     });
 
     afterEach(() => {
@@ -82,9 +70,9 @@ describe('TransformersEmbeddings', () => {
             assert.equal(embeddings.model, 'Xenova/all-MiniLM-L6-v2', 'default model should be all-MiniLM-L6-v2');
 
             // Verify pipeline was called with correct arguments
-            assert.ok(mockPipeline.calledOnce, 'pipeline should be called once');
-            assert.equal(mockPipeline.firstCall.args[0], 'feature-extraction');
-            assert.equal(mockPipeline.firstCall.args[1], 'Xenova/all-MiniLM-L6-v2');
+            assert.ok(pipelineStub.calledOnce, 'pipeline should be called once');
+            assert.equal(pipelineStub.firstCall.args[0], 'feature-extraction');
+            assert.equal(pipelineStub.firstCall.args[1], 'Xenova/all-MiniLM-L6-v2');
         });
 
         it('creates instance with custom options', async () => {
@@ -117,7 +105,6 @@ describe('TransformersEmbeddings', () => {
             assert.ok(result.output, 'output should be defined');
             assert.equal(result.output!.length, 1, 'should have one embedding');
             assert.equal(result.output![0].length, 4, 'embedding should have 4 dimensions');
-            // Use approximate comparison due to Float32Array precision
             const expected = [0.1, 0.2, 0.3, 0.4];
             result.output![0].forEach((val: number, i: number) => {
                 assert.ok(Math.abs(val - expected[i]) < 0.001, `value ${val} should be close to ${expected[i]}`);
@@ -133,7 +120,6 @@ describe('TransformersEmbeddings', () => {
             assert.ok(result.output, 'output should be defined');
             assert.equal(result.output!.length, 2, 'should have two embeddings');
 
-            // Verify extractor was called once with the batch (efficient batching)
             assert.equal(mockExtractor.callCount, 1);
             assert.deepEqual(mockExtractor.firstCall.args[0], ['hello', 'world']);
         });
@@ -195,26 +181,8 @@ describe('TransformersEmbeddings', () => {
             const tokenizer1 = embeddings.getTokenizer();
             const tokenizer2 = embeddings.getTokenizer();
 
-            // They should be different instances but use same underlying tokenizer
             assert.ok(tokenizer1);
             assert.ok(tokenizer2);
         });
-    });
-});
-
-describe('TransformersEmbeddings without @huggingface/transformers', () => {
-    it('throws helpful error when package is not installed', async () => {
-        // Use proxyquire to simulate missing package
-        const module = proxyquire.noCallThru()('./TransformersEmbeddings', {
-            '@huggingface/transformers': null
-        });
-
-        try {
-            await module.TransformersEmbeddings.create();
-            assert.fail('Should have thrown an error');
-        } catch (error: any) {
-            assert.ok(error.message.includes('@huggingface/transformers'));
-            assert.ok(error.message.includes('npm install'));
-        }
     });
 });

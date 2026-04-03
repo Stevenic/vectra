@@ -1,6 +1,5 @@
 import assert from 'node:assert';
 import sinon from 'sinon';
-import axios, { AxiosInstance, AxiosResponse } from 'axios';
 import {
   OpenAIEmbeddings,
   AzureOpenAIEmbeddingsOptions,
@@ -10,18 +9,17 @@ import {
 
 describe('OpenAIEmbeddings', () => {
   let sandbox: sinon.SinonSandbox;
-  let postStub: sinon.SinonStub;
-  let createdConfig: any;
+  let fetchStub: sinon.SinonStub;
 
-  function makeAxiosResponse<T>(status: number, data: any, statusText = ''): AxiosResponse<T> {
+  function makeFetchResponse(status: number, data: any, statusText = ''): Response {
     return {
       status,
-      data,
       statusText,
-      headers: {},
-      config: {} as any,
-      request: {} as any
-    } as AxiosResponse<T>;
+      ok: status >= 200 && status < 300,
+      headers: new Headers(),
+      json: async () => data,
+      text: async () => JSON.stringify(data),
+    } as Response;
   }
 
   const successData = {
@@ -35,33 +33,11 @@ describe('OpenAIEmbeddings', () => {
 
   beforeEach(() => {
     sandbox = sinon.createSandbox();
-    postStub = sandbox.stub();
-    createdConfig = undefined;
-
-    sandbox.stub(axios, 'create').callsFake((config: any) => {
-      createdConfig = config;
-      const instance = { post: postStub } as unknown as AxiosInstance;
-      return instance;
-    });
+    fetchStub = sandbox.stub(globalThis, 'fetch');
   });
 
   afterEach(() => {
     sandbox.restore();
-  });
-
-  it('constructs axios client with validateStatus allowing <400 and 429', () => {
-    const inst = new OpenAIEmbeddings({
-      apiKey: 'sk',
-      model: 'm'
-    } as OpenAIEmbeddingsOptions);
-
-    assert.ok(inst); // sanity
-    assert.ok(createdConfig && typeof createdConfig.validateStatus === 'function');
-    assert.strictEqual(createdConfig.validateStatus(200), true);
-    assert.strictEqual(createdConfig.validateStatus(399), true);
-    assert.strictEqual(createdConfig.validateStatus(400), false);
-    assert.strictEqual(createdConfig.validateStatus(429), true);
-    assert.strictEqual(createdConfig.validateStatus(500), false);
   });
 
   it('Azure: trims trailing slash, enforces https, defaults apiVersion and maxTokens', () => {
@@ -119,7 +95,7 @@ describe('OpenAIEmbeddings', () => {
   });
 
   it('Azure: URL formation and dimensions passthrough', async () => {
-    postStub.resolves(makeAxiosResponse(200, successData));
+    fetchStub.resolves(makeFetchResponse(200, successData));
 
     const inst = new OpenAIEmbeddings({
       azureApiKey: 'key',
@@ -130,15 +106,15 @@ describe('OpenAIEmbeddings', () => {
 
     await inst.createEmbeddings('hello');
 
-    // capture args to _httpClient.post(url, body, config)
-    const [url, body] = postStub.getCall(0).args;
+    const [url, init] = fetchStub.getCall(0).args;
     assert.strictEqual(url, 'https://example.com/openai/deployments/dep/embeddings?api-version=2023-05-15');
+    const body = JSON.parse(init.body);
     assert.strictEqual(body.input, 'hello');
     assert.strictEqual(body.dimensions, 256);
   });
 
   it('OSS: URL formation and model injection', async () => {
-    postStub.resolves(makeAxiosResponse(200, successData));
+    fetchStub.resolves(makeFetchResponse(200, successData));
 
     const inst = new OpenAIEmbeddings({
       ossModel: 'oss-emb',
@@ -146,14 +122,15 @@ describe('OpenAIEmbeddings', () => {
     } as OSSEmbeddingsOptions);
 
     await inst.createEmbeddings('text');
-    const [url, body] = postStub.getCall(0).args;
+    const [url, init] = fetchStub.getCall(0).args;
     assert.strictEqual(url, 'https://oss.example.com/v1/embeddings');
+    const body = JSON.parse(init.body);
     assert.strictEqual(body.input, 'text');
     assert.strictEqual(body.model, 'oss-emb');
   });
 
   it('OpenAI: URL formation (default endpoint) and model injection', async () => {
-    postStub.resolves(makeAxiosResponse(200, successData));
+    fetchStub.resolves(makeFetchResponse(200, successData));
 
     const inst = new OpenAIEmbeddings({
       apiKey: 'sk',
@@ -161,13 +138,14 @@ describe('OpenAIEmbeddings', () => {
     } as OpenAIEmbeddingsOptions);
 
     await inst.createEmbeddings('x');
-    const [url, body] = postStub.getCall(0).args;
+    const [url, init] = fetchStub.getCall(0).args;
     assert.strictEqual(url, 'https://api.openai.com/v1/embeddings');
+    const body = JSON.parse(init.body);
     assert.strictEqual(body.model, 'm');
   });
 
   it('OpenAI: URL formation (custom endpoint)', async () => {
-    postStub.resolves(makeAxiosResponse(200, successData));
+    fetchStub.resolves(makeFetchResponse(200, successData));
 
     const inst = new OpenAIEmbeddings({
       apiKey: 'sk',
@@ -176,12 +154,12 @@ describe('OpenAIEmbeddings', () => {
     } as OpenAIEmbeddingsOptions);
 
     await inst.createEmbeddings('x');
-    const [url] = postStub.getCall(0).args;
+    const [url] = fetchStub.getCall(0).args;
     assert.strictEqual(url, 'https://custom/v1/embeddings');
   });
 
   it('Azure: headers include Content-Type, User-Agent, api-key', async () => {
-    postStub.resolves(makeAxiosResponse(200, successData));
+    fetchStub.resolves(makeFetchResponse(200, successData));
 
     const inst = new OpenAIEmbeddings({
       azureApiKey: 'key',
@@ -190,14 +168,15 @@ describe('OpenAIEmbeddings', () => {
     } as AzureOpenAIEmbeddingsOptions);
 
     await inst.createEmbeddings('x');
-    const [, , config] = postStub.getCall(0).args;
-    assert.strictEqual(config.headers['Content-Type'], 'application/json');
-    assert.strictEqual(config.headers['User-Agent'], 'AlphaWave');
-    assert.strictEqual(config.headers['api-key'], 'key');
+    const [, init] = fetchStub.getCall(0).args;
+    const headers = new Headers(init.headers);
+    assert.strictEqual(headers.get('Content-Type'), 'application/json');
+    assert.strictEqual(headers.get('User-Agent'), 'AlphaWave');
+    assert.strictEqual(headers.get('api-key'), 'key');
   });
 
   it('OpenAI: headers include Authorization and OpenAI-Organization when provided', async () => {
-    postStub.resolves(makeAxiosResponse(200, successData));
+    fetchStub.resolves(makeFetchResponse(200, successData));
 
     const inst = new OpenAIEmbeddings({
       apiKey: 'sk',
@@ -206,13 +185,14 @@ describe('OpenAIEmbeddings', () => {
     } as OpenAIEmbeddingsOptions);
 
     await inst.createEmbeddings('x');
-    const [, , config] = postStub.getCall(0).args;
-    assert.strictEqual(config.headers['Authorization'], 'Bearer sk');
-    assert.strictEqual(config.headers['OpenAI-Organization'], 'org1');
+    const [, init] = fetchStub.getCall(0).args;
+    const headers = new Headers(init.headers);
+    assert.strictEqual(headers.get('Authorization'), 'Bearer sk');
+    assert.strictEqual(headers.get('OpenAI-Organization'), 'org1');
   });
 
   it('Respects pre-supplied headers from requestConfig and does not overwrite them', async () => {
-    postStub.resolves(makeAxiosResponse(200, successData));
+    fetchStub.resolves(makeFetchResponse(200, successData));
 
     const inst = new OpenAIEmbeddings({
       apiKey: 'sk',
@@ -227,23 +207,24 @@ describe('OpenAIEmbeddings', () => {
     } as OpenAIEmbeddingsOptions);
 
     await inst.createEmbeddings('x');
-    const [, , config] = postStub.getCall(0).args;
+    const [, init] = fetchStub.getCall(0).args;
+    const headers = new Headers(init.headers);
 
-    assert.strictEqual(config.headers['Content-Type'], 'application/x-custom'); // preserved
-    assert.strictEqual(config.headers['User-Agent'], 'MyUA'); // preserved
-    assert.strictEqual(config.headers['X-Custom'], '1'); // preserved
-    assert.strictEqual(config.headers['Authorization'], 'Bearer sk'); // added
+    assert.strictEqual(headers.get('Content-Type'), 'application/x-custom'); // preserved
+    assert.strictEqual(headers.get('User-Agent'), 'MyUA'); // preserved
+    assert.strictEqual(headers.get('X-Custom'), '1'); // preserved
+    assert.strictEqual(headers.get('Authorization'), 'Bearer sk'); // added
   });
 
   it('429 retry path obeys retryPolicy delays and eventually succeeds', async () => {
     const clock = sandbox.useFakeTimers();
 
-    const resp429 = makeAxiosResponse(429, {} as any);
-    const resp200 = makeAxiosResponse(200, successData);
+    const resp429 = makeFetchResponse(429, {} as any);
+    const resp200 = makeFetchResponse(200, successData);
 
-    postStub.onCall(0).resolves(resp429);
-    postStub.onCall(1).resolves(resp429);
-    postStub.onCall(2).resolves(resp200);
+    fetchStub.onCall(0).resolves(resp429);
+    fetchStub.onCall(1).resolves(resp429);
+    fetchStub.onCall(2).resolves(resp200);
 
     const inst = new OpenAIEmbeddings({
       apiKey: 'sk',
@@ -256,15 +237,15 @@ describe('OpenAIEmbeddings', () => {
     await clock.tickAsync(20);
     const result = await p;
 
-    assert.strictEqual(postStub.callCount, 3);
+    assert.strictEqual(fetchStub.callCount, 3);
     assert.strictEqual(result.status, 'success');
 
     clock.restore();
   });
 
   it('429 with empty retryPolicy returns rate_limited', async () => {
-    const resp429 = makeAxiosResponse(429, {} as any);
-    postStub.resolves(resp429);
+    const resp429 = makeFetchResponse(429, {} as any);
+    fetchStub.resolves(resp429);
 
     const inst = new OpenAIEmbeddings({
       apiKey: 'sk',
@@ -288,7 +269,7 @@ describe('OpenAIEmbeddings', () => {
       ],
       usage: { prompt_tokens: 1, total_tokens: 1 }
     };
-    postStub.resolves(makeAxiosResponse(200, data));
+    fetchStub.resolves(makeFetchResponse(200, data));
 
     const inst = new OpenAIEmbeddings({
       apiKey: 'sk',
@@ -301,7 +282,7 @@ describe('OpenAIEmbeddings', () => {
   });
 
   it('Non-429 error returns status error with message', async () => {
-    postStub.resolves(makeAxiosResponse(500, {} as any, 'Internal Server Error'));
+    fetchStub.resolves(makeFetchResponse(500, {} as any, 'Internal Server Error'));
 
     const inst = new OpenAIEmbeddings({
       apiKey: 'sk',
@@ -314,7 +295,7 @@ describe('OpenAIEmbeddings', () => {
   });
 
   it('logRequests true logs request and response details', async () => {
-    postStub.resolves(makeAxiosResponse(200, successData));
+    fetchStub.resolves(makeFetchResponse(200, successData));
     const logSpy = sandbox.stub(console, 'log');
 
     const inst = new OpenAIEmbeddings({
@@ -329,7 +310,7 @@ describe('OpenAIEmbeddings', () => {
   });
 
   it('Input handling: string preserved in body', async () => {
-    postStub.resolves(makeAxiosResponse(200, successData));
+    fetchStub.resolves(makeFetchResponse(200, successData));
 
     const inst = new OpenAIEmbeddings({
       apiKey: 'sk',
@@ -337,12 +318,13 @@ describe('OpenAIEmbeddings', () => {
     } as OpenAIEmbeddingsOptions);
 
     await inst.createEmbeddings('hello');
-    const [, body] = postStub.getCall(0).args;
+    const [, init] = fetchStub.getCall(0).args;
+    const body = JSON.parse(init.body);
     assert.strictEqual(body.input, 'hello');
   });
 
   it('Input handling: string[] preserved in body', async () => {
-    postStub.resolves(makeAxiosResponse(200, successData));
+    fetchStub.resolves(makeFetchResponse(200, successData));
 
     const inst = new OpenAIEmbeddings({
       apiKey: 'sk',
@@ -350,7 +332,8 @@ describe('OpenAIEmbeddings', () => {
     } as OpenAIEmbeddingsOptions);
 
     await inst.createEmbeddings(['a', 'b']);
-    const [, body] = postStub.getCall(0).args;
+    const [, init] = fetchStub.getCall(0).args;
+    const body = JSON.parse(init.body);
     assert.deepStrictEqual(body.input, ['a', 'b']);
   });
 

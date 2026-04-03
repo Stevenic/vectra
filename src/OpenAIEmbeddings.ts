@@ -1,4 +1,3 @@
-import axios, { AxiosInstance, AxiosResponse, AxiosRequestConfig } from 'axios';
 import { EmbeddingsModel, EmbeddingsResponse } from "./types";
 import { CreateEmbeddingRequest, CreateEmbeddingResponse, OpenAICreateEmbeddingRequest } from "./internals";
 import { Colorize } from "./internals";
@@ -32,7 +31,7 @@ export interface BaseOpenAIEmbeddingsOptions {
     /**
      * Optional. Request options to use when calling the OpenAI API.
      */
-    requestConfig?: AxiosRequestConfig;
+    requestConfig?: RequestInit;
 }
 
 
@@ -112,13 +111,12 @@ export interface AzureOpenAIEmbeddingsOptions extends BaseOpenAIEmbeddingsOption
  * @remarks
  */
 export class OpenAIEmbeddings implements EmbeddingsModel {
-    private readonly _httpClient: AxiosInstance;
     private readonly _clientType: ClientType;
 
     private readonly UserAgent = 'AlphaWave';
 
     public readonly maxTokens;
-    
+
     /**
      * Options the client was configured with.
      */
@@ -161,11 +159,6 @@ export class OpenAIEmbeddings implements EmbeddingsModel {
                 retryPolicy: [2000, 5000]
             }, options) as OpenAIEmbeddingsOptions;
         }
-
-        // Create client
-        this._httpClient = axios.create({
-            validateStatus: (status) => status < 400 || status == 429
-        });
     }
 
     /**
@@ -185,17 +178,19 @@ export class OpenAIEmbeddings implements EmbeddingsModel {
             input: inputs,
         });
 
+        const data = await response.json() as CreateEmbeddingResponse;
+
         if (this.options.logRequests) {
             console.log(Colorize.title('RESPONSE:'));
             console.log(Colorize.value('status', response.status));
             console.log(Colorize.value('duration', Date.now() - startTime, 'ms'));
-            console.log(Colorize.output(response.data));
+            console.log(Colorize.output(data));
         }
 
 
         // Process response
         if (response.status < 300) {
-            return { status: 'success', output: response.data.data.sort((a, b) => a.index - b.index).map((item) => item.embedding) };
+            return { status: 'success', output: data.data.sort((a, b) => a.index - b.index).map((item) => item.embedding) };
         } else if (response.status == 429) {
             return { status: 'rate_limited', message: `The embeddings API returned a rate limit error.` }
         } else {
@@ -206,7 +201,7 @@ export class OpenAIEmbeddings implements EmbeddingsModel {
     /**
      * @private
      */
-    protected createEmbeddingRequest(request: CreateEmbeddingRequest): Promise<AxiosResponse<CreateEmbeddingResponse>> {
+    protected createEmbeddingRequest(request: CreateEmbeddingRequest): Promise<Response> {
         if (this.options.dimensions) {
             request.dimensions = this.options.dimensions;
         }
@@ -230,33 +225,37 @@ export class OpenAIEmbeddings implements EmbeddingsModel {
     /**
      * @private
      */
-    protected async post<TData>(url: string, body: object, retryCount = 0): Promise<AxiosResponse<TData>> {
-        // Initialize request config
-        const requestConfig: AxiosRequestConfig = Object.assign({}, this.options.requestConfig);
+    protected async post(url: string, body: object, retryCount = 0): Promise<Response> {
+        // Initialize headers from requestConfig
+        const baseHeaders = new Headers((this.options.requestConfig?.headers as Record<string, string>) ?? {});
 
-        // Initialize request headers
-        if (!requestConfig.headers) {
-            requestConfig.headers = {};
+        // Set defaults if not already provided
+        if (!baseHeaders.has('Content-Type')) {
+            baseHeaders.set('Content-Type', 'application/json');
         }
-        if (!requestConfig.headers['Content-Type']) {
-            requestConfig.headers['Content-Type'] = 'application/json';
+        if (!baseHeaders.has('User-Agent')) {
+            baseHeaders.set('User-Agent', this.UserAgent);
         }
-        if (!requestConfig.headers['User-Agent']) {
-            requestConfig.headers['User-Agent'] = this.UserAgent;
-        }
+
+        // Set auth headers
         if (this._clientType == ClientType.AzureOpenAI) {
             const options = this.options as AzureOpenAIEmbeddingsOptions;
-            requestConfig.headers['api-key'] = options.azureApiKey;
+            baseHeaders.set('api-key', options.azureApiKey);
         } else if (this._clientType == ClientType.OpenAI) {
             const options = this.options as OpenAIEmbeddingsOptions;
-            requestConfig.headers['Authorization'] = `Bearer ${options.apiKey}`;
+            baseHeaders.set('Authorization', `Bearer ${options.apiKey}`);
             if (options.organization) {
-                requestConfig.headers['OpenAI-Organization'] = options.organization;
+                baseHeaders.set('OpenAI-Organization', options.organization);
             }
         }
 
         // Send request
-        const response = await this._httpClient.post(url, body, requestConfig);
+        const response = await fetch(url, {
+            ...this.options.requestConfig,
+            method: 'POST',
+            headers: baseHeaders,
+            body: JSON.stringify(body),
+        });
 
         // Check for rate limit error
         if (response.status == 429 && Array.isArray(this.options.retryPolicy) && retryCount < this.options.retryPolicy.length) {

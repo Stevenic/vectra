@@ -1,0 +1,140 @@
+# Vectra
+
+> Vectra is a local, file-backed, in-memory vector database with a gRPC server for cross-language access. Each index is a folder on disk; queries use MongoDB-style metadata filters and cosine similarity ranking. Ideal for small, mostly static corpora: prompt augmentation, few-shot libraries, single-document Q&A, and local dev workflows.
+
+Vectra works like a local Pinecone or Qdrant. Indexes load fully into memory for fast lookups (<1 ms for small indexes, 1-2 ms for medium). It supports two storage formats (JSON default, Protocol Buffers for 40-50% smaller files) and two index types: `LocalIndex` (you supply vectors + metadata) and `LocalDocumentIndex` (Vectra chunks, embeds, and retrieves text).
+
+The built-in gRPC server (`vectra serve`) exposes 19 RPCs so any language can use Vectra as a vector database. Generate idiomatic client scaffolding for Python, C#, Rust, Go, Java, or TypeScript with `vectra generate --language <lang>`.
+
+## Using the TypeScript Library
+
+Install: `npm install vectra`
+
+Key exports: `LocalIndex`, `LocalDocumentIndex`, `OpenAIEmbeddings`, `LocalEmbeddings`, `JsonCodec`, `ProtobufCodec`, `migrateIndex`, `VectraServer`, `IndexManager`, `FolderWatcher`, `TextSplitter`, `GPT3Tokenizer`, `ItemSelector`, `FileFetcher`, `WebFetcher`, `LocalFileStorage`, `VirtualFileStorage`, `IndexedDBStorage`.
+
+Storage backends:
+- `LocalFileStorage` — filesystem (Node.js, default)
+- `IndexedDBStorage` — IndexedDB (browsers, Electron)
+- `VirtualFileStorage` — in-memory (any environment, ephemeral)
+- Custom implementations via the `FileStorage` interface
+
+Vectra runs in browsers using `IndexedDBStorage` for persistence and `LocalEmbeddings` for offline vector generation.
+
+Embeddings providers:
+- `OpenAIEmbeddings` — OpenAI, Azure OpenAI, or any OpenAI-compatible endpoint
+- `LocalEmbeddings` — local HuggingFace models, no API key (requires optional `@huggingface/transformers`)
+
+LocalIndex (items + metadata):
+```ts
+import { LocalIndex } from 'vectra';
+const index = new LocalIndex('./my-index');
+await index.createIndex({ version: 1, metadata_config: { indexed: ['category'] } });
+await index.insertItem({ vector: [0.1, 0.2, ...], metadata: { text: 'hello', category: 'greeting' } });
+const results = await index.queryItems(queryVector, '', 3, { category: { $eq: 'greeting' } });
+```
+
+LocalDocumentIndex (documents + chunking):
+```ts
+import { LocalDocumentIndex, OpenAIEmbeddings } from 'vectra';
+const embeddings = new OpenAIEmbeddings({ apiKey: '...', model: 'text-embedding-3-small', maxTokens: 8000 });
+const docs = new LocalDocumentIndex({ folderPath: './my-doc-index', embeddings });
+await docs.createIndex({ version: 1 });
+await docs.upsertDocument('doc://readme', text, 'md');
+const results = await docs.queryDocuments('search query', { maxDocuments: 5, maxChunks: 20 });
+```
+
+Filter operators (Pinecone-compatible subset): `$and`, `$or`, `$eq`, `$ne`, `$gt`, `$gte`, `$lt`, `$lte`, `$in`, `$nin`. Only fields in `metadata_config.indexed` are filterable.
+
+## Using Vectra from Other Languages (gRPC)
+
+Any language can use Vectra via the gRPC server. The workflow is:
+
+1. Start the server: `npx vectra serve ./my-index --keys ./keys.json --port 50051`
+2. Generate client bindings: `npx vectra generate --language <lang> --output ./bindings/<lang>`
+3. Use the generated `VectraClient` class in your code
+
+Multi-index mode: `npx vectra serve --root ./indexes --keys ./keys.json`
+Daemon mode: add `--daemon --pid-file ./vectra.pid`; stop with `npx vectra stop --pid-file ./vectra.pid`
+
+The server binds to 127.0.0.1 only. Clients send text; the server computes embeddings server-side.
+
+gRPC service RPCs (VectraService):
+- Index management: `CreateIndex`, `DeleteIndex`, `ListIndexes`
+- Item CRUD: `InsertItem`, `UpsertItem`, `BatchInsertItems`, `GetItem`, `DeleteItem`, `ListItems`
+- Queries: `QueryItems`, `QueryDocuments`
+- Documents: `UpsertDocument`, `DeleteDocument`, `ListDocuments`
+- Stats: `GetIndexStats`, `GetCatalogStats`
+- Lifecycle: `Healthcheck`, `Shutdown`
+
+Python example:
+```python
+from vectra_client import VectraClient
+client = VectraClient("localhost:50051")
+client.create_index("my-index", metadata_config={"indexed": ["category"]})
+client.insert_item("my-index", text="hello world", metadata={"category": "greeting"})
+results = client.query_items("my-index", text="hi there", top_k=3)
+```
+
+C# example:
+```csharp
+using Vectra.Client;
+var client = new VectraClient("localhost:50051");
+await client.CreateIndexAsync("my-index", new MetadataConfig { Indexed = ["category"] });
+await client.InsertItemAsync("my-index", text: "hello world", metadata: new { category = "greeting" });
+var results = await client.QueryItemsAsync("my-index", text: "hi there", topK: 3);
+```
+
+Rust example:
+```rust
+use vectra_client::VectraClient;
+let client = VectraClient::connect("http://localhost:50051").await?;
+client.create_index("my-index", Some(vec!["category"])).await?;
+client.insert_item("my-index", "hello world", json!({"category": "greeting"})).await?;
+let results = client.query_items("my-index", "hi there", 3).await?;
+```
+
+## CLI Reference
+
+All commands: `npx vectra --help`
+Global options: `--storage <local|virtual>`, `--storage-root <path>`
+
+- `vectra create <path> [--format json|protobuf]` — create a new index
+- `vectra delete <path>` — delete an index
+- `vectra add <path> --keys <keys.json> --uri <url|file>` — add documents
+- `vectra remove <path> --uri <uri>` — remove documents
+- `vectra query <path> "<text>" --keys <keys.json>` — query an index
+- `vectra stats <path>` — print index statistics
+- `vectra migrate <path> --to <json|protobuf>` — migrate storage format
+- `vectra serve [path] --keys <keys.json> [--root <dir>] [--port 50051] [--daemon]` — start gRPC server
+- `vectra stop --pid-file <path>` — stop daemon
+- `vectra generate --language <lang> --output <dir>` — generate language bindings
+- `vectra watch <index> --keys <keys> --uri <path>... [--list <file>] [--extensions .txt .md] [--debounce 500] [--chunk-size 512]` — watch folders and auto-sync file changes into an index
+
+keys.json for OpenAI: `{ "apiKey": "sk-...", "model": "text-embedding-3-small", "maxTokens": 8000 }`
+keys.json for Azure: `{ "azureApiKey": "...", "azureEndpoint": "https://...", "azureDeployment": "...", "azureApiVersion": "2023-05-15" }`
+
+## On-disk Format
+
+Each index is a folder. JSON format (default):
+- `index.json` — version, metadata_config, items array (id, vector, norm, metadata, optional metadataFile)
+- `*.json` — per-item metadata files
+- `catalog.json` — URI-to-ID mapping (document indexes)
+- `<documentId>.txt` — document bodies
+
+Protocol Buffer format (`.pb` extensions instead of `.json`). Migrate with `vectra migrate <path> --to protobuf`.
+
+## Documentation
+
+- [README](https://github.com/Stevenic/vectra/blob/main/README.md): Full project documentation with API usage, CLI reference, and architecture
+- [Getting Started](https://github.com/Stevenic/vectra/blob/main/docs/getting-started.md): Install, quick start for both index types
+- [Core Concepts](https://github.com/Stevenic/vectra/blob/main/docs/core-concepts.md): Index types, metadata filtering, hybrid retrieval, on-disk layout
+- [CLI Reference](https://github.com/Stevenic/vectra/blob/main/docs/cli.md): All CLI commands with flags and examples
+- [API Reference](https://github.com/Stevenic/vectra/blob/main/docs/api-reference.md): LocalIndex, LocalDocumentIndex, embeddings, utilities
+- [Best Practices](https://github.com/Stevenic/vectra/blob/main/docs/best-practices.md): Index design, chunking, retrieval tuning, troubleshooting
+- [Proto Definition](https://github.com/Stevenic/vectra/blob/main/proto/vectra_service.proto): Full gRPC service definition
+- [Contributing](https://github.com/Stevenic/vectra/blob/main/CONTRIBUTING.md): Contribution guidelines
+- [License](https://github.com/Stevenic/vectra/blob/main/LICENSE): MIT License
+
+## Optional
+
+- [Code of Conduct](https://github.com/Stevenic/vectra/blob/main/CODE_OF_CONDUCT.md): Community standards

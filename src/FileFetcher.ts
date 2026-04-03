@@ -1,5 +1,5 @@
 import { TextFetcher } from './types';
-import * as fs from 'fs/promises';
+import fs from 'node:fs';
 import * as path from 'node:path';
 
 export class FileFetcher implements TextFetcher {
@@ -8,19 +8,19 @@ export class FileFetcher implements TextFetcher {
     onDocument: (uri: string, text: string, docType?: string | undefined) => Promise<boolean>
   ): Promise<boolean> {
     // Does path exist and is it a directory?
-    let isDirectory: boolean;
+    let stat;
     try {
-      const stat = await fs.stat(uri);
-      isDirectory = stat.isDirectory();
+      stat = await fs.promises.stat(uri);
     } catch {
       // Non-existent path: treat as no-op success
       return true;
     }
 
-    if (isDirectory) {
-      const files = await fs.readdir(uri);
+    if (stat.isDirectory()) {
+      // Read directory and recurse. If any child returns false, aggregate to false.
+      const entries = await fs.promises.readdir(uri);
       let allOk = true;
-      for (const file of files) {
+      for (const file of entries) {
         const filePath = path.join(uri, file);
         const ok = await this.fetch(filePath, onDocument);
         if (!ok) {
@@ -29,12 +29,8 @@ export class FileFetcher implements TextFetcher {
       }
       return allOk;
     } else {
-      // Read file and call onDocument
-      const text = await fs.readFile(uri, 'utf8');
-
-      // Determine docType:
-      // - if extension exists, use it (without dot)
-      // - otherwise, use last path segment (basename)
+      // Read file and invoke onDocument
+      const text = await fs.promises.readFile(uri, 'utf8');
       const ext = path.extname(uri);
       const docType =
         ext && ext.length > 1
