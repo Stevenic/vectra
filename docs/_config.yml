@@ -1,6 +1,6 @@
 title: Vectra
 description: A local vector database
-remote_theme: just-the-docs/just-the-docs@v0.10.1
+remote_theme: just-the-docs/just-the-docs@v0.12.0
 
 url: https://stevenic.github.io
 baseurl: /vectra

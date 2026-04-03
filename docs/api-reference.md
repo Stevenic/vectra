@@ -324,6 +324,74 @@ const response = await embeddings.createEmbeddings(['hello', 'world']);
 
 ---
 
+## TransformersEmbeddings
+
+Run embeddings locally using Transformers.js with full control over device, quantization, and pooling. Works in Node.js, browsers, and Electron. Requires the optional `@huggingface/transformers` package.
+
+### Factory method
+
+```ts
+import { TransformersEmbeddings } from 'vectra';
+
+// Default: Xenova/all-MiniLM-L6-v2 (384 dims, 512 max tokens)
+const embeddings = await TransformersEmbeddings.create();
+
+// Custom options
+const embeddings = await TransformersEmbeddings.create({
+  model: 'Xenova/bge-small-en-v1.5',
+  maxTokens: 512,
+  device: 'gpu',
+  dtype: 'q8',
+  pooling: 'mean',
+  normalize: true,
+  progressCallback: (p) => console.log(p.status, p.progress),
+});
+```
+
+{: .note }
+Use the async `create()` factory — the constructor is private. The model is downloaded and cached on first call.
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `model` | `string?` | `'Xenova/all-MiniLM-L6-v2'` | HuggingFace model ID (must support `feature-extraction` pipeline) |
+| `maxTokens` | `number?` | `512` | Maximum tokens per input |
+| `device` | `'auto' \| 'gpu' \| 'cpu' \| 'wasm'` | `'auto'` | Inference device (WebGPU in browser, CUDA in Node.js if available) |
+| `dtype` | `'fp32' \| 'fp16' \| 'q8' \| 'q4'` | `'fp32'` | Model weight precision — lower precision trades quality for speed/size |
+| `normalize` | `boolean?` | `true` | Normalize embeddings to unit length |
+| `pooling` | `'mean' \| 'cls'` | `'mean'` | Token pooling strategy |
+| `progressCallback` | `function?` | -- | Callback for model download/load progress |
+
+### Properties
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `model` | `string` | The model ID in use |
+| `maxTokens` | `number` | Maximum tokens per input |
+
+### Methods
+
+#### createEmbeddings(inputs)
+
+Generate embeddings for one or more text strings.
+
+```ts
+const response = await embeddings.createEmbeddings(['hello', 'world']);
+// response.status: 'success' | 'error'
+// response.output: number[][] (one vector per input)
+```
+
+#### getTokenizer()
+
+Returns a `TransformersTokenizer` that uses the same tokenization as this embedding model. Use it with `LocalDocumentIndex` to ensure text chunking aligns with the model's token boundaries.
+
+```ts
+const tokenizer = embeddings.getTokenizer();
+const tokens = tokenizer.encode('hello world');
+const text = tokenizer.decode(tokens);
+```
+
+---
+
 ## FolderWatcher
 
 Watch folders for file changes and automatically sync them into a `LocalDocumentIndex`. Performs an initial full sync on start, then monitors for real-time adds, updates, and deletes.
@@ -440,6 +508,8 @@ See [Storage Formats](/vectra/storage#storage-formats) for details and migration
 | `ItemSelector` | Item selection utilities |
 | `FileFetcher` | Read local files for document ingestion (Node.js only) |
 | `WebFetcher` | Fetch web pages for document ingestion (Node.js only) |
+| `BrowserWebFetcher` | Fetch web pages in browsers/Electron using Fetch API + DOMParser |
+| `TransformersTokenizer` | Tokenizer matching a `TransformersEmbeddings` model (encode/decode) |
 | `pathUtils` | Cross-platform path utilities (works in Node.js and browsers) |
 | `migrateIndex` | Migrate an index between serialization formats |
 

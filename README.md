@@ -17,7 +17,7 @@ Vectra is a local, file-backed, in-memory vector database with an optional gRPC 
 - **Pinecone-style filtering** — familiar MongoDB query operators for metadata filtering
 - **Multiple embeddings providers** — OpenAI, Azure OpenAI, OSS endpoints, or local HuggingFace models (no API key needed)
 - **Pluggable storage** — filesystem, IndexedDB (browsers), in-memory, or your own custom `FileStorage` implementation
-- **Browser compatible** — runs entirely in the browser with IndexedDB persistence and local embeddings
+- **Browser & Electron compatible** — runs in browsers and Electron with IndexedDB persistence, local embeddings, and a dedicated `vectra/browser` entry point
 - **CLI included** — manage indexes, serve gRPC, watch folders from the command line
 - **Cross-language access** — built-in gRPC server with client bindings for Python, C#, Rust, Go, Java, and TypeScript
 - **Flexible serialization** — JSON (human-readable) or Protocol Buffers (40-50% smaller)
@@ -118,16 +118,20 @@ if (results.length > 0) {
 }
 ```
 
-### Running in the Browser
+### Running in the Browser or Electron
+
+Use the `vectra/browser` entry point — it excludes Node-specific modules and works with any bundler (webpack, Vite, esbuild, etc.):
 
 ```ts
-import { LocalDocumentIndex, LocalEmbeddings, IndexedDBStorage } from 'vectra';
+import { LocalDocumentIndex, TransformersEmbeddings, IndexedDBStorage } from 'vectra/browser';
 
 const storage = new IndexedDBStorage('my-app-vectors');
-const embeddings = new LocalEmbeddings(); // runs locally, no API key
+const embeddings = await TransformersEmbeddings.create(); // runs locally, no API key
 
 const index = new LocalDocumentIndex({ folderPath: 'my-index', embeddings, storage });
 ```
+
+Bundlers that support the `exports` field in `package.json` will automatically resolve `vectra` to the browser entry point when targeting a browser environment.
 
 See the [Storage guide](https://stevenic.github.io/vectra/storage#running-in-the-browser) for full browser setup details.
 
@@ -177,6 +181,9 @@ Key exports from `vectra`:
 | `LocalDocumentIndex` | Document ingestion, chunking, and retrieval |
 | `OpenAIEmbeddings` | OpenAI / Azure / OSS embeddings |
 | `LocalEmbeddings` | Local HuggingFace embeddings (no API key) |
+| `TransformersEmbeddings` | Async local embeddings with GPU/WASM, quantization, and pooling options |
+| `TransformersTokenizer` | Tokenizer matching the `TransformersEmbeddings` model for chunking alignment |
+| `BrowserWebFetcher` | Browser-native web fetcher using Fetch API and DOMParser |
 | `LocalFileStorage` | Filesystem storage (Node.js, default) |
 | `IndexedDBStorage` | IndexedDB storage (browsers) |
 | `VirtualFileStorage` | In-memory storage (testing) |

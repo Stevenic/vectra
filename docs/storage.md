@@ -98,9 +98,6 @@ Additional methods:
 - `close()` — close the database connection
 - `destroy()` — delete the entire database and all stored data
 
-{: .note }
-IndexedDBStorage is available on the `stevenic/browser-support` branch (PR #95) and will be included in an upcoming release.
-
 ### VirtualFileStorage
 
 Fully in-memory storage. Works in Node.js and browsers. Useful for testing, CI, and ephemeral workflows where you don't need persistence.
@@ -172,22 +169,24 @@ Your implementation must match the behavioral contract: `createFile` must throw 
 
 ## Running in the browser
 
-Vectra can run entirely in the browser — no Node.js required. Use `IndexedDBStorage` for persistence or `VirtualFileStorage` for ephemeral use.
+Vectra can run entirely in the browser or Electron — no Node.js required. Use `IndexedDBStorage` for persistence or `VirtualFileStorage` for ephemeral use.
 
 ### Setup
 
-When bundling for the browser, Vectra's package exports map `LocalFileStorage` to a stub that throws a helpful error directing you to use `IndexedDBStorage` or `VirtualFileStorage` instead.
+Import from `vectra/browser` (or just `vectra` — bundlers that support conditional exports will resolve automatically). This entry point excludes Node-specific modules (`LocalFileStorage`, `FileFetcher`, `WebFetcher`, `FolderWatcher`) and includes browser alternatives like `BrowserWebFetcher`.
+
+If you accidentally import `LocalFileStorage` in a browser bundle, the stub throws a helpful error directing you to use `IndexedDBStorage` or `VirtualFileStorage` instead.
 
 ### Browser example with IndexedDB
 
 ```ts
-import { LocalDocumentIndex, LocalEmbeddings, IndexedDBStorage } from 'vectra';
+import { LocalDocumentIndex, TransformersEmbeddings, IndexedDBStorage } from 'vectra/browser';
 
 // Persistent browser storage via IndexedDB
 const storage = new IndexedDBStorage('my-app-vectors');
 
 // Local embeddings run entirely in the browser — no API key needed
-const embeddings = new LocalEmbeddings();
+const embeddings = await TransformersEmbeddings.create();
 
 const index = new LocalDocumentIndex({
   folderPath: 'my-index',
@@ -214,13 +213,15 @@ const results = await index.queryDocuments('search query', {
 | LocalIndex | Yes (with IndexedDBStorage or VirtualFileStorage) |
 | LocalDocumentIndex | Yes |
 | LocalEmbeddings | Yes (uses @huggingface/transformers) |
+| TransformersEmbeddings | Yes (async factory, GPU/WASM device options, quantization) |
 | OpenAIEmbeddings | Yes (makes fetch requests to API) |
 | Metadata filtering | Yes |
 | VirtualFileStorage | Yes |
 | IndexedDBStorage | Yes |
+| BrowserWebFetcher | Yes (uses Fetch API + DOMParser) |
 | LocalFileStorage | No (Node.js only) |
 | FileFetcher | No (Node.js only) |
-| WebFetcher | No (Node.js only — uses node-fetch) |
+| WebFetcher | No (Node.js only — uses cheerio) |
 | FolderWatcher | No (Node.js only — uses fs.watch) |
 | CLI | No (Node.js only) |
 

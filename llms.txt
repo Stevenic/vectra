@@ -10,7 +10,9 @@ The built-in gRPC server (`vectra serve`) exposes 19 RPCs so any language can us
 
 Install: `npm install vectra`
 
-Key exports: `LocalIndex`, `LocalDocumentIndex`, `OpenAIEmbeddings`, `LocalEmbeddings`, `JsonCodec`, `ProtobufCodec`, `migrateIndex`, `VectraServer`, `IndexManager`, `FolderWatcher`, `TextSplitter`, `GPT3Tokenizer`, `ItemSelector`, `FileFetcher`, `WebFetcher`, `LocalFileStorage`, `VirtualFileStorage`, `IndexedDBStorage`.
+Key exports: `LocalIndex`, `LocalDocumentIndex`, `OpenAIEmbeddings`, `LocalEmbeddings`, `TransformersEmbeddings`, `TransformersTokenizer`, `JsonCodec`, `ProtobufCodec`, `migrateIndex`, `VectraServer`, `IndexManager`, `FolderWatcher`, `TextSplitter`, `GPT3Tokenizer`, `ItemSelector`, `FileFetcher`, `WebFetcher`, `BrowserWebFetcher`, `LocalFileStorage`, `VirtualFileStorage`, `IndexedDBStorage`, `pathUtils`.
+
+Browser/Electron entry point: `import { ... } from 'vectra/browser'` — excludes Node-specific modules (LocalFileStorage, FileFetcher, WebFetcher, FolderWatcher) and includes browser alternatives (BrowserWebFetcher, IndexedDBStorage). Bundlers with conditional export support auto-resolve `vectra` to the browser entry point when targeting browsers.
 
 Storage backends:
 - `LocalFileStorage` — filesystem (Node.js, default)
@@ -18,11 +20,12 @@ Storage backends:
 - `VirtualFileStorage` — in-memory (any environment, ephemeral)
 - Custom implementations via the `FileStorage` interface
 
-Vectra runs in browsers using `IndexedDBStorage` for persistence and `LocalEmbeddings` for offline vector generation.
+Vectra runs in browsers and Electron using `IndexedDBStorage` for persistence and `TransformersEmbeddings` or `LocalEmbeddings` for offline vector generation.
 
 Embeddings providers:
 - `OpenAIEmbeddings` — OpenAI, Azure OpenAI, or any OpenAI-compatible endpoint
 - `LocalEmbeddings` — local HuggingFace models, no API key (requires optional `@huggingface/transformers`)
+- `TransformersEmbeddings` — async factory with device selection (GPU/WASM/CPU), quantization (fp32/fp16/q8/q4), and pooling options. Use `await TransformersEmbeddings.create(options)` to instantiate.
 
 LocalIndex (items + metadata):
 ```ts

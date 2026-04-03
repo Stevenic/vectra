@@ -31,7 +31,7 @@ Install Vectra and run your first queries in minutes.
 - Sufficient RAM to hold your index in memory during queries (see [Performance and limits](/vectra/best-practices#performance-and-limits))
 
 {: .note }
-Vectra also runs in the browser using `IndexedDBStorage` for persistence. See the [Storage](/vectra/storage#running-in-the-browser) guide for browser setup.
+Vectra also runs in browsers and Electron. Import from `vectra/browser` for a bundle that excludes Node-specific modules. See the [Storage](/vectra/storage#running-in-the-browser) guide for browser setup.
 
 ## Install
 
