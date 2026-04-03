@@ -21,7 +21,7 @@ Install Vectra and run your first queries in minutes.
 
 ## Requirements
 
-- **Node.js 20.x** or newer
+- **Node.js 20.x** or newer (for the TypeScript library and CLI)
 - A package manager (**npm** or **yarn**)
 - An embeddings provider for similarity search:
   - OpenAI (API key + model, e.g., `text-embedding-3-large`)
@@ -142,7 +142,7 @@ if (!(await docs.isIndexCreated())) {
 
 // 3) Add a document
 await docs.upsertDocument('doc://welcome', `
-Vectra is a file-backed, in-memory vector DB for Node.js.
+Vectra is a local, file-backed, in-memory vector database.
 It supports Pinecone-like metadata filtering and fast local retrieval.
 `, 'md');
 

@@ -2,7 +2,7 @@
 
 ## 1. Introduction
 
-Thank you for your interest in contributing to Vectra! This project is an open-source local vector database for Node.js, licensed under the MIT License. These guidelines are intended to help you understand how to contribute effectively, maintain code quality, and foster a welcoming and productive community. Please read them carefully before making contributions.
+Thank you for your interest in contributing to Vectra! This project is an open-source local vector database, licensed under the MIT License. These guidelines are intended to help you understand how to contribute effectively, maintain code quality, and foster a welcoming and productive community. Please read them carefully before making contributions.
 
 ## 2. Code of Conduct
 

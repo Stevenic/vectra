@@ -1,6 +1,7 @@
 export * from './codecs';
 export * from './storage';
 export * from './FileFetcher';
+export * from './FolderWatcher';
 export * from './GPT3Tokenizer';
 export * from './ItemSelector';
 export * from './LocalEmbeddings';

@@ -135,7 +135,7 @@ If you manage updates manually, call `beginUpdate` â†’ multiple insert/delete â†
 
 **Fix:** Keep a single embedding model/dimension per index. Re-embed and rebuild if you change models.
 
-### Node.js or environment issues
+### Runtime or environment issues
 
 **Symptom:** Runtime errors on `fs` or syntax errors.
 

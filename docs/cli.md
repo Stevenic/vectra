@@ -122,6 +122,41 @@ Print index statistics.
 npx vectra stats ./my-doc-index
 ```
 
+### watch
+
+Watch folders for file changes and automatically sync them into an index. Performs an initial full sync, then monitors for real-time adds, updates, and deletes. Press Ctrl+C to stop.
+
+```sh
+# Watch a single folder
+npx vectra watch ./my-doc-index --keys ./keys.json --uri ./docs
+
+# Watch multiple paths with extension filtering
+npx vectra watch ./my-doc-index --keys ./keys.json \
+  --uri ./docs --uri ./notes \
+  --extensions .txt .md .html
+
+# Watch paths listed in a file (one per line)
+npx vectra watch ./my-doc-index --keys ./keys.json --list ./watch-paths.txt
+
+# Custom debounce interval and chunk size
+npx vectra watch ./my-doc-index --keys ./keys.json --uri ./docs \
+  --debounce 1000 --chunk-size 256
+```
+
+**Options:**
+
+| Flag | Alias | Default | Description |
+|------|-------|---------|-------------|
+| `--keys <path>` | `-k` | — | Path to embeddings provider config (required) |
+| `--uri <path>` | `-u` | — | Folder or file path to watch (repeatable) |
+| `--list <path>` | `-l` | — | File containing one path per line |
+| `--extensions <ext...>` | `-e` | all files | File extensions to include (e.g., `.txt .md .html`) |
+| `--chunk-size <n>` | `-cs` | 512 | Token count per chunk |
+| `--debounce <ms>` | — | 500 | Debounce interval in milliseconds |
+
+{: .note }
+The `FolderWatcher` class is also exported from the library for programmatic use. See the [API Reference](/vectra/api-reference) for details.
+
 ### help
 
 Show all available commands:

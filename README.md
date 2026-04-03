@@ -1,7 +1,12 @@
-# Vectra: local, file-backed vector database for Node.js
+# Vectra: a local vector database
+
+[![npm version](https://img.shields.io/npm/v/vectra.svg)](https://www.npmjs.com/package/vectra)
+[![Build](https://github.com/Stevenic/vectra/actions/workflows/ci.yml/badge.svg)](https://github.com/Stevenic/vectra/actions/workflows/ci.yml)
+[![Coverage Status](https://coveralls.io/repos/github/Stevenic/vectra/badge.svg?branch=main)](https://coveralls.io/github/Stevenic/vectra?branch=main)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ## Overview
-Vectra is a file-backed, in-memory vector database for Node.js with an optional gRPC server for cross-language access. It works like a local [Pinecone](https://www.pinecone.io/) or [Qdrant](https://qdrant.tech/): each index is just a folder on disk with an index file containing vectors and any metadata fields you choose to index; all other metadata is stored per-item as separate files. Queries use a Pinecone-compatible subset of [MongoDB-style operators](https://www.mongodb.com/docs/manual/reference/operator/query/) for filtering, then rank matches by cosine similarity. Because the entire index is loaded into memory, lookups are extremely fast (often <1 ms for small indexes, commonly 1-2 ms for larger local sets). It's ideal when you want simple, zero-infrastructure retrieval over a small, mostly static corpus. Pinecone-style namespaces aren't built-in, but you can mimic them by using separate folders (indexes).
+Vectra is a local, file-backed, in-memory vector database with an optional gRPC server for cross-language access. It works like a local [Pinecone](https://www.pinecone.io/) or [Qdrant](https://qdrant.tech/): each index is just a folder on disk with an index file containing vectors and any metadata fields you choose to index; all other metadata is stored per-item as separate files. Queries use a Pinecone-compatible subset of [MongoDB-style operators](https://www.mongodb.com/docs/manual/reference/operator/query/) for filtering, then rank matches by cosine similarity. Because the entire index is loaded into memory, lookups are extremely fast (often <1 ms for small indexes, commonly 1-2 ms for larger local sets). It's ideal when you want simple, zero-infrastructure retrieval over a small, mostly static corpus. Pinecone-style namespaces aren't built-in, but you can mimic them by using separate folders (indexes).
 
 Typical use cases:
 - Prompt augmentation over a small, mostly static corpus
@@ -34,6 +39,7 @@ Typical use cases:
   - [serve](#serve)
   - [stop](#stop)
   - [generate](#generate)
+  - [watch](#watch)
 - [gRPC Server](#grpc-server)
   - [Starting the Server](#starting-the-server)
   - [Service API](#service-api)
@@ -73,7 +79,7 @@ const index = new LocalDocumentIndex({ folderPath: './my-index', embeddings });
 Indexes can now be stored in Protocol Buffer format for 40-50% smaller files on disk. Use `--format protobuf` when creating an index, or migrate existing indexes with `vectra migrate`. The `protobufjs` package is an optional dependency — install it to enable this feature.
 
 ### gRPC Server
-Vectra now ships with a built-in gRPC server (`vectra serve`) that exposes all index operations over the network. This enables any language to use Vectra as a vector database without the Node.js library. Supports single-index and multi-index modes, foreground and daemon operation, and 19 RPCs covering index management, item CRUD, document operations, queries, stats, and lifecycle.
+Vectra now ships with a built-in gRPC server (`vectra serve`) that exposes all index operations over the network. This enables any language to use Vectra as a vector database. Supports single-index and multi-index modes, foreground and daemon operation, and 19 RPCs covering index management, item CRUD, document operations, queries, stats, and lifecycle.
 
 ### Language Binding Generator
 Generate idiomatic client scaffolding for **6 languages** with `vectra generate --language <lang> --output <dir>`. Supported languages: Python, C#, Rust, Go, Java, and TypeScript. Each generated package includes the proto file, a client wrapper, and a README with setup instructions.
@@ -84,6 +90,7 @@ Generate idiomatic client scaffolding for **6 languages** with `vectra generate 
 - `vectra serve [index]` — start the gRPC server
 - `vectra stop --pid-file <path>` — stop a running daemon
 - `vectra generate --language <lang> --output <dir>` — scaffold language bindings
+- `vectra watch <index> --keys <keys> --uri <path>...` — watch folders and auto-sync changes into an index
 - Global `--storage` and `--storage-root` options for all commands
 
 ## Why Vectra
@@ -116,7 +123,7 @@ Notes and tips:
 - Rough sizing: a 1536-dim float32 vector is ~6 KB in JSON, ~6 KB as binary float array; savings come from eliminating JSON overhead (brackets, commas, text-encoded floats).
 
 ## Requirements
-- Node.js 20.x or newer
+- Node.js 20.x or newer (for the TypeScript library and CLI)
 - A package manager (npm or yarn)
 - An embeddings provider for similarity search (pick one):
   - **OpenAI** (API key + model, e.g., `text-embedding-3-large` or compatible)
@@ -240,7 +247,7 @@ if (!(await docs.isIndexCreated())) {
 // 3) Add a document (string); you can also add files/URLs via FileFetcher/WebFetcher or the CLI
 const uri = 'doc://welcome';
 const text = `
-Vectra is a file-backed, in-memory vector DB for Node.js. It supports Pinecone-like metadata filtering
+Vectra is a local, file-backed, in-memory vector database. It supports Pinecone-like metadata filtering
 and fast local retrieval. It's ideal for small, mostly static corpora and prompt augmentation.
 `;
 await docs.upsertDocument(uri, text, 'md'); // optional docType hints chunking
@@ -474,6 +481,36 @@ Supported languages: `python`, `csharp`, `rust`, `go`, `java`, `typescript`.
 
 Each generated package includes the `.proto` file, an idiomatic client wrapper, and a README with setup instructions.
 
+### watch
+Watch folders for file changes and automatically sync them into an index. Performs an initial full sync, then monitors for real-time adds, updates, and deletes.
+```sh
+# Watch a single folder
+npx vectra watch ./my-index --keys ./keys.json --uri ./docs
+
+# Watch multiple paths with extension filtering
+npx vectra watch ./my-index --keys ./keys.json \
+  --uri ./docs --uri ./notes \
+  --extensions .txt .md .html
+
+# Watch paths from a list file
+npx vectra watch ./my-index --keys ./keys.json --list ./watch-paths.txt
+
+# Custom debounce and chunk size
+npx vectra watch ./my-index --keys ./keys.json --uri ./docs \
+  --debounce 1000 --chunk-size 256
+```
+
+| Flag | Alias | Default | Description |
+|------|-------|---------|-------------|
+| `--keys` | `-k` | — | Path to keys.json (required) |
+| `--uri` | `-u` | — | Folder or file path to watch (repeatable) |
+| `--list` | `-l` | — | File containing one path per line |
+| `--extensions` | `-e` | all | File extensions to include (e.g., `.txt .md`) |
+| `--chunk-size` | `-cs` | 512 | Chunk size in tokens |
+| `--debounce` | — | 500 | Debounce interval in milliseconds |
+
+Press Ctrl+C to gracefully stop watching. The `FolderWatcher` class is also available as a library export for programmatic use.
+
 ## gRPC Server
 
 Vectra includes a built-in gRPC server that exposes all index operations over the network. This lets any language use Vectra as a vector database — clients send text, the server computes embeddings and executes operations.
@@ -701,7 +738,7 @@ await index.createIndex({
 
 - **Memory model**
   - Entire index is loaded into RAM for querying.
-  - Rule-of-thumb sizing per vector (Node.js in-memory):
+  - Rule-of-thumb sizing per vector (in-memory):
     - `number[]` uses ~8 bytes per element (JS double) + array/object overhead.
     - Example: 1536-dim vector ~ 12 KB for raw numbers, plus per-item metadata/object overhead.
   - On disk, JSON is larger than binary; protobuf format reduces file sizes by 40-50%.
@@ -787,6 +824,7 @@ Key exports from `vectra`:
 | `migrateIndex` | Migrate an index between serialization formats |
 | `VectraServer` | gRPC server for cross-language access |
 | `IndexManager` | Multi-index management for the gRPC server |
+| `FolderWatcher` | Watch folders and auto-sync file changes into an index |
 | `TextSplitter` | Configurable text chunking |
 | `GPT3Tokenizer` | Token counting |
 | `ItemSelector` | Item selection utilities |

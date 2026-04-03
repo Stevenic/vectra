@@ -12,6 +12,7 @@ import { LocalFileStorage } from './storage/LocalFileStorage';
 import { VirtualFileStorage } from './storage/VirtualFileStorage';
 import { IndexCodec, JsonCodec, ProtobufCodec, detectCodec, migrateIndex, FormatName } from './codecs';
 import { VectraServer } from './server/VectraServer';
+import { FolderWatcher } from './FolderWatcher';
 
 function getStorage(args: any) {
   if (args.storage === 'virtual') {
@@ -315,6 +316,116 @@ export async function run() {
           }
         }
       }
+    })
+    .command('watch <index>', 'watch folders and automatically sync file changes into the index', (yargs) => {
+      return yargs
+        .option('keys', {
+          alias: 'k',
+          describe: 'path of a JSON file containing the model keys to use for generating embeddings',
+          type: 'string'
+        })
+        .option('uri', {
+          alias: 'u',
+          array: true,
+          describe: 'folder or file path to watch',
+          type: 'string'
+        })
+        .option('list', {
+          alias: 'l',
+          describe: 'path to a file containing a list of folders/files to watch',
+          type: 'string'
+        })
+        .option('extensions', {
+          alias: 'e',
+          array: true,
+          describe: 'file extensions to include (e.g., .txt .md .html)',
+          type: 'string'
+        })
+        .option('chunk-size', {
+          alias: 'cs',
+          describe: 'size of the generated chunks in tokens (defaults to 512)',
+          type: 'number',
+          default: 512
+        })
+        .option('debounce', {
+          describe: 'debounce interval in milliseconds (defaults to 500)',
+          type: 'number',
+          default: 500
+        })
+        .check((argv) => {
+          if (Array.isArray(argv.uri) && argv.uri.length > 0) {
+            return true;
+          } else if (typeof argv.list == 'string' && argv.list.trim().length > 0) {
+            return true;
+          } else {
+            throw new Error(`you must specify either one or more "--uri <path>" for the folders/files to watch or a "--list <file path>" for a file containing the paths.`);
+          }
+        })
+        .demandOption(['keys']);
+    }, async (args) => {
+      console.log(Colorize.title('Vectra Watch Mode'));
+
+      // Get embedding options
+      const options: OpenAIEmbeddingsOptions | AzureOpenAIEmbeddingsOptions | OSSEmbeddingsOptions = JSON.parse(await fs.readFile(args.keys as string, 'utf-8'));
+      if ((options as OpenAIEmbeddingsOptions).apiKey && !(options as OpenAIEmbeddingsOptions).model) {
+        (options as OpenAIEmbeddingsOptions).model = 'text-embedding-ada-002';
+        (options as OpenAIEmbeddingsOptions).maxTokens = 8000;
+      }
+
+      // Create embeddings
+      const embeddings = new OpenAIEmbeddings(options);
+
+      // Initialize index
+      const folderPath = args.index as string;
+      const storage = getStorage(args);
+      const codec = await detectCodec(folderPath, storage).catch(() => undefined);
+      const index = new LocalDocumentIndex({
+        folderPath,
+        embeddings,
+        chunkingConfig: {
+          chunkSize: args.chunkSize
+        },
+        storage,
+        codec
+      });
+
+      // Get list of paths to watch
+      const watchPaths = await getItemList(args.uri as string[], args.list as string, 'path');
+
+      // Create watcher
+      const watcher = new FolderWatcher({
+        index,
+        paths: watchPaths,
+        extensions: args.extensions as string[] | undefined,
+        debounceMs: args.debounce
+      });
+
+      // Wire up events
+      watcher.on('sync', (uri: string, action: string) => {
+        if (action === 'deleted') {
+          console.log(Colorize.warning(`removed ${uri}`));
+        } else {
+          console.log(Colorize.success(`${action} ${uri}`));
+        }
+      });
+      watcher.on('error', (err: Error, uri: string) => {
+        console.log(Colorize.error(`Error syncing ${uri}: ${err.message}`));
+      });
+
+      // Start watching
+      console.log(Colorize.progress(`performing initial sync...`));
+      await watcher.start();
+      console.log(Colorize.success(`initial sync complete (${watcher.trackedFileCount} files tracked)`));
+      console.log(Colorize.output(`watching for changes... (press Ctrl+C to stop)`));
+
+      // Handle graceful shutdown
+      const handleSignal = async () => {
+        console.log(Colorize.output('\nStopping watcher...'));
+        await watcher.stop();
+        process.exit(0);
+      };
+      process.on('SIGINT', handleSignal);
+      process.on('SIGTERM', handleSignal);
     })
     .command('generate', 'generate language bindings for the gRPC service', (yargs) => {
       return yargs

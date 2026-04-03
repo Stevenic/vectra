@@ -1,5 +1,5 @@
 title: Vectra
-description: A local, file-backed vector database for Node.js
+description: A local vector database
 remote_theme: just-the-docs/just-the-docs@v0.10.1
 
 url: https://stevenic.github.io
