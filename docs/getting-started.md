@@ -178,13 +178,16 @@ if (results.length > 0) {
 ```
 
 {: .note }
-Set `isBm25: true` in `queryDocuments` options to enable [hybrid retrieval](/vectra/core-concepts#hybrid-retrieval-documents) — blending keyword matches alongside semantic results.
+Set `isBm25: true` in `queryDocuments` options to enable [hybrid retrieval](/vectra/documents#hybrid-retrieval-bm25) — blending keyword matches alongside semantic results.
 
 ## Next steps
 
 - [Core Concepts](/vectra/core-concepts) — understand index types, metadata filtering, and on-disk layout
-- [Storage](/vectra/storage) — pluggable storage backends, custom implementations, and browser support
+- [Embeddings Guide](/vectra/embeddings) — choose and configure an embeddings provider
+- [Document Indexing](/vectra/documents) — deep dive on chunking, retrieval, hybrid search, and FolderWatcher
 - [CLI Reference](/vectra/cli) — manage indexes from the command line
-- [API Reference](/vectra/api-reference) — full API documentation
+- [API Reference](/vectra/api-reference) — TypeScript API overview
+- [Storage](/vectra/storage) — pluggable storage backends, browser support, and custom implementations
 - [gRPC Server](/vectra/grpc) — cross-language access via gRPC
 - [Best Practices](/vectra/best-practices) — performance tuning and troubleshooting
+- [Tutorials](/vectra/tutorials/) — end-to-end walkthroughs: RAG pipeline, browser app, gRPC, custom storage, folder sync

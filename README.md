@@ -6,33 +6,18 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![LLM Ready](https://img.shields.io/badge/LLM-Ready-blue.svg)](https://github.com/Stevenic/vectra/blob/main/llms.txt)
 
-## Overview
+Vectra is a local, file-backed, in-memory vector database with an optional gRPC server for cross-language access. Each index is a folder on disk — queries use MongoDB-style metadata filtering and cosine similarity ranking, with sub-millisecond latency for small indexes.
 
-Vectra is a local, file-backed, in-memory vector database with an optional gRPC server for cross-language access. It works like a local [Pinecone](https://www.pinecone.io/) or [Qdrant](https://qdrant.tech/): each index is just a folder on disk with an index file containing vectors and metadata. Queries use a Pinecone-compatible subset of [MongoDB-style operators](https://www.mongodb.com/docs/manual/reference/operator/query/) for filtering, then rank matches by cosine similarity. Because the entire index is loaded into memory, lookups are extremely fast (often <1 ms for small indexes, commonly 1-2 ms for larger local sets).
+## What's New in Vectra 0.14
 
-**Key capabilities:**
+- **Browser & Electron support** — `vectra/browser` entry point with `IndexedDBStorage` and `TransformersEmbeddings`
+- **Local embeddings** — `LocalEmbeddings` and `TransformersEmbeddings` run HuggingFace models with no API key
+- **Protocol Buffers** — opt-in binary format, 40-50% smaller files
+- **gRPC server** — `vectra serve` exposes 19 RPCs for cross-language access
+- **FolderWatcher** — auto-sync directories into a document index
+- **Language bindings** — `vectra generate` scaffolds clients for 6 languages
 
-- **Zero infrastructure** — everything lives in a local folder; no servers or managed services required
-- **Fast lookups** — sub-millisecond to low-millisecond latency for small/medium corpora
-- **Pinecone-style filtering** — familiar MongoDB query operators for metadata filtering
-- **Multiple embeddings providers** — OpenAI, Azure OpenAI, OSS endpoints, or local HuggingFace models (no API key needed)
-- **Pluggable storage** — filesystem, IndexedDB (browsers), in-memory, or your own custom `FileStorage` implementation
-- **Browser & Electron compatible** — runs in browsers and Electron with IndexedDB persistence, local embeddings, and a dedicated `vectra/browser` entry point
-- **CLI included** — manage indexes, serve gRPC, watch folders from the command line
-- **Cross-language access** — built-in gRPC server with client bindings for Python, C#, Rust, Go, Java, and TypeScript
-- **Flexible serialization** — JSON (human-readable) or Protocol Buffers (40-50% smaller)
-
-Typical use cases: prompt augmentation, infinite few-shot example libraries, single/small-document Q&A, local dev workflows, and cross-language access via gRPC.
-
-## Breaking Changes in v0.14.x
-
-### fetch() replaces axios
-
-All HTTP requests now use the built-in `fetch()` API instead of [axios](https://github.com/axios/axios). This removes axios as a dependency and reduces the attack surface — `fetch()` is built into Node.js and browsers with no third-party code in the request path. If your project was relying on axios interceptors or custom axios configuration passed through Vectra, you will need to update your integration.
-
-### Node.js 22.x minimum
-
-The minimum Node.js version is now **22.x** (up from 20.x). This is driven by the `undici@8.0.0` transitive dependency which requires `node >=22.19.0`. Node.js 20.x reached end-of-life on March 26, 2026, so most projects should already be on 22.x LTS.
+See the [Changelog](https://stevenic.github.io/vectra/changelog) for breaking changes and migration details.
 
 ## Install
 
@@ -40,161 +25,50 @@ The minimum Node.js version is now **22.x** (up from 20.x). This is driven by th
 npm install vectra
 ```
 
-Optional dependencies:
-
-```sh
-npm install @huggingface/transformers  # local embeddings (no API key)
-npm install protobufjs                 # Protocol Buffer storage format
-```
-
-## Quick Start
-
-### Path A: LocalIndex (items + metadata)
-
-Use `LocalIndex` when you already have vectors and want to store items with metadata.
+## Quick Example
 
 ```ts
-import path from 'node:path';
-import { LocalIndex } from 'vectra';
-import { OpenAI } from 'openai';
-
-const index = new LocalIndex(path.join(process.cwd(), 'my-index'));
-
-if (!(await index.isIndexCreated())) {
-  await index.createIndex({
-    version: 1,
-    metadata_config: { indexed: ['category'] },
-  });
-}
-
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! });
-async function getVector(text: string): Promise<number[]> {
-  const resp = await openai.embeddings.create({ model: 'text-embedding-3-small', input: text });
-  return resp.data[0].embedding;
-}
-
-await index.insertItem({
-  vector: await getVector('apple'),
-  metadata: { text: 'apple', category: 'food' },
-});
-
-const results = await index.queryItems(await getVector('banana'), '', 3, { category: { $eq: 'food' } });
-for (const r of results) {
-  console.log(r.score.toFixed(4), r.item.metadata.text);
-}
-```
-
-### Path B: LocalDocumentIndex (documents + chunking + retrieval)
-
-Use `LocalDocumentIndex` when you have raw text and want Vectra to handle chunking, embedding, and retrieval.
-
-```ts
-import path from 'node:path';
 import { LocalDocumentIndex, OpenAIEmbeddings } from 'vectra';
 
-const embeddings = new OpenAIEmbeddings({
-  apiKey: process.env.OPENAI_API_KEY!,
-  model: 'text-embedding-3-small',
-  maxTokens: 8000,
-});
-
 const docs = new LocalDocumentIndex({
-  folderPath: path.join(process.cwd(), 'my-doc-index'),
-  embeddings,
+  folderPath: './my-index',
+  embeddings: new OpenAIEmbeddings({
+    apiKey: process.env.OPENAI_API_KEY!,
+    model: 'text-embedding-3-small',
+    maxTokens: 8000,
+  }),
 });
 
 if (!(await docs.isIndexCreated())) {
   await docs.createIndex({ version: 1 });
 }
 
-await docs.upsertDocument('doc://welcome', 'Vectra is a local vector database...', 'md');
+await docs.upsertDocument('doc://readme', 'Vectra is a local vector database...', 'md');
 
-const results = await docs.queryDocuments('What is Vectra?', { maxDocuments: 5, maxChunks: 20 });
+const results = await docs.queryDocuments('What is Vectra?', { maxDocuments: 5 });
 if (results.length > 0) {
   const sections = await results[0].renderSections(2000, 1, true);
-  for (const s of sections) {
-    console.log(s.score.toFixed(4), s.text);
-  }
+  console.log(sections[0].text);
 }
 ```
 
-### Running in the Browser or Electron
-
-Use the `vectra/browser` entry point — it excludes Node-specific modules and works with any bundler (webpack, Vite, esbuild, etc.):
-
-```ts
-import { LocalDocumentIndex, TransformersEmbeddings, IndexedDBStorage } from 'vectra/browser';
-
-const storage = new IndexedDBStorage('my-app-vectors');
-const embeddings = await TransformersEmbeddings.create(); // runs locally, no API key
-
-const index = new LocalDocumentIndex({ folderPath: 'my-index', embeddings, storage });
-```
-
-Bundlers that support the `exports` field in `package.json` will automatically resolve `vectra` to the browser entry point when targeting a browser environment.
-
-See the [Storage guide](https://stevenic.github.io/vectra/storage#running-in-the-browser) for full browser setup details.
-
 ## Documentation
 
-Full documentation is available at **[stevenic.github.io/vectra](https://stevenic.github.io/vectra/)**:
+Full docs at **[stevenic.github.io/vectra](https://stevenic.github.io/vectra/)**:
 
 | Guide | Description |
 |-------|-------------|
 | [Getting Started](https://stevenic.github.io/vectra/getting-started) | Install, requirements, quick start with both index types |
-| [Core Concepts](https://stevenic.github.io/vectra/core-concepts) | Index types, metadata filtering, hybrid retrieval, on-disk layout |
-| [CLI Reference](https://stevenic.github.io/vectra/cli) | All CLI commands, flags, and embeddings provider config |
-| [API Reference](https://stevenic.github.io/vectra/api-reference) | LocalIndex, LocalDocumentIndex, embeddings, FolderWatcher, utilities |
-| [Best Practices](https://stevenic.github.io/vectra/best-practices) | Performance tuning, operational tips, troubleshooting |
-| [Storage](https://stevenic.github.io/vectra/storage) | Pluggable backends, custom storage, browser/IndexedDB, serialization formats |
-| [gRPC Server](https://stevenic.github.io/vectra/grpc) | Cross-language access, service API, language bindings |
-
-## CLI Overview
-
-```sh
-npx vectra --help
-```
-
-| Command | Description |
-|---------|-------------|
-| `create` | Create a new index |
-| `delete` | Delete an index |
-| `add` | Add documents (URLs or files) |
-| `remove` | Remove documents by URI |
-| `query` | Query by text |
-| `stats` | Print index statistics |
-| `watch` | Watch folders and auto-sync changes |
-| `migrate` | Migrate between JSON and protobuf formats |
-| `serve` | Start the gRPC server |
-| `stop` | Stop a running daemon |
-| `generate` | Generate language bindings |
-
-See the [CLI Reference](https://stevenic.github.io/vectra/cli) for full usage details.
-
-## API Summary
-
-Key exports from `vectra`:
-
-| Export | Description |
-|--------|-------------|
-| `LocalIndex` | Item-level vector storage with metadata filtering |
-| `LocalDocumentIndex` | Document ingestion, chunking, and retrieval |
-| `OpenAIEmbeddings` | OpenAI / Azure / OSS embeddings |
-| `LocalEmbeddings` | Local HuggingFace embeddings (no API key) |
-| `TransformersEmbeddings` | Async local embeddings with GPU/WASM, quantization, and pooling options |
-| `TransformersTokenizer` | Tokenizer matching the `TransformersEmbeddings` model for chunking alignment |
-| `BrowserWebFetcher` | Browser-native web fetcher using Fetch API and DOMParser |
-| `LocalFileStorage` | Filesystem storage (Node.js, default) |
-| `IndexedDBStorage` | IndexedDB storage (browsers) |
-| `VirtualFileStorage` | In-memory storage (testing) |
-| `JsonCodec` | JSON serialization (default) |
-| `ProtobufCodec` | Protocol Buffer serialization |
-| `migrateIndex` | Migrate between serialization formats |
-| `FolderWatcher` | Watch folders and auto-sync to an index |
-| `VectraServer` | gRPC server for cross-language access |
-| `TextSplitter` | Configurable text chunking |
-| `FileFetcher` | Local file ingestion |
-| `WebFetcher` | Web page ingestion |
+| [Core Concepts](https://stevenic.github.io/vectra/core-concepts) | Index types, metadata filtering, on-disk layout |
+| [Embeddings Guide](https://stevenic.github.io/vectra/embeddings) | Choose and configure an embeddings provider |
+| [Document Indexing](https://stevenic.github.io/vectra/documents) | Chunking, retrieval, hybrid search, FolderWatcher |
+| [CLI Reference](https://stevenic.github.io/vectra/cli) | All CLI commands, flags, and provider config |
+| [API Reference](https://stevenic.github.io/vectra/api-reference) | TypeScript API overview |
+| [Best Practices](https://stevenic.github.io/vectra/best-practices) | Performance tuning, troubleshooting |
+| [Storage](https://stevenic.github.io/vectra/storage) | Pluggable backends, browser/IndexedDB, serialization formats |
+| [gRPC Server](https://stevenic.github.io/vectra/grpc) | Cross-language access and language bindings |
+| [Changelog](https://stevenic.github.io/vectra/changelog) | Breaking changes and migration guides |
+| [Tutorials](https://stevenic.github.io/vectra/tutorials/) | RAG pipeline, browser app, gRPC, custom storage, folder sync |
 
 ## License
 

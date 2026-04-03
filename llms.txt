@@ -128,12 +128,18 @@ Protocol Buffer format (`.pb` extensions instead of `.json`). Migrate with `vect
 
 ## Documentation
 
-- [README](https://github.com/Stevenic/vectra/blob/main/README.md): Full project documentation with API usage, CLI reference, and architecture
+- [README](https://github.com/Stevenic/vectra/blob/main/README.md): Project overview and quick example
 - [Getting Started](https://github.com/Stevenic/vectra/blob/main/docs/getting-started.md): Install, quick start for both index types
-- [Core Concepts](https://github.com/Stevenic/vectra/blob/main/docs/core-concepts.md): Index types, metadata filtering, hybrid retrieval, on-disk layout
+- [Core Concepts](https://github.com/Stevenic/vectra/blob/main/docs/core-concepts.md): Index types, metadata filtering, on-disk layout
+- [Embeddings Guide](https://github.com/Stevenic/vectra/blob/main/docs/embeddings.md): Provider comparison, configuration for OpenAI/Azure/Local/Transformers
+- [Document Indexing](https://github.com/Stevenic/vectra/blob/main/docs/documents.md): Chunking, retrieval, hybrid search, FolderWatcher
 - [CLI Reference](https://github.com/Stevenic/vectra/blob/main/docs/cli.md): All CLI commands with flags and examples
-- [API Reference](https://github.com/Stevenic/vectra/blob/main/docs/api-reference.md): LocalIndex, LocalDocumentIndex, embeddings, utilities
-- [Best Practices](https://github.com/Stevenic/vectra/blob/main/docs/best-practices.md): Index design, chunking, retrieval tuning, troubleshooting
+- [API Reference](https://github.com/Stevenic/vectra/blob/main/docs/api-reference.md): TypeScript API overview
+- [Best Practices](https://github.com/Stevenic/vectra/blob/main/docs/best-practices.md): Performance, troubleshooting
+- [Storage](https://github.com/Stevenic/vectra/blob/main/docs/storage.md): Pluggable backends, browser/IndexedDB, formats
+- [gRPC Server](https://github.com/Stevenic/vectra/blob/main/docs/grpc.md): Cross-language access, service API, bindings
+- [Changelog](https://github.com/Stevenic/vectra/blob/main/docs/changelog.md): Breaking changes, migration guides
+- [Tutorials](https://github.com/Stevenic/vectra/blob/main/docs/tutorials/): RAG pipeline, custom storage, browser/Electron, gRPC cross-language, folder sync
 - [Proto Definition](https://github.com/Stevenic/vectra/blob/main/proto/vectra_service.proto): Full gRPC service definition
 - [Contributing](https://github.com/Stevenic/vectra/blob/main/CONTRIBUTING.md): Contribution guidelines
 - [License](https://github.com/Stevenic/vectra/blob/main/LICENSE): MIT License

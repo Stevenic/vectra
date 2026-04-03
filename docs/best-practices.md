@@ -1,7 +1,7 @@
 ---
 title: Best Practices
 layout: default
-nav_order: 6
+nav_order: 8
 ---
 
 # Best Practices

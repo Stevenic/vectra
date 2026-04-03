@@ -39,6 +39,8 @@ Vectra keeps a simple, portable model: indexes live as folders on disk, but are 
 
 Both are folder-backed and portable — any language can read/write the on-disk format.
 
+For a deep dive on the document workflow — chunking, retrieval, hybrid search, and FolderWatcher — see the [Document Indexing](/vectra/documents) guide.
+
 ## Metadata filtering
 
 Vectra uses a Pinecone-compatible subset of MongoDB-style query operators. Filters are evaluated **before** similarity ranking.
@@ -70,25 +72,6 @@ await index.createIndex({
 
 {: .important }
 Only fields listed in `metadata_config.indexed` can be used in query filters. All other metadata is stored per-item on disk and is not available for filtering.
-
-## Hybrid retrieval (documents)
-
-`LocalDocumentIndex` supports two retrieval modes:
-
-1. **Semantic** (default) — ranks chunks by embedding cosine similarity.
-2. **Keyword (BM25)** — uses Okapi BM25 to find strong keyword matches.
-
-Enable hybrid mode per query:
-
-```ts
-const results = await docs.queryDocuments('search term', {
-  maxDocuments: 5,
-  maxChunks: 20,
-  isBm25: true, // blend keyword matches with semantic results
-});
-```
-
-Each rendered section includes an `isBm25` flag so you can distinguish keyword matches from semantic matches in your prompts.
 
 ## On-disk layout
 
@@ -135,7 +118,7 @@ my-index/
 └── ...
 ```
 
-See [Storage](/vectra/storage#storage-formats) for setup and migration details.
+See [Storage — Formats](/vectra/storage#storage-formats) for setup and migration details.
 
 ## Storage backends
 
