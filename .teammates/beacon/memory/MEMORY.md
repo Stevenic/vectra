@@ -1,2 +1,3 @@
-- [Daily 2026-04-02](2026-04-02.md) — Clean build fix, WebFetcher type error, test import fix
-- [Project: ESM compat issue](project_esm_compat.md) — proxyquire tests fail under ESM auto-detect
+- [Daily 2026-04-03](2026-04-03.md) — Wisdom distillation, updated entries for new subsystems
+- [Daily 2026-04-02](2026-04-02.md) — Clean build fix, browser merge, ESLint setup, coverage push to 96%
+- [Project: ESM compat resolved](project_esm_compat.md) — proxyquire removed; sinon stubs are the standard
