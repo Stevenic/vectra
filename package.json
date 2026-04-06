@@ -102,7 +102,7 @@
         "@types/sinon": "^21.0.0",
         "@types/turndown": "^5.0.5",
         "@types/uuid": "10.0.0",
-        "@types/yargs": "17.0.33",
+        "@types/yargs": "17.0.35",
         "@typescript-eslint/eslint-plugin": "^8.58.0",
         "@typescript-eslint/parser": "^8.58.0",
         "eslint": "^10.1.0",
