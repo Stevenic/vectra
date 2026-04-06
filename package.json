@@ -95,7 +95,7 @@
     },
     "devDependencies": {
         "@eslint/js": "^10.0.1",
-        "@huggingface/transformers": "^3.8.1",
+        "@huggingface/transformers": "^4.0.1",
         "@types/assert": "^1.5.11",
         "@types/mocha": "^10.0.10",
         "@types/node": "^25.5.0",
@@ -120,7 +120,7 @@
         "wink-bm25-text-search": "^3.1.2"
     },
     "peerDependencies": {
-        "@huggingface/transformers": "^3.8.1"
+        "@huggingface/transformers": "^4.0.1"
     },
     "peerDependenciesMeta": {
         "@huggingface/transformers": {
