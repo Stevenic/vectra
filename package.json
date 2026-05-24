@@ -2,7 +2,7 @@
     "name": "vectra",
     "author": "Steven Ickman",
     "description": "A lightweight, file-backed vector database for Node.js and browsers with Pinecone-compatible filtering and hybrid BM25 search.",
-    "version": "0.14.0",
+    "version": "0.15.0",
     "license": "MIT",
     "keywords": [
         "vector-database",
