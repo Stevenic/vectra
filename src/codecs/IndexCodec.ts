@@ -8,6 +8,14 @@ export interface DocumentCatalog {
     count: number;
     uriToId: { [uri: string]: string };
     idToUri: { [id: string]: string };
+    /**
+     * Optional. SHA-256 hash of each document's last-stored content keyed by URI.
+     * @remarks
+     * Used by `LocalDocumentIndex.upsertDocument` to short-circuit when an upsert
+     * would re-store byte-identical content. Absent on catalogs written by older
+     * versions; populated lazily on subsequent upserts.
+     */
+    uriToHash?: { [uri: string]: string };
 }
 
 /**

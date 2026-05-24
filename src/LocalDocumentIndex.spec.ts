@@ -4,6 +4,7 @@ import { describe, it, beforeEach } from 'mocha';
 import { LocalDocumentIndex, LocalDocumentIndexConfig } from './LocalDocumentIndex';
 import { EmbeddingsModel, EmbeddingsResponse, Tokenizer } from './types';
 import { FileStorage, FileDetails } from './storage';
+import { computeContentHash } from './internals/contentHash';
 
 class FakeEmbeddings implements EmbeddingsModel {
   maxTokens = 10;
@@ -337,6 +338,137 @@ describe('LocalDocumentIndex', () => {
       embeddings.createEmbeddingsResponses.push({ status: 'success', output: [[0.1, 0.2]] });
       (index as any).insertItem = async () => { throw new Error('insert error'); };
       await assert.rejects(index.upsertDocument('u', 't'), /Error adding document "u": Error: insert error/);
+    });
+
+    it('writes content hash to catalog on successful add', async () => {
+      (index as any).insertItem = async () => { };
+      const text = 'fresh content';
+      const doc = await index.upsertDocument('new.txt', text);
+      const expectedHash = computeContentHash(text, undefined, undefined);
+      assert.equal((index as any)._catalog.uriToHash['new.txt'], expectedHash);
+      assert.equal(doc.uri, 'new.txt');
+    });
+  });
+
+  describe('upsertDocument skip-if-unchanged', () => {
+    const uri = 'doc://unchanged';
+    const existingId = 'doc-existing';
+    const text = 'identical content';
+    const metadata = { author: 'alice', tag: 'spec' };
+
+    beforeEach(() => {
+      const hash = computeContentHash(text, 'md', metadata);
+      (index as any)._catalog = {
+        version: 1,
+        count: 1,
+        uriToId: { [uri]: existingId },
+        idToUri: { [existingId]: uri },
+        uriToHash: { [uri]: hash },
+      };
+    });
+
+    it('short-circuits when content + metadata + docType are unchanged', async () => {
+      let deleteCalled = false;
+      (index as any).deleteDocument = async () => { deleteCalled = true; };
+      (index as any).insertItem = async () => { };
+      const callsBefore = embeddings.createEmbeddingsCalls.length;
+      const upsertCallsBefore = storage.upsertFileCalls.length;
+
+      const doc = await index.upsertDocument(uri, text, 'md', metadata);
+
+      assert.equal(deleteCalled, false, 'deleteDocument should not be called');
+      assert.equal(embeddings.createEmbeddingsCalls.length, callsBefore, 'no embeddings calls expected');
+      assert.equal(storage.upsertFileCalls.length, upsertCallsBefore, 'no file writes expected');
+      assert.equal(doc.id, existingId);
+      assert.equal(doc.uri, uri);
+    });
+
+    it('re-embeds when text changes', async () => {
+      (index as any).deleteDocument = async () => { };
+      (index as any).insertItem = async () => { };
+      const callsBefore = embeddings.createEmbeddingsCalls.length;
+      await index.upsertDocument(uri, 'different content', 'md', metadata);
+      assert(embeddings.createEmbeddingsCalls.length > callsBefore, 'embeddings should be called');
+      const newHash = computeContentHash('different content', 'md', metadata);
+      assert.equal((index as any)._catalog.uriToHash[uri], newHash);
+    });
+
+    it('re-embeds when metadata changes (text identical)', async () => {
+      (index as any).deleteDocument = async () => { };
+      (index as any).insertItem = async () => { };
+      const callsBefore = embeddings.createEmbeddingsCalls.length;
+      const changedMetadata = { author: 'bob', tag: 'spec' };
+      await index.upsertDocument(uri, text, 'md', changedMetadata);
+      assert(embeddings.createEmbeddingsCalls.length > callsBefore);
+      const newHash = computeContentHash(text, 'md', changedMetadata);
+      assert.equal((index as any)._catalog.uriToHash[uri], newHash);
+    });
+
+    it('re-embeds when docType changes (text + metadata identical)', async () => {
+      (index as any).deleteDocument = async () => { };
+      (index as any).insertItem = async () => { };
+      const callsBefore = embeddings.createEmbeddingsCalls.length;
+      await index.upsertDocument(uri, text, 'txt', metadata);
+      assert(embeddings.createEmbeddingsCalls.length > callsBefore);
+      const newHash = computeContentHash(text, 'txt', metadata);
+      assert.equal((index as any)._catalog.uriToHash[uri], newHash);
+    });
+
+    it('force: true re-embeds even when hash matches', async () => {
+      (index as any).deleteDocument = async () => { };
+      (index as any).insertItem = async () => { };
+      const callsBefore = embeddings.createEmbeddingsCalls.length;
+      await index.upsertDocument(uri, text, 'md', metadata, { force: true });
+      assert(embeddings.createEmbeddingsCalls.length > callsBefore, 'force should bypass short-circuit');
+      const newHash = computeContentHash(text, 'md', metadata);
+      assert.equal((index as any)._catalog.uriToHash[uri], newHash);
+    });
+
+    it('metadata key order does not break the short-circuit', async () => {
+      let deleteCalled = false;
+      (index as any).deleteDocument = async () => { deleteCalled = true; };
+      (index as any).insertItem = async () => { };
+      const reordered = { tag: 'spec', author: 'alice' };
+      const callsBefore = embeddings.createEmbeddingsCalls.length;
+      await index.upsertDocument(uri, text, 'md', reordered);
+      assert.equal(deleteCalled, false);
+      assert.equal(embeddings.createEmbeddingsCalls.length, callsBefore);
+    });
+
+    it('old catalog without uriToHash bootstraps on first upsert, then short-circuits', async () => {
+      // Reset catalog to pre-upgrade shape (no uriToHash).
+      (index as any)._catalog = {
+        version: 1,
+        count: 1,
+        uriToId: { [uri]: existingId },
+        idToUri: { [existingId]: uri },
+      };
+      let deleteCount = 0;
+      (index as any).deleteDocument = async () => { deleteCount++; };
+      (index as any).insertItem = async () => { };
+
+      // First upsert: no hash present → falls through to re-embed, populates hash.
+      const callsBefore1 = embeddings.createEmbeddingsCalls.length;
+      await index.upsertDocument(uri, text, 'md', metadata);
+      assert.equal(deleteCount, 1);
+      assert(embeddings.createEmbeddingsCalls.length > callsBefore1);
+      const expectedHash = computeContentHash(text, 'md', metadata);
+      assert.equal((index as any)._catalog.uriToHash[uri], expectedHash);
+
+      // Second upsert with identical content: hash matches → short-circuit.
+      const callsBefore2 = embeddings.createEmbeddingsCalls.length;
+      await index.upsertDocument(uri, text, 'md', metadata);
+      assert.equal(deleteCount, 1, 'second call must not delete');
+      assert.equal(embeddings.createEmbeddingsCalls.length, callsBefore2, 'second call must not embed');
+    });
+
+    it('clears hash entry on deleteDocument', async () => {
+      storage.files.set(path.join(folderPath, `${existingId}.txt`), 'x');
+      storage.files.set(path.join(folderPath, `${existingId}.json`), '{}');
+      (index as any).listItemsByMetadata = async () => [];
+      (index as any).deleteItem = async () => { };
+      await index.deleteDocument(uri);
+      assert.equal((index as any)._catalog.uriToHash?.[uri], undefined);
     });
   });
 

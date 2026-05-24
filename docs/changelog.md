@@ -21,6 +21,20 @@ Release history, breaking changes, and migration guides.
 
 ## v0.14.x
 
+### Skip-if-unchanged document upsert
+
+`LocalDocumentIndex.upsertDocument` now hashes `text + docType + metadata` (canonicalized, SHA-256) and stores the hash on the catalog. When a caller re-upserts a URI whose content + metadata are byte-identical to what's already stored, the call returns a `LocalDocument` handle without re-chunking or re-embedding.
+
+**Who is affected:** Callers that drive Vectra in a "scan every file, upsert each one" sync pattern. No-op syncs against unchanged corpora drop from O(chunks) embedding calls per pass to zero.
+
+**Backward compatibility:** Public API is unchanged. An old catalog (no hash field) bootstraps on first upsert per URI, then short-circuits on subsequent identical upserts. The on-disk catalog gains an optional `uriToHash` map (JSON) / `uri_to_hash` field (protobuf, tag 5) — old readers ignore unknown fields.
+
+**Opt-out:** Pass `{ force: true }` as the fifth argument to bypass the check (e.g., after rotating embeddings models):
+
+```ts
+await docs.upsertDocument(uri, text, docType, metadata, { force: true });
+```
+
 ### Breaking: fetch() replaces axios
 
 All HTTP requests now use the built-in `fetch()` API instead of [axios](https://github.com/axios/axios). This removes axios as a dependency and eliminates third-party code from the HTTP request path.

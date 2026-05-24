@@ -8,6 +8,7 @@ import { LocalDocumentResult } from './LocalDocumentResult';
 import { LocalDocument } from './LocalDocument';
 import { FileStorage } from './storage';
 import { DocumentCatalog, IndexCodec, JsonCodec } from './codecs';
+import { computeContentHash } from './internals/contentHash';
 
 /**
  * Options for querying documents in the index.
@@ -184,6 +185,9 @@ export class LocalDocumentIndex extends LocalIndex<DocumentChunkMetadata> {
             // Remove entry from catalog
             delete this._newCatalog!.uriToId[uri];
             delete this._newCatalog!.idToUri[documentId];
+            if (this._newCatalog!.uriToHash) {
+                delete this._newCatalog!.uriToHash[uri];
+            }
             this._newCatalog!.count--;
             // Commit changes
             await this.endUpdate();
@@ -211,23 +215,38 @@ export class LocalDocumentIndex extends LocalIndex<DocumentChunkMetadata> {
     /**
      * Adds a document to the catalog.
      * @remarks
-     * A new update is started if one is not already in progress. If an document with the same uri
-     * already exists, it will be replaced.
+     * A new update is started if one is not already in progress. If a document with the same uri
+     * already exists, it will be replaced — unless its stored content hash matches the new content,
+     * in which case the call is a no-op and the existing document handle is returned. Pass
+     * `options.force = true` to bypass the hash check and force a re-embed (useful after rotating
+     * the embeddings model).
      * @param uri - Document URI
      * @param text - Document text
      * @param docType - Optional. Document type
      * @param metadata - Optional. Document metadata to index
+     * @param options - Optional. `force: true` skips the skip-if-unchanged check.
      * @returns Inserted document
      */
-    public async upsertDocument(uri: string, text: string, docType?: string, metadata?: Record<string, MetadataTypes>): Promise<LocalDocument> {
+    public async upsertDocument(uri: string, text: string, docType?: string, metadata?: Record<string, MetadataTypes>, options?: { force?: boolean }): Promise<LocalDocument> {
         // Ensure embeddings configured
         if (!this._embeddings) {
             throw new Error(`Embeddings model not configured.`);
         }
 
+        // Compute hash of the inputs that determine the stored chunks/vectors.
+        const newHash = computeContentHash(text, docType, metadata);
+
         // Check for existing document ID
         let documentId = await this.getDocumentId(uri);
         if (documentId != undefined) {
+            // Short-circuit: if content + metadata is unchanged, skip the
+            // expensive re-embed and return a handle to the existing document.
+            if (!options?.force) {
+                const existingHash = this._catalog?.uriToHash?.[uri];
+                if (existingHash === newHash) {
+                    return new LocalDocument(this, documentId, uri);
+                }
+            }
             // Delete existing document
             await this.deleteDocument(uri);
         } else {
@@ -318,6 +337,8 @@ export class LocalDocumentIndex extends LocalIndex<DocumentChunkMetadata> {
             // Add entry to catalog
             this._newCatalog!.uriToId[uri] = documentId;
             this._newCatalog!.idToUri[documentId] = uri;
+            this._newCatalog!.uriToHash = this._newCatalog!.uriToHash ?? {};
+            this._newCatalog!.uriToHash[uri] = newHash;
             this._newCatalog!.count++;
 
             // Commit changes

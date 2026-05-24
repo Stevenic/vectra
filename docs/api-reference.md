@@ -61,7 +61,7 @@ const results = await docs.queryDocuments('search query', { maxDocuments: 5, max
 
 | Method | Description |
 |--------|-------------|
-| `upsertDocument(uri, text, docType?)` | Add or update a document |
+| `upsertDocument(uri, text, docType?, metadata?, options?)` | Add or update a document. Skips re-embedding when `text + docType + metadata` is unchanged from the stored content. Pass `{ force: true }` to bypass the check (e.g., after rotating embeddings models). |
 | `deleteDocument(uri)` | Remove a document and its chunks |
 | `queryDocuments(query, options)` | Query by text, returns `LocalDocumentResult[]` |
 | `listDocuments()` | List all documents |
