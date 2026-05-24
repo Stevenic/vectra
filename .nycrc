@@ -15,6 +15,7 @@
     "**/index.ts",
     "**/templates/**",
     "**/*.browser.ts",
+    "**/browser.ts",
     "**/BrowserWebFetcher.ts",
     "**/IndexedDBStorage.ts"
   ],

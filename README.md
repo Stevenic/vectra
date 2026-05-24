@@ -8,7 +8,7 @@
 
 Vectra is a local, file-backed, in-memory vector database with an optional gRPC server for cross-language access. Each index is a folder on disk — queries use MongoDB-style metadata filtering and cosine similarity ranking, with sub-millisecond latency for small indexes.
 
-## What's New in Vectra 0.14
+## What's New in Vectra 0.14+
 
 - **Browser & Electron support** — `vectra/browser` entry point with `IndexedDBStorage` and `TransformersEmbeddings`
 - **Local embeddings** — `LocalEmbeddings` and `TransformersEmbeddings` run HuggingFace models with no API key
@@ -16,6 +16,7 @@ Vectra is a local, file-backed, in-memory vector database with an optional gRPC 
 - **gRPC server** — `vectra serve` exposes 19 RPCs for cross-language access
 - **FolderWatcher** — auto-sync directories into a document index
 - **Language bindings** — `vectra generate` scaffolds clients for 6 languages
+- **0.15: Performance improvements** — skip-if-unchanged document upserts, shallow-clone transactional snapshots, heap-based top-K query ranking, parallel metadata loads, and O(N) batch chunk deletion
 
 See the [Changelog](https://stevenic.github.io/vectra/changelog) for breaking changes and migration details.
 

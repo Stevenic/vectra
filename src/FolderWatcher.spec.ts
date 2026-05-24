@@ -31,7 +31,13 @@ describe('FolderWatcher', () => {
 
     beforeEach(async () => {
         sandbox = sinon.createSandbox();
-        tmpDir = await fs.promises.mkdtemp(path.join(os.tmpdir(), 'vectra-watch-'));
+        // realpath the temp dir to resolve Windows 8.3 short names (e.g.,
+        // os.tmpdir() returns `C:\Users\STEVEN~1\...` on some boxes). The
+        // FolderWatcher canonicalizes internally; matching here keeps tracked
+        // URIs aligned with the paths the tests look up.
+        tmpDir = await fs.promises.realpath(
+            await fs.promises.mkdtemp(path.join(os.tmpdir(), 'vectra-watch-'))
+        );
         indexDir = path.join(tmpDir, 'index');
         watchDir = path.join(tmpDir, 'watch');
         await fs.promises.mkdir(indexDir, { recursive: true });
@@ -284,5 +290,253 @@ describe('FolderWatcher', () => {
         } finally {
             await watcher.stop();
         }
+    });
+
+    describe('internal event dispatch (white-box)', () => {
+        // These tests invoke the private event-dispatch helpers directly so we
+        // don't depend on the OS firing fs.watch events at a predictable time.
+        // They exercise the same code paths that fs.watch would trigger.
+
+        it('_processEvent on a new subdirectory installs watchers and syncs files inside it', async () => {
+            // Stage the subdirectory first so this test is isolated from the
+            // race between real fs.watch events and our manual dispatch.
+            const subDir = path.join(watchDir, 'new-sub');
+            await fs.promises.mkdir(subDir);
+            await fs.promises.writeFile(path.join(subDir, 'a.txt'), 'a');
+            await fs.promises.writeFile(path.join(subDir, 'b.txt'), 'b');
+
+            const watcher = new FolderWatcher({ index, paths: [watchDir] });
+            // Manually enable _running and call _processEvent directly without
+            // ever starting the OS fs.watch, so this test is deterministic.
+            (watcher as any)._running = true;
+            try {
+                await (watcher as any)._processEvent(subDir);
+                assert.equal(watcher.trackedFileCount, 2);
+                assert.ok((watcher as any)._dirWatchers.has(subDir));
+            } finally {
+                (watcher as any)._running = false;
+                for (const w of (watcher as any)._watchers) {
+                    try { w.close(); } catch { /* ignore */ }
+                }
+            }
+        });
+
+        it('_processEvent on a deleted watched directory tears down its watcher (and descendants)', async () => {
+            const subDir = path.join(watchDir, 'doomed');
+            const innerDir = path.join(subDir, 'inner');
+            await fs.promises.mkdir(innerDir, { recursive: true });
+            await fs.promises.writeFile(path.join(innerDir, 'inside.txt'), 'x');
+
+            const watcher = new FolderWatcher({ index, paths: [watchDir] });
+            await watcher.start();
+            try {
+                assert.ok((watcher as any)._dirWatchers.has(subDir));
+                assert.ok((watcher as any)._dirWatchers.has(innerDir));
+
+                // Delete the subdir on disk, then signal the event.
+                await fs.promises.rm(subDir, { recursive: true, force: true });
+                await (watcher as any)._processEvent(subDir);
+
+                assert.equal((watcher as any)._dirWatchers.has(subDir), false);
+                assert.equal((watcher as any)._dirWatchers.has(innerDir), false,
+                    'descendant watcher should be cleaned up too');
+            } finally {
+                await watcher.stop();
+            }
+        });
+
+        it('_processEvent on a file path debounces a sync', async () => {
+            await fs.promises.writeFile(path.join(watchDir, 'existing.txt'), 'v1');
+            const watcher = new FolderWatcher({ index, paths: [watchDir], debounceMs: 10 });
+            await watcher.start();
+            try {
+                const filePath = path.join(watchDir, 'existing.txt');
+                await fs.promises.writeFile(filePath, 'v2');
+                await (watcher as any)._processEvent(filePath);
+
+                // Wait for the debounce timer to fire.
+                await new Promise(r => setTimeout(r, 40));
+
+                const tracked = (watcher as any)._tracked.get(filePath);
+                assert.ok(tracked, 'file should be tracked after debounce fires');
+            } finally {
+                await watcher.stop();
+            }
+        });
+
+        it('_processEvent on a deleted tracked file triggers debouncedSync that deletes it', async () => {
+            const filePath = path.join(watchDir, 'goner.txt');
+            await fs.promises.writeFile(filePath, 'v1');
+            const watcher = new FolderWatcher({ index, paths: [watchDir], debounceMs: 10 });
+            await watcher.start();
+            try {
+                assert.equal(watcher.trackedFileCount, 1);
+                await fs.promises.unlink(filePath);
+                await (watcher as any)._processEvent(filePath);
+
+                // Wait for the debounce timer to fire and call _deleteFile.
+                await new Promise(r => setTimeout(r, 40));
+
+                assert.equal(watcher.trackedFileCount, 0);
+            } finally {
+                await watcher.stop();
+            }
+        });
+
+        it('_processEvent ignores files whose extension does not match the filter', async () => {
+            const watcher = new FolderWatcher({
+                index,
+                paths: [watchDir],
+                extensions: ['.md'],
+                debounceMs: 10,
+            });
+            await watcher.start();
+            try {
+                const filePath = path.join(watchDir, 'skip.txt');
+                await fs.promises.writeFile(filePath, 'should be skipped');
+                await (watcher as any)._processEvent(filePath);
+                await new Promise(r => setTimeout(r, 40));
+                assert.equal(watcher.trackedFileCount, 0);
+            } finally {
+                await watcher.stop();
+            }
+        });
+
+        it('_processEvent does nothing once the watcher has been stopped', async () => {
+            const watcher = new FolderWatcher({ index, paths: [watchDir] });
+            await watcher.start();
+            await watcher.stop();
+            const filePath = path.join(watchDir, 'never.txt');
+            await fs.promises.writeFile(filePath, 'x');
+            await (watcher as any)._processEvent(filePath);
+            assert.equal(watcher.trackedFileCount, 0);
+        });
+
+        it('error events from a directory watcher remove it from the internal maps', async () => {
+            const watcher = new FolderWatcher({ index, paths: [watchDir] });
+            await watcher.start();
+            try {
+                const dirWatcher = (watcher as any)._dirWatchers.get(watchDir);
+                assert.ok(dirWatcher, 'watcher should be installed');
+
+                const errors: Array<{ err: Error; uri: string }> = [];
+                watcher.on('error', (err: Error, uri: string) => errors.push({ err, uri }));
+
+                dirWatcher.emit('error', new Error('simulated watcher fault'));
+
+                assert.equal(errors.length, 1);
+                assert.equal(errors[0].err.message, 'simulated watcher fault');
+                assert.equal((watcher as any)._dirWatchers.has(watchDir), false,
+                    'the dead watcher should have been removed from the map');
+            } finally {
+                await watcher.stop();
+            }
+        });
+
+        it('error events from a single-file watcher are surfaced to consumers', async () => {
+            const singleFile = path.join(tmpDir, 'single.txt');
+            await fs.promises.writeFile(singleFile, 'hi');
+            const watcher = new FolderWatcher({ index, paths: [singleFile] });
+            await watcher.start();
+            try {
+                const fileWatcher = (watcher as any)._watchers[0];
+                assert.ok(fileWatcher, 'file watcher should be installed');
+
+                const errors: Array<{ err: Error; uri: string }> = [];
+                watcher.on('error', (err: Error, uri: string) => errors.push({ err, uri }));
+
+                fileWatcher.emit('error', new Error('file watcher fault'));
+
+                assert.equal(errors.length, 1);
+                assert.equal(errors[0].err.message, 'file watcher fault');
+            } finally {
+                await watcher.stop();
+            }
+        });
+
+        it('_addDirectoryWatch emits an error event when fs.watch throws synchronously', async () => {
+            const watcher = new FolderWatcher({ index, paths: [watchDir] });
+            await watcher.start();
+            try {
+                const errors: Array<{ err: Error; uri: string }> = [];
+                watcher.on('error', (err: Error, uri: string) => errors.push({ err, uri }));
+
+                const stub = sandbox.stub(fs, 'watch').throws(new Error('watch failed'));
+                try {
+                    (watcher as any)._addDirectoryWatch(path.join(watchDir, 'never-watched'));
+                } finally {
+                    stub.restore();
+                }
+
+                assert.equal(errors.length, 1);
+                assert.equal(errors[0].err.message, 'watch failed');
+            } finally {
+                await watcher.stop();
+            }
+        });
+
+        it('_watchFile change event fires the debounced sync', async () => {
+            const singleFile = path.join(tmpDir, 'single.txt');
+            await fs.promises.writeFile(singleFile, 'v1');
+            const watcher = new FolderWatcher({
+                index,
+                paths: [singleFile],
+                debounceMs: 10,
+            });
+            await watcher.start();
+            try {
+                const fileWatcher = (watcher as any)._watchers[0];
+                await fs.promises.writeFile(singleFile, 'v2');
+                // FSWatcher emits 'change' events that invoke the callback we
+                // registered with fs.watch.
+                fileWatcher.emit('change', 'change', path.basename(singleFile));
+                await new Promise(r => setTimeout(r, 40));
+
+                const tracked = (watcher as any)._tracked.get(singleFile);
+                assert.ok(tracked, 'file should be tracked after debounce fires');
+            } finally {
+                await watcher.stop();
+            }
+        });
+
+        it('_watchFile emits an error event when fs.watch throws synchronously', async () => {
+            const singleFile = path.join(tmpDir, 'single.txt');
+            await fs.promises.writeFile(singleFile, 'hi');
+            const watcher = new FolderWatcher({ index, paths: [singleFile] });
+
+            const errors: Array<{ err: Error; uri: string }> = [];
+            watcher.on('error', (err: Error, uri: string) => errors.push({ err, uri }));
+
+            const stub = sandbox.stub(fs, 'watch').throws(new Error('file watch failed'));
+            try {
+                (watcher as any)._watchFile(singleFile);
+            } finally {
+                stub.restore();
+            }
+            assert.equal(errors.length, 1);
+            assert.equal(errors[0].err.message, 'file watch failed');
+        });
+
+        it('_processEvent surfaces exceptions through the error event', async () => {
+            const watcher = new FolderWatcher({ index, paths: [watchDir] });
+            await watcher.start();
+            try {
+                const errors: Array<{ err: Error; uri: string }> = [];
+                watcher.on('error', (err: Error, uri: string) => errors.push({ err, uri }));
+                // Force _processEvent to reject so we exercise the .catch in
+                // _handleEvent.
+                const stub = sandbox.stub(watcher as any, '_processEvent').rejects(new Error('boom'));
+                try {
+                    (watcher as any)._handleEvent(path.join(watchDir, 'whatever.txt'));
+                    await new Promise(r => setImmediate(r));
+                } finally {
+                    stub.restore();
+                }
+                assert.equal(errors.length, 1);
+                assert.equal(errors[0].err.message, 'boom');
+            } finally {
+                await watcher.stop();
+            }
+        });
     });
 });

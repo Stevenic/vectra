@@ -46,6 +46,10 @@ A set of non-breaking optimizations to hot paths. No API changes beyond the new 
 - **`queryItems` loads external metadata files in parallel.** Top-K metadata reads now use `Promise.all` instead of awaiting each file sequentially.
 - **`deleteDocument` removes all chunks in a single pass.** New public method `LocalIndex.deleteItems(ids: Iterable<string>)` does a single `filter` over the items array. `LocalDocumentIndex.deleteDocument` now uses this, dropping chunk-removal cost from O(N·M) to O(N) for a document with M chunks in an index of N total chunks.
 
+### Bug fix: FolderWatcher crash on Windows with 8.3 short-name paths
+
+`FolderWatcher.start()` now resolves each watched path through `fs.realpath` before handing it to `fs.watch`. Previously, watching a path containing a Windows 8.3 short name (e.g., anything under `os.tmpdir()` when the user's home dir maps to a `STEVEN~1`-style alias) would crash the process with a libuv assertion (`!_wcsnicmp` in `fs-event.c`) the first time `ReadDirectoryChangesW` returned an event filename in long-name form. The watcher also no longer uses `fs.watch(..., { recursive: true })`; it walks the tree on start and installs one non-recursive watcher per directory, dynamically adding/removing watchers as subdirectories appear or disappear. Both fixes are internal — no API changes — but URIs stored in the index for paths that contained short names will now be in their canonical long-name form.
+
 ### Bug fix: stale norm after `upsertItem`
 
 `LocalIndex.upsertItem` previously updated the item's `vector`, `metadata`, and `metadataFile` but kept the **old precomputed norm**. Any upsert that changed the vector would leave behind a norm that no longer matched, skewing every subsequent cosine-similarity ranking against that item until it was deleted and re-inserted.
@@ -91,6 +95,7 @@ GitHub Actions:
 ### Other
 
 - Test scripts now quote the spec glob so all spec files run on Linux CI (previously some shells were expanding the glob too eagerly and missing files).
+- `TransformersEmbeddings` now imports `@huggingface/transformers` through an internal loader module (`src/internals/transformersLoader.ts`) instead of inlining the dynamic import. The loader exposes a `_setTransformersLoader` hook for tests to inject mocks — necessary because `@huggingface/transformers` 4.x marks its ESM exports as non-configurable, which broke the prior `sinon.stub(module, 'pipeline')` approach. Production behavior is unchanged.
 
 ---
 
