@@ -247,12 +247,12 @@ describe('LocalDocumentIndex', () => {
       assert.equal((index as any)._catalog.idToUri[documentId], undefined);
     });
 
-    it('cancels update and throws when deleteItem fails', async () => {
+    it('cancels update and throws when batch chunk deletion fails', async () => {
       const uri = 'doc://err';
       const documentId = 'id-err';
       (index as any)._catalog = { version: 1, count: 1, uriToId: { [uri]: documentId }, idToUri: { [documentId]: uri } };
       (index as any).listItemsByMetadata = async () => [{ id: 'chunk-1', metadata: { documentId } }];
-      (index as any).deleteItem = async () => { throw new Error('delete error'); };
+      (index as any).deleteItems = async () => { throw new Error('delete error'); };
       await assert.rejects(index.deleteDocument(uri), /Error deleting document "doc:\/\/err": Error: delete error/);
     });
 

@@ -176,12 +176,9 @@ export class LocalDocumentIndex extends LocalIndex<DocumentChunkMetadata> {
         // Delete document chunks from index and remove from catalog
         await this.beginUpdate();
         try {
-            // Get list of chunks for document
+            // Get list of chunks for document and delete in a single pass.
             const chunks = await this.listItemsByMetadata({ documentId });
-            // Delete chunks
-            for (const chunk of chunks) {
-                await this.deleteItem(chunk.id);
-            }
+            await this.deleteItems(chunks.map(c => c.id));
             // Remove entry from catalog
             delete this._newCatalog!.uriToId[uri];
             delete this._newCatalog!.idToUri[documentId];

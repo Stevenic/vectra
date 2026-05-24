@@ -21,6 +21,15 @@ Release history, breaking changes, and migration guides.
 
 ## v0.14.x
 
+### Internal performance improvements
+
+A set of non-breaking optimizations to hot paths. No API changes; existing tests pass without modification.
+
+- **`beginUpdate` no longer deep-clones vectors.** The transactional snapshot is now a shallow copy of the items array. For an index with N chunks × D-dimensional vectors, this saves O(N·D) memory copy per `upsertItem` / `upsertDocument`. Internally, upsert now replaces items rather than mutating them so the previous snapshot stays intact.
+- **`queryItems` uses a bounded min-heap for top-K.** Distance ranking is now O(N log K) instead of O(N log N), and avoids allocating an N-sized intermediate distance array.
+- **`queryItems` loads external metadata files in parallel.** Top-K metadata reads now use `Promise.all` instead of awaiting each file sequentially.
+- **`deleteDocument` removes all chunks in a single pass.** New public method `LocalIndex.deleteItems(ids)` does a single `filter` over the items array. `LocalDocumentIndex.deleteDocument` now uses this, dropping chunk-removal cost from O(N·M) to O(N) for a document with M chunks in an index of N total chunks.
+
 ### Skip-if-unchanged document upsert
 
 `LocalDocumentIndex.upsertDocument` now hashes `text + docType + metadata` (canonicalized, SHA-256) and stores the hash on the catalog. When a caller re-upserts a URI whose content + metadata are byte-identical to what's already stored, the call returns a `LocalDocument` handle without re-chunking or re-embedding.

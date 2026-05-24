@@ -45,6 +45,7 @@ const results = await index.queryItems(queryVector, '', 10, { category: { $eq: '
 | `listItemsByMetadata(filter)` | List items matching a metadata filter |
 | `getItem(id)` | Get a single item by ID |
 | `deleteItem(id)` | Delete a single item |
+| `deleteItems(ids)` | Delete a batch of items in a single pass |
 | `beginUpdate() / endUpdate()` | Manual update locking for batch operations |
 
 ### LocalDocumentIndex
