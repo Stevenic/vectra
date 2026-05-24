@@ -45,6 +45,7 @@ const results = await index.queryItems(queryVector, '', 10, { category: { $eq: '
 | `listItemsByMetadata(filter)` | List items matching a metadata filter |
 | `getItem(id)` | Get a single item by ID |
 | `deleteItem(id)` | Delete a single item |
+| `deleteItems(ids)` | Delete a batch of items in a single pass |
 | `beginUpdate() / endUpdate()` | Manual update locking for batch operations |
 
 ### LocalDocumentIndex
@@ -61,7 +62,7 @@ const results = await docs.queryDocuments('search query', { maxDocuments: 5, max
 
 | Method | Description |
 |--------|-------------|
-| `upsertDocument(uri, text, docType?)` | Add or update a document |
+| `upsertDocument(uri, text, docType?, metadata?, options?)` | Add or update a document. Skips re-embedding when `text + docType + metadata` is unchanged from the stored content. Pass `{ force: true }` to bypass the check (e.g., after rotating embeddings models). |
 | `deleteDocument(uri)` | Remove a document and its chunks |
 | `queryDocuments(query, options)` | Query by text, returns `LocalDocumentResult[]` |
 | `listDocuments()` | List all documents |

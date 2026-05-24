@@ -144,12 +144,15 @@ export class ProtobufCodec implements IndexCodec {
     serializeCatalog(catalog: DocumentCatalog): Buffer {
         const root = getRoot();
         const CatalogMsg = root.lookupType('DocumentCatalog');
-        const payload = {
+        const payload: Record<string, any> = {
             version: catalog.version,
             count: catalog.count,
             uriToId: catalog.uriToId,
             idToUri: catalog.idToUri,
         };
+        if (catalog.uriToHash) {
+            payload.uriToHash = catalog.uriToHash;
+        }
         const err = CatalogMsg.verify(payload);
         if (err) throw new Error(`Protobuf verify error: ${err}`);
         const message = CatalogMsg.create(payload);
@@ -166,12 +169,16 @@ export class ProtobufCodec implements IndexCodec {
             defaults: true,
             oneofs: true,
         });
-        return {
+        const catalog: DocumentCatalog = {
             version: obj.version,
             count: obj.count,
             uriToId: obj.uriToId || {},
             idToUri: obj.idToUri || {},
         };
+        if (obj.uriToHash && Object.keys(obj.uriToHash).length > 0) {
+            catalog.uriToHash = obj.uriToHash;
+        }
+        return catalog;
     }
 
     serializeMetadata(metadata: Record<string, MetadataTypes>): Buffer {

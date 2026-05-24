@@ -253,6 +253,99 @@ describe('LocalIndex', () => {
     })
   })
 
+  describe('deleteItems', () => {
+    it('removes a batch of items in one pass when no update is in progress', async () => {
+      const index = new LocalIndex(testIndexDir)
+      await index.createIndex()
+      await index.batchInsertItems([
+        { id: '1', vector: [1] },
+        { id: '2', vector: [2] },
+        { id: '3', vector: [3] },
+        { id: '4', vector: [4] }
+      ])
+      await index.deleteItems(['1', '3'])
+      const items = await index.listItems()
+      assert.deepStrictEqual(items.map(i => i.id).sort(), ['2', '4'])
+    })
+
+    it('removes items inside an active update without committing', async () => {
+      const index = new LocalIndex(testIndexDir)
+      await index.createIndex()
+      await index.batchInsertItems([
+        { id: '1', vector: [1] },
+        { id: '2', vector: [2] }
+      ])
+      await index.beginUpdate()
+      await index.deleteItems(['1'])
+      // Not committed yet — listItems uses the persisted snapshot.
+      assert.deepStrictEqual((await index.listItems()).map(i => i.id).sort(), ['1', '2'])
+      await index.endUpdate()
+      assert.deepStrictEqual((await index.listItems()).map(i => i.id), ['2'])
+    })
+
+    it('accepts a Set directly', async () => {
+      const index = new LocalIndex(testIndexDir)
+      await index.createIndex()
+      await index.batchInsertItems([
+        { id: 'a', vector: [1] },
+        { id: 'b', vector: [2] }
+      ])
+      await index.deleteItems(new Set(['a']))
+      assert.deepStrictEqual((await index.listItems()).map(i => i.id), ['b'])
+    })
+
+    it('silently ignores ids that do not exist', async () => {
+      const index = new LocalIndex(testIndexDir)
+      await index.createIndex()
+      await index.batchInsertItems([{ id: '1', vector: [1] }])
+      await assert.doesNotReject(index.deleteItems(['missing', '1']))
+      assert.deepStrictEqual((await index.listItems()).map(i => i.id), [])
+    })
+
+    it('no-ops on empty input without starting an update', async () => {
+      const index = new LocalIndex(testIndexDir)
+      await index.createIndex()
+      await index.batchInsertItems([{ id: '1', vector: [1] }])
+      await index.deleteItems([])
+      assert.deepStrictEqual((await index.listItems()).map(i => i.id), ['1'])
+    })
+  })
+
+  describe('beginUpdate shallow snapshot', () => {
+    it('cancelUpdate does not leak in-progress changes back to _data', async () => {
+      const index = new LocalIndex(testIndexDir)
+      await index.createIndex()
+      await index.batchInsertItems([{ id: '1', vector: [1, 2, 3] }])
+      const before = (await index.listItems())[0]
+      await index.beginUpdate()
+      await index.deleteItems(['1'])
+      index.cancelUpdate()
+      const after = (await index.listItems())[0]
+      assert.deepStrictEqual(after, before)
+    })
+
+    it('upserting an existing item recomputes its norm from the new vector', async () => {
+      const index = new LocalIndex(testIndexDir)
+      await index.createIndex()
+      await index.insertItem({ id: '1', vector: [3, 4] }) // norm = 5
+      await index.upsertItem({ id: '1', vector: [6, 8] }) // norm should now be 10
+      const item = (await index.listItems()).find(i => i.id === '1')!
+      assert.ok(Math.abs(item.norm! - 10) < 1e-9, `expected norm ~10, got ${item.norm}`)
+    })
+
+    it('upserting an existing item does not mutate the previously committed snapshot', async () => {
+      const index = new LocalIndex(testIndexDir)
+      await index.createIndex({ version: 1, metadata_config: { indexed: ['k'] } })
+      await index.insertItem({ id: '1', vector: [1, 0, 0], metadata: { k: 'first' } })
+      // Capture a reference to the pre-upsert item from a list snapshot.
+      const beforeRef = (await index.listItems())[0]
+      const beforeMetaSnapshot = { ...beforeRef.metadata }
+      await index.upsertItem({ id: '1', vector: [0, 1, 0], metadata: { k: 'second' } })
+      // The reference we captured before should be untouched by the upsert.
+      assert.deepStrictEqual(beforeRef.metadata, beforeMetaSnapshot)
+    })
+  })
+
   describe('endUpdate', () => {
     it('throws an error if no update has begun', async () => {
       const index = new LocalIndex(testIndexDir)

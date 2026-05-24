@@ -1,15 +1,10 @@
 import { EmbeddingsModel, EmbeddingsResponse } from "./types";
 import { TransformersTokenizer } from "./TransformersTokenizer";
 import { FeatureExtractionPipeline, PreTrainedTokenizer } from "@huggingface/transformers";
+import { loadTransformers } from "./internals/transformersLoader";
 
 
 const DEFAULT_MODEL = 'Xenova/all-MiniLM-L6-v2';
-
-/**
- * Type definition for the Transformers.js library.
- * Used for dynamic import and type safety.
- */
-type TransformersLibrary = typeof import('@huggingface/transformers');
 
 /**
  * Configuration options for TransformersEmbeddings.
@@ -125,18 +120,10 @@ export class TransformersEmbeddings implements EmbeddingsModel {
      * @throws Error if @huggingface/transformers is not installed.
      */
     public static async create(options?: TransformersEmbeddingsOptions): Promise<TransformersEmbeddings> {
-        // Dynamically import to allow optional dependency
-        let transformers: TransformersLibrary;
-
-        try {
-            transformers = await import('@huggingface/transformers');
-        } catch (e) {
-            throw new Error(
-                'TransformersEmbeddings requires @huggingface/transformers. ' +
-                'Install it with: npm install @huggingface/transformers'
-            );
-        }
-
+        // Dynamically import via the loader seam so tests can substitute a
+        // mock without monkey-patching the @huggingface/transformers module
+        // (whose ESM exports are non-configurable in 4.x).
+        const transformers = await loadTransformers();
         const { pipeline } = transformers;
 
         // Apply defaults

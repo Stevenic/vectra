@@ -100,7 +100,15 @@ export class LocalIndex<TMetadata extends Record<string, MetadataTypes> = Record
       throw new Error('Update already in progress');
     }
     await this.loadIndexData();
-    this._update = structuredClone(this._data);
+    // Shallow copy: the items array is duplicated so splices/pushes don't
+    // touch _data, but individual IndexItem objects are shared by reference.
+    // Mutating an item in place would alias into _data, so addItemToUpdate's
+    // upsert path replaces items instead of mutating them.
+    this._update = {
+      version: this._data!.version,
+      metadata_config: this._data!.metadata_config,
+      items: this._data!.items.slice(),
+    };
   }
 
   /**
@@ -171,6 +179,29 @@ export class LocalIndex<TMetadata extends Record<string, MetadataTypes> = Record
       if (index >= 0) {
         this._update!.items.splice(index, 1);
       }
+      await this.endUpdate();
+    }
+  }
+
+  /**
+   * Deletes a batch of items from the index in a single O(N) pass over the
+   * items array.
+   * @remarks
+   * Functionally equivalent to calling `deleteItem` for each id, but avoids the
+   * O(N·M) cost of repeated linear scans + splices when removing many items.
+   * Like `deleteItem`, ids that don't exist are silently ignored.
+   * @param ids IDs of items to delete.
+   */
+  public async deleteItems(ids: Iterable<string>): Promise<void> {
+    const idSet = ids instanceof Set ? ids : new Set(ids);
+    if (idSet.size === 0) {
+      return;
+    }
+    if (this._update) {
+      this._update.items = this._update.items.filter(i => !idSet.has(i.id));
+    } else {
+      await this.beginUpdate();
+      this._update!.items = this._update!.items.filter(i => !idSet.has(i.id));
       await this.endUpdate();
     }
   }
@@ -319,34 +350,64 @@ export class LocalIndex<TMetadata extends Record<string, MetadataTypes> = Record
       items = items.filter(i => ItemSelector.select(i.metadata, filter));
     }
 
-    // Calculate distances
+    // Find top K by cosine similarity using a bounded min-heap of size K.
+    // For N items this is O(N log K) vs the previous O(N log N) full sort.
     const norm = ItemSelector.normalize(vector);
-    const distances: { index: number; distance: number }[] = [];
+    const k = Math.min(topK, items.length);
+    const heap: { index: number; distance: number }[] = [];
+    const siftUp = (start: number) => {
+      let i = start;
+      while (i > 0) {
+        const parent = (i - 1) >> 1;
+        if (heap[parent].distance > heap[i].distance) {
+          const tmp = heap[parent]; heap[parent] = heap[i]; heap[i] = tmp;
+          i = parent;
+        } else break;
+      }
+    };
+    const siftDown = () => {
+      let i = 0;
+      const n = heap.length;
+      while (true) {
+        const l = (i << 1) + 1;
+        const r = l + 1;
+        let smallest = i;
+        if (l < n && heap[l].distance < heap[smallest].distance) smallest = l;
+        if (r < n && heap[r].distance < heap[smallest].distance) smallest = r;
+        if (smallest === i) break;
+        const tmp = heap[i]; heap[i] = heap[smallest]; heap[smallest] = tmp;
+        i = smallest;
+      }
+    };
     for (let i = 0; i < items.length; i++) {
-      const item = items[i];
-      const distance = ItemSelector.normalizedCosineSimilarity(vector, norm, item.vector, item.norm);
-      distances.push({ index: i, distance: distance });
+      const distance = ItemSelector.normalizedCosineSimilarity(vector, norm, items[i].vector, items[i].norm);
+      if (heap.length < k) {
+        heap.push({ index: i, distance });
+        siftUp(heap.length - 1);
+      } else if (k > 0 && distance > heap[0].distance) {
+        heap[0] = { index: i, distance };
+        siftDown();
+      }
     }
-
-    // Sort by distance DESCENDING
-    distances.sort((a, b) => b.distance - a.distance);
+    heap.sort((a, b) => b.distance - a.distance);
 
     // Find top k
-    const top: QueryResult<TItemMetadata>[] = distances.slice(0, topK).map(d => {
+    const top: QueryResult<TItemMetadata>[] = heap.map(d => {
       return {
         item: Object.assign({}, items[d.index]) as any,
         score: d.distance
       };
     });
 
-    // Load external metadata
-    for (const item of top) {
+    // Load external metadata in parallel — each file is independent, and the
+    // top-K size is small, so this is bounded fan-out.
+    await Promise.all(top.map(async (item) => {
       if (item.item.metadataFile) {
         const metadataPath = path.join(this._folderPath, item.item.metadataFile);
         const metadataBuffer = await this.storage.readFile(metadataPath);
         item.item.metadata = this._codec.deserializeMetadata(metadataBuffer) as any;
       }
-    }
+    }));
 
     // Perform bm25 search only if enabled. Avoid duplicate chunks that are already selected during semantic search.
     if (isBm25) {
@@ -489,20 +550,25 @@ export class LocalIndex<TMetadata extends Record<string, MetadataTypes> = Record
 
     // Add item to index
     if (!unique) {
-      const existing = this._update!.items.find(i => i.id === id);
-      if (existing) {
-        existing.metadata = newItem.metadata;
-        existing.vector = newItem.vector;
-        existing.metadataFile = newItem.metadataFile;
-        return existing;
-      } else {
-        this._update!.items.push(newItem);
-        return newItem;
+      const existingIdx = this._update!.items.findIndex(i => i.id === id);
+      if (existingIdx >= 0) {
+        // Replace instead of mutating: items are shared by reference with
+        // _data after beginUpdate's shallow clone, so in-place mutation would
+        // alias into the committed snapshot.
+        const existing = this._update!.items[existingIdx];
+        const updated: IndexItem = {
+          ...existing,
+          metadata: newItem.metadata,
+          vector: newItem.vector,
+          norm: newItem.norm,
+          metadataFile: newItem.metadataFile,
+        };
+        this._update!.items[existingIdx] = updated;
+        return updated;
       }
-    } else {
-      this._update!.items.push(newItem);
-      return newItem;
     }
+    this._update!.items.push(newItem);
+    return newItem;
   }
 
   private async setupBm25(): Promise<any> {

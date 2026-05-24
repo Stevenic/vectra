@@ -19,6 +19,86 @@ Release history, breaking changes, and migration guides.
 
 ---
 
+## v0.15.0
+
+Performance, a bug fix, and a wave of dependency updates. All Vectra API surface changes are additive and non-breaking; one direct runtime dependency (`openai`) had a major version bump that callers using the SDK directly should review.
+
+### Skip-if-unchanged document upsert
+
+`LocalDocumentIndex.upsertDocument` now hashes `text + docType + metadata` (canonicalized, SHA-256) and stores the hash on the catalog. When a caller re-upserts a URI whose content + metadata are byte-identical to what's already stored, the call returns a `LocalDocument` handle without re-chunking or re-embedding.
+
+**Who is affected:** Callers that drive Vectra in a "scan every file, upsert each one" sync pattern. No-op syncs against unchanged corpora drop from O(chunks) embedding calls per pass to zero. Measured: a 100-file periodic sync that previously grew to ~505s of pure re-embed overhead now finishes in well under a second when nothing has changed.
+
+**Backward compatibility:** Public API is unchanged. An old catalog (no hash field) bootstraps on first upsert per URI, then short-circuits on subsequent identical upserts. The on-disk catalog gains an optional `uriToHash` map (JSON) / `uri_to_hash` field (protobuf, tag 5) — old readers ignore unknown fields. No catalog version bump.
+
+**Opt-out:** Pass `{ force: true }` as the fifth argument to bypass the check (e.g., after rotating embeddings models):
+
+```ts
+await docs.upsertDocument(uri, text, docType, metadata, { force: true });
+```
+
+### Internal performance improvements
+
+A set of non-breaking optimizations to hot paths. No API changes beyond the new `deleteItems` helper; all existing tests pass without modification.
+
+- **`beginUpdate` no longer deep-clones vectors.** The transactional snapshot is now a shallow copy of the items array. For an index with N chunks × D-dimensional vectors, this saves O(N·D) memory copy per `upsertItem` / `upsertDocument`. Internally, upsert now replaces items rather than mutating them so the previously-committed snapshot stays intact on `cancelUpdate`.
+- **`queryItems` uses a bounded min-heap for top-K.** Distance ranking is now O(N log K) instead of O(N log N), and avoids allocating an N-sized intermediate distance array.
+- **`queryItems` loads external metadata files in parallel.** Top-K metadata reads now use `Promise.all` instead of awaiting each file sequentially.
+- **`deleteDocument` removes all chunks in a single pass.** New public method `LocalIndex.deleteItems(ids: Iterable<string>)` does a single `filter` over the items array. `LocalDocumentIndex.deleteDocument` now uses this, dropping chunk-removal cost from O(N·M) to O(N) for a document with M chunks in an index of N total chunks.
+
+### Bug fix: FolderWatcher crash on Windows with 8.3 short-name paths
+
+`FolderWatcher.start()` now resolves each watched path through `fs.realpath` before handing it to `fs.watch`. Previously, watching a path containing a Windows 8.3 short name (e.g., anything under `os.tmpdir()` when the user's home dir maps to a `STEVEN~1`-style alias) would crash the process with a libuv assertion (`!_wcsnicmp` in `fs-event.c`) the first time `ReadDirectoryChangesW` returned an event filename in long-name form. The watcher also no longer uses `fs.watch(..., { recursive: true })`; it walks the tree on start and installs one non-recursive watcher per directory, dynamically adding/removing watchers as subdirectories appear or disappear. Both fixes are internal — no API changes — but URIs stored in the index for paths that contained short names will now be in their canonical long-name form.
+
+### Bug fix: stale norm after `upsertItem`
+
+`LocalIndex.upsertItem` previously updated the item's `vector`, `metadata`, and `metadataFile` but kept the **old precomputed norm**. Any upsert that changed the vector would leave behind a norm that no longer matched, skewing every subsequent cosine-similarity ranking against that item until it was deleted and re-inserted.
+
+The fix is a one-line addition in the upsert replacement path that also recomputes `norm` from the new vector. Indexes built with affected versions will self-heal on the next upsert per item; if you suspect query results are off and you've been upserting items in place, force a refresh via `upsertItem` (or, for documents, `upsertDocument(..., { force: true })`).
+
+### Dependency updates
+
+Major-version runtime dependencies — review your direct usage if any:
+
+- `openai` 4.104.0 → 6.33.0
+- `@huggingface/transformers` 3.8.1 → 4.0.1
+- `dotenv` 16.5.0 → 17.4.1
+- `protobufjs` 7.5.4 → 8.0.0
+- `uuid` 11.1.0 → 13.0.0
+- `yargs` 17.7.2 → 18.0.0
+
+Minor / patch runtime updates:
+
+- `wink-nlp` 2.3.2 → 2.4.0
+- `cheerio` 1.0.0 → 1.2.0
+- `turndown` 7.2.0 → 7.2.4
+
+Dev / tooling:
+
+- `typescript` 5.8.3 → 5.9.3
+- `eslint` 10.1.0 → 10.2.0
+- `mocha` 11.2.2 → 11.7.5
+- `nyc` 17.1.0 → 18.0.0
+- `webpack-cli` 6.0.1 → 7.0.2
+- `@types/node` 22.15.11 → 25.5.2
+- `@types/uuid` 10.0.0 → 11.0.0
+- `@types/yargs` 17.0.33 → 17.0.35
+
+GitHub Actions:
+
+- `actions/checkout` 4 → 6
+- `actions/setup-node` 4 → 6
+- `actions/deploy-pages` 4 → 5
+- `actions/upload-pages-artifact` 3 → 5
+- `actions/configure-pages` 5 → 6
+
+### Other
+
+- Test scripts now quote the spec glob so all spec files run on Linux CI (previously some shells were expanding the glob too eagerly and missing files).
+- `TransformersEmbeddings` now imports `@huggingface/transformers` through an internal loader module (`src/internals/transformersLoader.ts`) instead of inlining the dynamic import. The loader exposes a `_setTransformersLoader` hook for tests to inject mocks — necessary because `@huggingface/transformers` 4.x marks its ESM exports as non-configurable, which broke the prior `sinon.stub(module, 'pipeline')` approach. Production behavior is unchanged.
+
+---
+
 ## v0.14.x
 
 ### Breaking: fetch() replaces axios

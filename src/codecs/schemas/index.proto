@@ -31,4 +31,5 @@ message DocumentCatalog {
   uint32 count = 2;
   map<string, string> uri_to_id = 3;
   map<string, string> id_to_uri = 4;
+  map<string, string> uri_to_hash = 5;
 }

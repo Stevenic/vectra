@@ -65,6 +65,7 @@ export class FolderWatcher extends EventEmitter {
     private readonly _tracked: Map<string, TrackedFile> = new Map();
     private readonly _pending: Map<string, NodeJS.Timeout> = new Map();
     private readonly _watchers: fs.FSWatcher[] = [];
+    private readonly _dirWatchers: Map<string, fs.FSWatcher> = new Map();
     private _running: boolean = false;
 
     /**
@@ -104,6 +105,22 @@ export class FolderWatcher extends EventEmitter {
         }
         this._running = true;
 
+        // Canonicalize watched paths. Windows `fs.watch` will crash inside
+        // libuv with a `!_wcsnicmp` assertion in `fs-event.c` when given a
+        // path containing an 8.3 short name (e.g., `STEVEN~1`) because
+        // ReadDirectoryChangesW reports event filenames with their long-name
+        // expansion and libuv's prefix check fails. `os.tmpdir()` is a common
+        // source of short names in the wild. Resolving up front keeps the
+        // tracked URIs, the initial sync, and the per-directory watchers all
+        // consistent on the long-name form.
+        for (let i = 0; i < this._paths.length; i++) {
+            try {
+                this._paths[i] = await fs.promises.realpath(this._paths[i]);
+            } catch {
+                // Path doesn't exist yet — leave as-is; the watch loop will skip it.
+            }
+        }
+
         // Initial sync
         await this._initialSync();
         this.emit('ready');
@@ -113,7 +130,7 @@ export class FolderWatcher extends EventEmitter {
             try {
                 const stat = await fs.promises.stat(watchPath);
                 if (stat.isDirectory()) {
-                    this._watchDirectory(watchPath);
+                    await this._watchDirectoryTree(watchPath);
                 } else if (stat.isFile()) {
                     this._watchFile(watchPath);
                 }
@@ -131,9 +148,10 @@ export class FolderWatcher extends EventEmitter {
 
         // Close all watchers
         for (const watcher of this._watchers) {
-            watcher.close();
+            try { watcher.close(); } catch { /* ignore */ }
         }
         this._watchers.length = 0;
+        this._dirWatchers.clear();
 
         // Clear pending debounced operations
         for (const timeout of this._pending.values()) {
@@ -242,21 +260,117 @@ export class FolderWatcher extends EventEmitter {
         }
     }
 
-    private _watchDirectory(dirPath: string): void {
+    /**
+     * Walks a directory tree and installs a non-recursive `fs.watch` on every
+     * directory it contains. Non-recursive watching avoids a known libuv bug on
+     * Windows (`Assertion failed: !_wcsnicmp` in `fs-event.c`) that fires when
+     * `fs.watch(..., { recursive: true })` receives events whose paths libuv's
+     * Windows backend can't normalize back to the watch root.
+     */
+    private async _watchDirectoryTree(rootDir: string): Promise<void> {
+        if (!this._running) return;
+        this._addDirectoryWatch(rootDir);
+        let entries: fs.Dirent[];
         try {
-            const watcher = fs.watch(dirPath, { recursive: true }, (eventType, filename) => {
+            entries = await fs.promises.readdir(rootDir, { withFileTypes: true });
+        } catch {
+            // Dir may have been removed mid-walk; nothing to recurse into.
+            return;
+        }
+        for (const entry of entries) {
+            if (entry.isDirectory()) {
+                await this._watchDirectoryTree(path.join(rootDir, entry.name));
+            }
+        }
+    }
+
+    private _addDirectoryWatch(dirPath: string): void {
+        if (this._dirWatchers.has(dirPath)) return;
+        try {
+            const watcher = fs.watch(dirPath, (_eventType, filename) => {
                 if (!this._running || !filename) return;
                 const fullPath = path.join(dirPath, filename);
-                if (this._shouldInclude(fullPath)) {
-                    this._debouncedSync(fullPath);
-                }
+                this._handleEvent(fullPath);
             });
             watcher.on('error', (err) => {
                 this.emit('error', err, dirPath);
+                // Clean up so we don't leak a dead handle in our maps.
+                this._stopWatchingDir(dirPath);
             });
+            this._dirWatchers.set(dirPath, watcher);
             this._watchers.push(watcher);
         } catch (err: unknown) {
             this.emit('error', err instanceof Error ? err : new Error(String(err)), dirPath);
+        }
+    }
+
+    /**
+     * Dispatch a single change event from one of the per-directory watchers.
+     * - File path: feed to the existing debounced file-sync pipeline.
+     * - New subdirectory: install watchers for it and sync its contents.
+     * - Path that used to be a watched subdirectory and no longer exists:
+     *   tear down its watchers (and any descendants) and mark affected
+     *   tracked files for deletion.
+     */
+    private _handleEvent(fullPath: string): void {
+        // fs.watch callbacks must return quickly; do the work async without
+        // awaiting and route exceptions to the error event.
+        void this._processEvent(fullPath).catch((err) => {
+            this.emit('error', err instanceof Error ? err : new Error(String(err)), fullPath);
+        });
+    }
+
+    private async _processEvent(fullPath: string): Promise<void> {
+        if (!this._running) return;
+        let stat: fs.Stats;
+        try {
+            stat = await fs.promises.stat(fullPath);
+        } catch {
+            // Path no longer exists. If it was a watched subdir, tear down.
+            if (this._dirWatchers.has(fullPath)) {
+                this._stopWatchingDir(fullPath);
+            }
+            // If a tracked file disappeared, debouncedSync will pick it up
+            // (its timer stats, fails, and calls _deleteFile).
+            if (this._tracked.has(fullPath)) {
+                this._debouncedSync(fullPath);
+            }
+            return;
+        }
+
+        if (stat.isDirectory()) {
+            if (!this._dirWatchers.has(fullPath)) {
+                // New subdirectory: watch it (and any descendants) and sync
+                // files that already exist inside it.
+                await this._watchDirectoryTree(fullPath);
+                const files = new Map<string, number>();
+                await this._collectFiles(fullPath, files);
+                for (const [filePath, mtimeMs] of files) {
+                    if (!this._running) return;
+                    await this._syncFile(filePath, mtimeMs);
+                }
+            }
+        } else if (stat.isFile() && this._shouldInclude(fullPath)) {
+            this._debouncedSync(fullPath);
+        }
+    }
+
+    private _stopWatchingDir(dirPath: string): void {
+        const prefix = dirPath + path.sep;
+        const doomed: string[] = [];
+        for (const watched of this._dirWatchers.keys()) {
+            if (watched === dirPath || watched.startsWith(prefix)) {
+                doomed.push(watched);
+            }
+        }
+        for (const watched of doomed) {
+            const watcher = this._dirWatchers.get(watched);
+            if (watcher) {
+                try { watcher.close(); } catch { /* ignore */ }
+                this._dirWatchers.delete(watched);
+                const idx = this._watchers.indexOf(watcher);
+                if (idx >= 0) this._watchers.splice(idx, 1);
+            }
         }
     }
 

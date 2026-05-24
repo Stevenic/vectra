@@ -52,6 +52,29 @@ describe('JsonCodec', () => {
             const result = codec.deserializeCatalog(codec.serializeCatalog(catalog));
             assert.deepStrictEqual(result, catalog);
         });
+
+        it('round-trips uriToHash when present', () => {
+            const catalog: DocumentCatalog = {
+                version: 1,
+                count: 1,
+                uriToId: { 'http://a': 'id-a' },
+                idToUri: { 'id-a': 'http://a' },
+                uriToHash: { 'http://a': 'abc123' },
+            };
+            const result = codec.deserializeCatalog(codec.serializeCatalog(catalog));
+            assert.deepStrictEqual(result, catalog);
+        });
+
+        it('reads old catalogs (without uriToHash) without error', () => {
+            const oldBuf = Buffer.from(JSON.stringify({
+                version: 1,
+                count: 1,
+                uriToId: { 'http://a': 'id-a' },
+                idToUri: { 'id-a': 'http://a' },
+            }), 'utf-8');
+            const result = codec.deserializeCatalog(oldBuf);
+            assert.equal(result.uriToHash, undefined);
+        });
     });
 
     describe('serializeMetadata / deserializeMetadata', () => {

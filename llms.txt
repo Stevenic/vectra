@@ -43,6 +43,9 @@ const embeddings = new OpenAIEmbeddings({ apiKey: '...', model: 'text-embedding-
 const docs = new LocalDocumentIndex({ folderPath: './my-doc-index', embeddings });
 await docs.createIndex({ version: 1 });
 await docs.upsertDocument('doc://readme', text, 'md');
+// upsertDocument(uri, text, docType?, metadata?, options?)
+// Skips re-embedding when text + docType + metadata is unchanged from the stored content.
+// Pass { force: true } to bypass the hash check (e.g., after rotating embeddings models).
 const results = await docs.queryDocuments('search query', { maxDocuments: 5, maxChunks: 20 });
 ```
 

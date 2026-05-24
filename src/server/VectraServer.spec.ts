@@ -300,4 +300,100 @@ describe('VectraServer', function () {
             assert.ok(names.includes('auto-detected'), `Expected auto-detected in ${JSON.stringify(names)}`);
         });
     });
+
+    describe('Server accessors', () => {
+        it('exposes the underlying gRPC server and IndexManager via getters', () => {
+            assert.ok(server.server, 'server getter should return the gRPC server');
+            assert.ok(server.indexManager, 'indexManager getter should return the manager');
+        });
+    });
+
+    describe('Handler argument validation', () => {
+        it('CreateIndex returns INVALID_ARGUMENT when index_name is missing', async () => {
+            try {
+                await rpc(client, 'CreateIndex', { format: 'json', is_document_index: false });
+                assert.fail('Expected INVALID_ARGUMENT');
+            } catch (err: any) {
+                assert.strictEqual(err.code, grpc.status.INVALID_ARGUMENT);
+            }
+        });
+
+        it('DeleteIndex returns INVALID_ARGUMENT when index_name is missing', async () => {
+            try {
+                await rpc(client, 'DeleteIndex', {});
+                assert.fail('Expected INVALID_ARGUMENT');
+            } catch (err: any) {
+                assert.strictEqual(err.code, grpc.status.INVALID_ARGUMENT);
+            }
+        });
+    });
+
+    describe('Shutdown RPC', () => {
+        // Placed last because it triggers server shutdown asynchronously; the
+        // top-level after() hook just awaits the same shutdown promise.
+        it('Shutdown RPC schedules graceful server shutdown', async () => {
+            const res = await rpc(client, 'Shutdown', {});
+            assert.deepEqual(res, {});
+            // Give nextTick a chance to fire the onShutdown callback.
+            await new Promise(r => setTimeout(r, 50));
+        });
+    });
+});
+
+describe('VectraServer (isolated lifecycle)', function () {
+    this.timeout(10000);
+
+    it('shutdown() is idempotent — concurrent calls share a single shutdown', async () => {
+        const dir = path.join(__dirname, '..', '..', '.test-server-idem');
+        if (fs.existsSync(dir)) fs.rmSync(dir, { recursive: true });
+        fs.mkdirSync(dir, { recursive: true });
+        try {
+            const s = new VectraServer({ port: 0, rootDir: dir, scanInterval: 1000 });
+            await s.start();
+            const mgr = s.indexManager;
+            let mgrShutdownCalls = 0;
+            const realShutdown = mgr.shutdown.bind(mgr);
+            mgr.shutdown = async () => { mgrShutdownCalls++; await realShutdown(); };
+
+            await Promise.all([s.shutdown(), s.shutdown(), s.shutdown()]);
+            assert.equal(mgrShutdownCalls, 1, 'indexManager.shutdown should fire exactly once');
+            assert.equal(s.server, undefined, 'server should be cleared after shutdown');
+        } finally {
+            if (fs.existsSync(dir)) fs.rmSync(dir, { recursive: true });
+        }
+    });
+
+    it('shutdown() is a no-op when start() was never called', async () => {
+        const dir = path.join(__dirname, '..', '..', '.test-server-nostart');
+        if (fs.existsSync(dir)) fs.rmSync(dir, { recursive: true });
+        fs.mkdirSync(dir, { recursive: true });
+        try {
+            const s = new VectraServer({ port: 0, rootDir: dir });
+            await s.shutdown(); // should not throw
+            assert.equal(s.server, undefined);
+        } finally {
+            if (fs.existsSync(dir)) fs.rmSync(dir, { recursive: true });
+        }
+    });
+
+    it('start() rejects when binding an already-bound port', async () => {
+        const dirA = path.join(__dirname, '..', '..', '.test-server-bindA');
+        const dirB = path.join(__dirname, '..', '..', '.test-server-bindB');
+        for (const d of [dirA, dirB]) {
+            if (fs.existsSync(d)) fs.rmSync(d, { recursive: true });
+            fs.mkdirSync(d, { recursive: true });
+        }
+        const a = new VectraServer({ port: 0, rootDir: dirA });
+        const portA = await a.start();
+        const b = new VectraServer({ port: portA, rootDir: dirB });
+        try {
+            await assert.rejects(b.start());
+        } finally {
+            await a.shutdown();
+            await b.shutdown().catch(() => { /* may not have started */ });
+            for (const d of [dirA, dirB]) {
+                if (fs.existsSync(d)) fs.rmSync(d, { recursive: true });
+            }
+        }
+    });
 });

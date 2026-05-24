@@ -90,6 +90,29 @@ describe('ProtobufCodec', () => {
             const result = codec.deserializeCatalog(codec.serializeCatalog(catalog));
             assert.deepStrictEqual(result, catalog);
         });
+
+        it('round-trips uriToHash when present', () => {
+            const catalog: DocumentCatalog = {
+                version: 1,
+                count: 1,
+                uriToId: { 'file://doc': 'id-1' },
+                idToUri: { 'id-1': 'file://doc' },
+                uriToHash: { 'file://doc': 'a'.repeat(64) },
+            };
+            const result = codec.deserializeCatalog(codec.serializeCatalog(catalog));
+            assert.deepStrictEqual(result, catalog);
+        });
+
+        it('returns uriToHash undefined when absent (old catalog shape)', () => {
+            const catalog: DocumentCatalog = {
+                version: 1,
+                count: 1,
+                uriToId: { 'file://doc': 'id-1' },
+                idToUri: { 'id-1': 'file://doc' },
+            };
+            const result = codec.deserializeCatalog(codec.serializeCatalog(catalog));
+            assert.equal(result.uriToHash, undefined);
+        });
     });
 
     describe('serializeMetadata / deserializeMetadata', () => {

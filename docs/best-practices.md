@@ -41,6 +41,16 @@ Prefer `batchInsertItems` for item-level bulk adds — it applies all-or-nothing
 
 For document flow, use `upsertDocument` / `deleteDocument` which manage update locking automatically.
 
+### Re-upsert is cheap when content hasn't changed
+
+`upsertDocument` hashes `text + docType + metadata` and short-circuits when the URI is already stored with an identical hash — no re-chunking, no re-embedding, no rewrite. Callers that scan a corpus and upsert every file on each pass pay O(chunks) embedding cost only for files whose content actually changed.
+
+After rotating embedding models (or any case where stored vectors are stale despite content being the same), pass `{ force: true }` to bypass the check:
+
+```ts
+await docs.upsertDocument(uri, text, docType, metadata, { force: true });
+```
+
 ### Respect the update lock
 
 If you manage updates manually, call `beginUpdate` → multiple insert/delete → `endUpdate`. Calling `beginUpdate` twice throws.

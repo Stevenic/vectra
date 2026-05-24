@@ -2,7 +2,7 @@ import { strict as assert } from 'node:assert';
 import { describe, it, beforeEach, afterEach } from 'mocha';
 import sinon from 'sinon';
 import { EmbeddingsModel } from './types';
-import * as transformersModule from '@huggingface/transformers';
+import { _setTransformersLoader } from './internals/transformersLoader';
 
 describe('TransformersEmbeddings', () => {
     let TransformersEmbeddings: any;
@@ -50,16 +50,20 @@ describe('TransformersEmbeddings', () => {
         // Attach tokenizer to the mock extractor so pipeline result has .tokenizer
         (mockExtractor as any).tokenizer = callableTokenizer;
 
-        // Stub the pipeline function from @huggingface/transformers
-        pipelineStub = sandbox.stub(transformersModule, 'pipeline' as any).resolves(mockExtractor);
+        // Inject a mock module via the loader seam. We can't `sinon.stub` the
+        // real @huggingface/transformers module because its 4.x ESM exports
+        // are non-configurable.
+        pipelineStub = sandbox.stub().resolves(mockExtractor);
+        _setTransformersLoader(async () => ({ pipeline: pipelineStub } as any));
 
-        // Import TransformersEmbeddings fresh (uses the stubbed pipeline via dynamic import)
+        // Import TransformersEmbeddings (uses the injected loader).
         const mod = await import('./TransformersEmbeddings');
         TransformersEmbeddings = mod.TransformersEmbeddings;
     });
 
     afterEach(() => {
         sandbox.restore();
+        _setTransformersLoader(undefined);
     });
 
     describe('create()', () => {
