@@ -1,0 +1,1 @@
+- [Quote globs in npm scripts](feedback_quote_globs_in_npm_scripts.md) — unquoted `**` globs break on Linux /bin/sh, silently skipping files
