@@ -835,8 +835,8 @@ Used with `queryItems`, `queryDocuments`, and `listItemsByMetadata`. Operators o
 | `$gte` | Greater than or equal | `{ score: { $gte: 0.8 } }` |
 | `$lt` | Less than | `{ count: { $lt: 10 } }` |
 | `$lte` | Less than or equal | `{ count: { $lte: 10 } }` |
-| `$in` | Value in array | `{ category: { $in: ['a', 'b'] } }` |
-| `$nin` | Value not in array | `{ category: { $nin: ['x'] } }` |
+| `$in` | Value in array (exact match; array-valued metadata matches if any element is in the array) | `{ category: { $in: ['a', 'b'] } }` |
+| `$nin` | Value not in array (exact match) | `{ category: { $nin: ['x'] } }` |
 | `$and` | Logical AND | `{ $and: [{ a: { $eq: 1 } }, { b: { $gt: 2 } }] }` |
 | `$or` | Logical OR | `{ $or: [{ a: { $eq: 1 } }, { a: { $eq: 2 } }] }` |
 
