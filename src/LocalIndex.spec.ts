@@ -486,6 +486,27 @@ describe('LocalIndex', () => {
       const items = await index.listItemsByMetadata({})
       assert.deepStrictEqual(items.map(i => i.id), ['a', 'b'])
     })
+
+    it('supports numeric $in and $nin filters', async () => {
+      const index = new LocalIndex(testIndexDir)
+      await index.createIndex()
+      await index.batchInsertItems([
+        { id: 'a', vector: [1], metadata: { year: 2019 } },
+        { id: 'b', vector: [1], metadata: { year: 2020 } },
+        { id: 'c', vector: [1], metadata: { year: 2021 } },
+        { id: 'd', vector: [1], metadata: { year: 0 } }
+      ])
+
+      const included = await index.listItemsByMetadata({ year: { $in: [2019, 2020] } })
+      assert.deepStrictEqual(included.map(i => i.id), ['a', 'b'])
+      const excluded = await index.listItemsByMetadata({ year: { $nin: [2019, 2020] } })
+      assert.deepStrictEqual(excluded.map(i => i.id), ['c', 'd'])
+      const zero = await index.listItemsByMetadata({ year: { $in: [0] } })
+      assert.deepStrictEqual(zero.map(i => i.id), ['d'])
+
+      const queried = await index.queryItems([1], '', 10, { year: { $in: [2021] } })
+      assert.deepStrictEqual(queried.map(r => r.item.id), ['c'])
+    })
   })
 
   describe('metadata indexing behavior', () => {

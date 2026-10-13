@@ -19,6 +19,20 @@ Release history, breaking changes, and migration guides.
 
 ---
 
+## Unreleased
+
+### Bug fix: numeric `$in` / `$nin` filters, and `$nin` substring matching
+
+`$in` and `$nin` now test for exact membership in the filter array. Previously a numeric metadata value was only ever compared against the **string** elements of the array, and only as a substring, so:
+
+- `{ year: { $in: [2019, 2020] } }` matched nothing, and `{ year: { $nin: [2019, 2020] } }` excluded nothing, because the numbers in the array were never compared.
+- A number could match as a substring of a string element (`42` matched `$in: ['x42y']`).
+- `$nin` applied the substring test to strings too, so `{ t: { $nin: ['abc'] } }` excluded the value `'b'`.
+
+Values are now compared with strict equality (`42` matches `42`, not `'42'` or `'x42y'`). Booleans still never match `$in` or `$nin`, and array-valued metadata (e.g. `categories: ['one', 'two']`) matches `$in` when any element is in the filter array and is excluded by `$nin` when any element is.
+
+**Who is affected:** Callers who relied on numeric `$in` / `$nin` silently matching nothing / excluding nothing, or on substring matching of strings inside `$in` / `$nin`, will see different results. Filters that already used string values with exact matches behave as before.
+
 ## v0.15.0
 
 Performance, a bug fix, and a wave of dependency updates. All Vectra API surface changes are additive and non-breaking; one direct runtime dependency (`openai`) had a major version bump that callers using the SDK directly should review.

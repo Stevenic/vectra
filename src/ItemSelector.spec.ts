@@ -170,59 +170,104 @@ describe('ItemSelector', () => {
       assert.equal(ItemSelector.select(metadata, { str: { $lte: 'z' } } as any), false);
     });
 
-    it('$in behavior matches implementation (booleans false, exact match for strings, substring for strings, numbers via substring in array strings)', () => {
-      const metadataBool = { val: true };
-      const metadataStr = { val: 'foo' };
-      const metadataStr2 = { val: 'oo' };
-      const metadataNum = { val: 42 };
+    it('$in matches only exact members of the list (booleans never match)', () => {
       const arrStr = ['foo', 'bar'];
-      const arrMixedNo = ['foobar', 'baz'];
-      const arrMixedYes = ['x42y', 'baz'];
 
       // boolean always false
-      assert.equal(ItemSelector.select(metadataBool, { val: { $in: ['foo'] } } as any), false);
+      assert.equal(ItemSelector.select({ val: true }, { val: { $in: ['foo'] } } as any), false);
 
-      // string exact includes
-      assert.equal(ItemSelector.select(metadataStr, { val: { $in: arrStr } } as any), true);
+      // string exact membership
+      assert.equal(ItemSelector.select({ val: 'foo' }, { val: { $in: arrStr } } as any), true);
+      assert.equal(ItemSelector.select({ val: 'baz' }, { val: { $in: arrStr } } as any), false);
 
-      // string not included
-      assert.equal(ItemSelector.select(metadataStr2, { val: { $in: arrStr } } as any), false);
+      // strings are not matched as substrings of list elements, nor list elements as substrings of the value
+      assert.equal(ItemSelector.select({ val: 'oo' }, { val: { $in: arrStr } } as any), false);
+      assert.equal(ItemSelector.select({ val: 'fo' }, { val: { $in: ['foobar', 'baz'] } } as any), false);
+      assert.equal(ItemSelector.select({ val: 'foobar' }, { val: { $in: arrStr } } as any), false);
 
-      // number: true only if some array string includes the number as a substring
-      assert.equal(ItemSelector.select(metadataNum, { val: { $in: arrMixedNo } } as any), false);
-      assert.equal(ItemSelector.select(metadataNum, { val: { $in: arrMixedYes } } as any), true);
-
-      // array of numbers does not include string '42'
-      assert.equal(ItemSelector.select({ val: '42' }, { val: { $in: [1, 2] } } as any), false);
+      // empty list matches nothing
+      assert.equal(ItemSelector.select({ val: 'foo' }, { val: { $in: [] } } as any), false);
     });
 
-    it('$nin behavior matches implementation (booleans false, blocks exact/substring for strings, numbers only blocked by substring in array strings)', () => {
-      const metadataBool = { val: true };
-      const metadataStr = { val: 'foo' };
-      const metadataStrSub = { val: 'oo' };
-      const metadataNum = { val: 42 };
+    it('$in compares numbers by value', () => {
+      assert.equal(ItemSelector.select({ val: 42 }, { val: { $in: [41, 42, 43] } } as any), true);
+      assert.equal(ItemSelector.select({ val: 0 }, { val: { $in: [0, 1] } } as any), true);
+      assert.equal(ItemSelector.select({ val: 42.5 }, { val: { $in: [42, 43] } } as any), false);
+      assert.equal(ItemSelector.select({ val: 42 }, { val: { $in: [1, 2] } } as any), false);
+
+      // a number is not matched as a substring of a string element (previously `42` matched 'x42y')
+      assert.equal(ItemSelector.select({ val: 42 }, { val: { $in: ['x42y', 'baz'] } } as any), false);
+      assert.equal(ItemSelector.select({ val: 42 }, { val: { $in: ['foobar', 'baz'] } } as any), false);
+
+      // no type coercion between numbers and strings
+      assert.equal(ItemSelector.select({ val: 42 }, { val: { $in: ['42'] } } as any), false);
+      assert.equal(ItemSelector.select({ val: '42' }, { val: { $in: [42] } } as any), false);
+      assert.equal(ItemSelector.select({ val: '42' }, { val: { $in: [1, 2] } } as any), false);
+
+      // mixed number/string lists
+      assert.equal(ItemSelector.select({ val: 42 }, { val: { $in: ['a', 42] } } as any), true);
+      assert.equal(ItemSelector.select({ val: 'a' }, { val: { $in: ['a', 42] } } as any), true);
+    });
+
+    it('$nin excludes only exact members of the list (booleans never match)', () => {
       const arrStr = ['foo', 'bar'];
-      const arrMixedNo = ['foobar', 'baz'];
-      const arrMixedYes = ['baz', 'z42z'];
-      const arrNum = [42];
 
       // boolean always false
-      assert.equal(ItemSelector.select(metadataBool, { val: { $nin: ['foo'] } } as any), false);
+      assert.equal(ItemSelector.select({ val: true }, { val: { $nin: ['foo'] } } as any), false);
 
-      // string exact match present -> false
-      assert.equal(ItemSelector.select(metadataStr, { val: { $nin: arrStr } } as any), false);
+      // string exact membership is excluded
+      assert.equal(ItemSelector.select({ val: 'foo' }, { val: { $nin: arrStr } } as any), false);
+      assert.equal(ItemSelector.select({ val: 'baz' }, { val: { $nin: arrStr } } as any), true);
 
-      // string is a substring of an element -> false
-      assert.equal(ItemSelector.select(metadataStrSub, { val: { $nin: arrMixedNo } } as any), false);
+      // substrings no longer exclude (previously `'oo'` was excluded by `['foobar']`)
+      assert.equal(ItemSelector.select({ val: 'oo' }, { val: { $nin: ['foobar', 'baz'] } } as any), true);
+      assert.equal(ItemSelector.select({ val: 'b' }, { val: { $nin: ['abc'] } } as any), true);
 
-      // number: true if no array string includes the number as substring
-      assert.equal(ItemSelector.select(metadataNum, { val: { $nin: arrMixedNo } } as any), true);
+      // empty list excludes nothing
+      assert.equal(ItemSelector.select({ val: 'foo' }, { val: { $nin: [] } } as any), true);
+    });
 
-      // number: false if some array string includes the number as substring
-      assert.equal(ItemSelector.select(metadataNum, { val: { $nin: arrMixedYes } } as any), false);
+    it('$nin compares numbers by value', () => {
+      // previously `{ val: 42 }` with `$nin: [42]` was (incorrectly) kept
+      assert.equal(ItemSelector.select({ val: 42 }, { val: { $nin: [42] } } as any), false);
+      assert.equal(ItemSelector.select({ val: 42 }, { val: { $nin: [41, 42, 43] } } as any), false);
+      assert.equal(ItemSelector.select({ val: 0 }, { val: { $nin: [0] } } as any), false);
+      assert.equal(ItemSelector.select({ val: 42 }, { val: { $nin: [1, 2] } } as any), true);
+      assert.equal(ItemSelector.select({ val: 42 }, { val: { $nin: [] } } as any), true);
 
-      // array of numbers does not block number (implementation detail)
-      assert.equal(ItemSelector.select(metadataNum, { val: { $nin: arrNum } } as any), true);
+      // substring matches against string elements do not exclude numbers
+      assert.equal(ItemSelector.select({ val: 42 }, { val: { $nin: ['foobar', 'baz'] } } as any), true);
+      assert.equal(ItemSelector.select({ val: 42 }, { val: { $nin: ['baz', 'z42z'] } } as any), true);
+
+      // no type coercion between numbers and strings
+      assert.equal(ItemSelector.select({ val: 42 }, { val: { $nin: ['42'] } } as any), true);
+      assert.equal(ItemSelector.select({ val: '42' }, { val: { $nin: [42] } } as any), true);
+    });
+
+    it('$in and $nin match array-valued metadata when any element is in the list', () => {
+      const tags = { categories: ['one'] } as any;
+      const multi = { categories: ['one', 'three'] } as any;
+      const nums = { categories: [1, 2] } as any;
+
+      assert.equal(ItemSelector.select(tags, { categories: { $in: ['one', 'two'] } } as any), true);
+      assert.equal(ItemSelector.select(tags, { categories: { $in: ['two'] } } as any), false);
+      assert.equal(ItemSelector.select(multi, { categories: { $in: ['one', 'two'] } } as any), true);
+      assert.equal(ItemSelector.select(multi, { categories: { $in: ['two'] } } as any), false);
+      assert.equal(ItemSelector.select(nums, { categories: { $in: [2, 5] } } as any), true);
+      assert.equal(ItemSelector.select(nums, { categories: { $in: [5] } } as any), false);
+      assert.equal(ItemSelector.select({ categories: [] } as any, { categories: { $in: ['one'] } } as any), false);
+
+      assert.equal(ItemSelector.select(tags, { categories: { $nin: ['one'] } } as any), false);
+      assert.equal(ItemSelector.select(tags, { categories: { $nin: ['two'] } } as any), true);
+      assert.equal(ItemSelector.select(multi, { categories: { $nin: ['three'] } } as any), false);
+      assert.equal(ItemSelector.select(multi, { categories: { $nin: ['two'] } } as any), true);
+      assert.equal(ItemSelector.select(nums, { categories: { $nin: [2] } } as any), false);
+      assert.equal(ItemSelector.select(nums, { categories: { $nin: [5] } } as any), true);
+    });
+
+    it('$in and $nin return false when the metadata field is missing', () => {
+      assert.equal(ItemSelector.select({}, { val: { $in: [1, 'a'] } } as any), false);
+      assert.equal(ItemSelector.select({}, { val: { $nin: [1, 'a'] } } as any), false);
     });
 
     it('handles default operator fall-through (unknown operator compares equality to its value)', () => {

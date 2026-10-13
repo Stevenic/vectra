@@ -115,6 +115,20 @@ export class ItemSelector {
     return sum;
   }
 
+  /**
+   * Returns true if a metadata value is an exact member of the list.
+   * @remarks
+   * Values are compared with strict equality, so `42` matches `42` but not `'42'` or `'x42y'`.
+   * Array-valued metadata (which can exist at runtime even though `MetadataTypes` is scalar)
+   * matches when any of its elements is a member of the list.
+   * @param value Metadata value (or array of values)
+   * @param list List of numbers and/or strings to look in
+   */
+  private static isInList(value: unknown, list: (number | string)[]): boolean {
+    const values: unknown[] = Array.isArray(value) ? value : [value];
+    return values.some(v => (typeof v == 'string' || typeof v == 'number') && list.includes(v));
+  }
+
   private static metadataFilter(value: MetadataTypes, filter: MetadataFilter): boolean {
     if (value === undefined || value === null) {
       return false;
@@ -153,22 +167,12 @@ export class ItemSelector {
           }
           break;
         case '$in':
-          if (typeof value == 'boolean') {
-            return false;
-          } else if (typeof value == 'string' && !filter[key]!.includes(value)) {
-            return false;
-          } else if (!filter[key]!.some(val => typeof val == 'string' && val.includes(value as string))) {
+          if (typeof value == 'boolean' || !this.isInList(value, filter[key]!)) {
             return false;
           }
           break;
         case '$nin':
-          if (typeof value == 'boolean') {
-            return false;
-          }
-          else if (typeof value == 'string' && filter[key]!.includes(value)) {
-            return false;
-          }
-          else if (filter[key]!.some(val => typeof val == 'string' && val.includes(value as string))) {
+          if (typeof value == 'boolean' || this.isInList(value, filter[key]!)) {
             return false;
           }
           break;
