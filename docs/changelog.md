@@ -19,6 +19,14 @@ Release history, breaking changes, and migration guides.
 
 ---
 
+## Unreleased
+
+### Bug fix: zero-vector items corrupting `queryItems` results
+
+`LocalIndex.queryItems` selects the top K results with a bounded min-heap. A stored item whose vector is all zeros has a cosine similarity of `NaN` (this is deliberate and unchanged), and because every comparison with `NaN` is false, a `NaN` entry that reached the heap root could never be replaced and the final sort used an inconsistent comparator. Depending on insertion order, a zero-vector item could push real matches out of the results (e.g. `topK: 2` returning `[zero-vector, best match]` and dropping the second best match) or leave the best match out of first place.
+
+Items with a `NaN` similarity are now ranked below every real match, so the top K is always chosen from the real scores and zero-vector items are only returned (with their `NaN` score, as before) when fewer than K items have a real score.
+
 ## v0.15.0
 
 Performance, a bug fix, and a wave of dependency updates. All Vectra API surface changes are additive and non-breaking; one direct runtime dependency (`openai`) had a major version bump that callers using the SDK directly should review.

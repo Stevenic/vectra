@@ -354,12 +354,16 @@ export class LocalIndex<TMetadata extends Record<string, MetadataTypes> = Record
     // For N items this is O(N log K) vs the previous O(N log N) full sort.
     const norm = ItemSelector.normalize(vector);
     const k = Math.min(topK, items.length);
-    const heap: { index: number; distance: number }[] = [];
+    // `distance` is the cosine similarity reported as the result's score (NaN for a zero-norm
+    // vector). `rank` is what the heap and sort compare: it is the same value except that NaN
+    // becomes -Infinity, because every comparison with NaN is false and a NaN at the heap root
+    // could never be replaced. Zero-norm items therefore rank below every real match.
+    const heap: { index: number; distance: number; rank: number }[] = [];
     const siftUp = (start: number) => {
       let i = start;
       while (i > 0) {
         const parent = (i - 1) >> 1;
-        if (heap[parent].distance > heap[i].distance) {
+        if (heap[parent].rank > heap[i].rank) {
           const tmp = heap[parent]; heap[parent] = heap[i]; heap[i] = tmp;
           i = parent;
         } else break;
@@ -372,8 +376,8 @@ export class LocalIndex<TMetadata extends Record<string, MetadataTypes> = Record
         const l = (i << 1) + 1;
         const r = l + 1;
         let smallest = i;
-        if (l < n && heap[l].distance < heap[smallest].distance) smallest = l;
-        if (r < n && heap[r].distance < heap[smallest].distance) smallest = r;
+        if (l < n && heap[l].rank < heap[smallest].rank) smallest = l;
+        if (r < n && heap[r].rank < heap[smallest].rank) smallest = r;
         if (smallest === i) break;
         const tmp = heap[i]; heap[i] = heap[smallest]; heap[smallest] = tmp;
         i = smallest;
@@ -381,15 +385,17 @@ export class LocalIndex<TMetadata extends Record<string, MetadataTypes> = Record
     };
     for (let i = 0; i < items.length; i++) {
       const distance = ItemSelector.normalizedCosineSimilarity(vector, norm, items[i].vector, items[i].norm);
+      const rank = Number.isNaN(distance) ? -Infinity : distance;
       if (heap.length < k) {
-        heap.push({ index: i, distance });
+        heap.push({ index: i, distance, rank });
         siftUp(heap.length - 1);
-      } else if (k > 0 && distance > heap[0].distance) {
-        heap[0] = { index: i, distance };
+      } else if (k > 0 && rank > heap[0].rank) {
+        heap[0] = { index: i, distance, rank };
         siftDown();
       }
     }
-    heap.sort((a, b) => b.distance - a.distance);
+    // Compare explicitly: `b.rank - a.rank` is NaN when both ranks are -Infinity.
+    heap.sort((a, b) => (a.rank === b.rank ? 0 : b.rank > a.rank ? 1 : -1));
 
     // Find top k
     const top: QueryResult<TItemMetadata>[] = heap.map(d => {

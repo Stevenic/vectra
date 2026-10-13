@@ -535,6 +535,68 @@ describe('LocalIndex', () => {
   })
 
   describe('queryItems', () => {
+    describe('zero-norm vectors', () => {
+      // Cosine similarity to the query [1, 0, 0] is: a = 1, b ~ 0.9939, c = 0, z = NaN (zero vector)
+      const vectors: Record<string, number[]> = { z: [0, 0, 0], a: [1, 0, 0], b: [0.9, 0.1, 0], c: [0, 1, 0] }
+      const ranked = ['a', 'b', 'c', 'z']
+
+      function permutations(ids: string[]): string[][] {
+        if (ids.length <= 1) return [ids]
+        return ids.flatMap((id, i) => permutations([...ids.slice(0, i), ...ids.slice(i + 1)]).map(rest => [id, ...rest]))
+      }
+
+      it('returns the best matches in order for every insertion order and topK, ranking the zero vector last', async () => {
+        for (const order of permutations(['z', 'a', 'b', 'c'])) {
+          await fs.rm(testIndexDir, { recursive: true, force: true })
+          const index = new LocalIndex(testIndexDir)
+          await index.createIndex()
+          for (const id of order) {
+            await index.insertItem({ id, vector: vectors[id] })
+          }
+
+          for (let topK = 1; topK <= 5; topK++) {
+            const results = await index.queryItems([1, 0, 0], '', topK)
+            assert.deepStrictEqual(
+              results.map(r => r.item.id),
+              ranked.slice(0, topK),
+              `insertion order ${order.join('')}, topK=${topK}`
+            )
+          }
+        }
+      })
+
+      it('keeps the NaN score for the zero vector when it is returned', async () => {
+        const index = new LocalIndex(testIndexDir)
+        await index.createIndex()
+        await index.batchInsertItems([
+          { id: 'z', vector: vectors.z },
+          { id: 'a', vector: vectors.a },
+          { id: 'b', vector: vectors.b }
+        ])
+
+        const results = await index.queryItems([1, 0, 0], '', 3)
+        assert.deepStrictEqual(results.map(r => r.item.id), ['a', 'b', 'z'])
+        assert.equal(results[0].score, 1)
+        assert.ok(results[1].score > 0.99 && results[1].score < 1)
+        assert.ok(Number.isNaN(results[2].score))
+      })
+
+      it('selects the true top K when many zero vectors are mixed in', async () => {
+        const index = new LocalIndex(testIndexDir)
+        await index.createIndex()
+        const items: { id: string; vector: number[] }[] = []
+        for (let i = 0; i < 20; i++) {
+          // even ids are zero vectors, odd ids get progressively worse matches for the query [1, 0]
+          items.push({ id: `item${i}`, vector: i % 2 === 0 ? [0, 0] : [1, i] })
+        }
+        await index.batchInsertItems(items)
+
+        const results = await index.queryItems([1, 0], '', 5)
+        assert.deepStrictEqual(results.map(r => r.item.id), ['item1', 'item3', 'item5', 'item7', 'item9'])
+        assert.ok(results.every(r => !Number.isNaN(r.score)))
+      })
+    })
+
     it('upsertItem uses the in-progress update path when _update is present', async () => {
       const index = new LocalIndex(testIndexDir)
       await index.createIndex()
