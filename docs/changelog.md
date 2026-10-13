@@ -19,6 +19,14 @@ Release history, breaking changes, and migration guides.
 
 ---
 
+## Unreleased
+
+### Bug fix: hybrid (`isBm25`) queries throwing on small result sets
+
+`LocalIndex.queryItems` (and `LocalDocumentIndex.queryDocuments`, which forwards `isBm25`) only adds the chunks that were **not** already selected by the semantic search to the BM25 engine. The underlying `wink-bm25-text-search` engine throws `document collection is too small for consolidation; add more docs!` when it is asked to consolidate fewer than 3 documents, and only the per-document `addDoc` step was guarded, so any query where fewer than 3 chunks lay outside the semantic top K (`items.length - topK < 3`, including `topK >= items.length` and tiny or empty indexes) threw.
+
+BM25 consolidation and search are now guarded as well: when the engine can't run, the query returns the semantic results unchanged instead of throwing.
+
 ## v0.15.0
 
 Performance, a bug fix, and a wave of dependency updates. All Vectra API surface changes are additive and non-breaking; one direct runtime dependency (`openai`) had a major version bump that callers using the SDK directly should review.
