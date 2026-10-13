@@ -436,9 +436,17 @@ export class LocalIndex<TMetadata extends Record<string, MetadataTypes> = Record
         }
       }
 
-      this._bm25Engine.consolidate?.();
-
-      const results: any[] = await this.bm25Search(query, items, topK);
+      // The BM25 engine refuses to consolidate (and so to search) a collection of fewer than 3
+      // documents, which is what is left over when the semantic results already cover most of
+      // the index (or the index is tiny). That's not an error for the caller: there is simply
+      // nothing to append, so fall back to the semantic results.
+      let results: any[] = [];
+      try {
+        this._bm25Engine.consolidate?.();
+        results = await this.bm25Search(query, items, topK);
+      } catch {
+        // Ignore BM25 consolidation/search errors and return the semantic results only
+      }
 
       results.forEach((res: any) => {
         // Support both [index, score] tuples and { item, score } objects

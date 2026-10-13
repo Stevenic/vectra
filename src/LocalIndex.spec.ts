@@ -886,6 +886,74 @@ describe('LocalIndex', () => {
       assert.ok(res.length >= 1)
       assert.ok(res.every(r => !(r.item.metadata as any)?.isBm25))
     })
+
+    describe('BM25 with the real engine and few items outside the semantic top K', () => {
+      // The real engine can't consolidate fewer than 3 documents, which is what is left when
+      // items.length - topK < 3.
+      const docReader = async (docId: string) => `document ${docId} is about cats and dogs and other animals`
+
+      async function createIndex(count: number): Promise<LocalIndex> {
+        const index = new LocalIndex(testIndexDir, undefined, undefined, undefined, { docReader })
+        await index.createIndex()
+        for (let i = 0; i < count; i++) {
+          await index.insertItem({ id: `i${i}`, vector: [1, i, 0], metadata: { documentId: `d${i}`, startPos: 0, endPos: 60 } })
+        }
+        return index
+      }
+
+      it('appends BM25 results when 3 or more items remain outside the top K', async () => {
+        const index = await createIndex(5)
+        const res = await index.queryItems([1, 0, 0], 'cats dogs', 2, undefined, true)
+        assert.deepStrictEqual(res.slice(0, 2).map(r => r.item.id), ['i0', 'i1'])
+        assert.ok(res.length > 2)
+        assert.ok(res.slice(2).every(r => (r.item.metadata as any)?.isBm25 === true))
+      })
+
+      it('returns the semantic results instead of throwing when fewer than 3 items remain', async () => {
+        const index = await createIndex(5)
+        for (const topK of [3, 4, 5, 10]) {
+          const res = await index.queryItems([1, 0, 0], 'cats dogs', topK, undefined, true)
+          assert.deepStrictEqual(
+            res.map(r => r.item.id),
+            ['i0', 'i1', 'i2', 'i3', 'i4'].slice(0, topK),
+            `topK=${topK}`
+          )
+          assert.ok(res.every(r => !(r.item.metadata as any)?.isBm25))
+        }
+      })
+
+      it('does not throw for tiny or empty indexes', async () => {
+        for (const count of [0, 1, 2]) {
+          await fs.rm(testIndexDir, { recursive: true, force: true })
+          const index = await createIndex(count)
+          const res = await index.queryItems([1, 0, 0], 'cats', 5, undefined, true)
+          assert.deepStrictEqual(res.map(r => r.item.id), ['i0', 'i1'].slice(0, count), `${count} items`)
+        }
+      })
+
+      it('returns the semantic results when the BM25 engine throws while consolidating or searching', async () => {
+        for (const failing of ['consolidate', 'search']) {
+          const fakeEngine: Record<string, unknown> = {
+            defineConfig: sinon.stub(),
+            definePrepTasks: sinon.stub(),
+            addDoc: sinon.stub(),
+            consolidate: sinon.stub(),
+            search: sinon.stub().returns([])
+          }
+          fakeEngine[failing] = sinon.stub().throws(new Error(`${failing} failed`))
+          await fs.rm(testIndexDir, { recursive: true, force: true })
+          const index = new LocalIndex(testIndexDir, undefined, undefined, undefined, { bm25Factory: () => fakeEngine, docReader })
+          await index.createIndex()
+          await index.batchInsertItems([
+            { id: 'a', vector: [1, 0], metadata: { documentId: 'd1', startPos: 0, endPos: 5 } },
+            { id: 'b', vector: [0, 1], metadata: { documentId: 'd2', startPos: 0, endPos: 5 } }
+          ])
+
+          const res = await index.queryItems([1, 0], 'kw', 1, undefined, true)
+          assert.deepStrictEqual(res.map(r => r.item.id), ['a'], failing)
+        }
+      })
+    })
   })
 
   describe('VirtualFileStorage (in-memory)', () => {
